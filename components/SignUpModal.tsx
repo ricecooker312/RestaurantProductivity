@@ -117,6 +117,8 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
         const isValidEmail = emailRegex.test(email)
         if (!isValidEmail) {
             setInvalidEmail(true)
+        } else {
+            setInvalidEmail(false)
         }
     }
   }, [errors, email])
