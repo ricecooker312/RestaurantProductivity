@@ -49,12 +49,14 @@ const closeModal = (
     setSignupModal: (value: boolean) => void,
     setPassword: Dispatch<SetStateAction<string | null>>, 
     setConfirmPassword: Dispatch<SetStateAction<string | null>>,
-    setErrors: Dispatch<SetStateAction<string[]>>
+    setErrors: Dispatch<SetStateAction<string[]>>,
+    setInvalidEmail: Dispatch<SetStateAction<boolean>>
 ) => {
     setSignupModal(false)
     setPassword("")
     setConfirmPassword("")
     setErrors([])
+    setInvalidEmail(false)
 }
 
 const signInUser = (
@@ -77,6 +79,7 @@ const signInUser = (
             ? errorArray
             : errorArray.push('Email cannot be empty')
     }
+
     if (!password) {
         errorArray?.includes('Password cannot be empty')
             ? errorArray
@@ -99,6 +102,7 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
   const [errors, setErrors] = useState<string[]>([])
   const [usernameError, setUsernameError] = useState<boolean>(false)
   const [emailError, setEmailError] = useState<boolean>(false)
+  const [invalidEmail, setInvalidEmail] = useState<boolean>(false)
   const [passwordError, setPasswordError] = useState<boolean>(false)
   const [confirmPasswordError, setConfirmPasswordError] = useState<boolean>(false)
 
@@ -107,15 +111,23 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
     setEmailError(errors.includes('Email cannot be empty'))
     setPasswordError(errors.includes('Password cannot be empty'))
     setConfirmPasswordError(errors.includes('Password and confirm password do not match'))
-  }, [errors])
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (email) {
+        const isValidEmail = emailRegex.test(email)
+        if (!isValidEmail) {
+            setInvalidEmail(true)
+        }
+    }
+  }, [errors, email])
 
   return (
     <SafeAreaProvider>
       <Modal
         isVisible={signupModal}
-        onBackdropPress={() => closeModal(setSignupModal, setPassword, setConfirmPassword, setErrors)}
+        onBackdropPress={() => closeModal(setSignupModal, setPassword, setConfirmPassword, setErrors, setInvalidEmail)}
         swipeDirection="down"
-        onSwipeComplete={() => closeModal(setSignupModal, setPassword, setConfirmPassword, setErrors)}
+        onSwipeComplete={() => closeModal(setSignupModal, setPassword, setConfirmPassword, setErrors, setInvalidEmail)}
         backdropOpacity={0.45}
         hideModalContentWhileAnimating
         useNativeDriver
@@ -157,9 +169,11 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
                     />
                 </View>
                 <View className="w-[85%] relative mt-6">
-                    {emailError && (
+                    {emailError ? (
                         <Text className="absolute top-0 border-black border-solid left-[12px] color-error">Email cannot be empty</Text>
-                    )}
+                    ) : (invalidEmail && (
+                        <Text className="absolute top-0 border-black border-solid left-[12px] color-error">Invalid email</Text>
+                    ))}
                     <FormInput 
                     placeholder='Email' 
                     value={email}
@@ -173,7 +187,7 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
                         text-xl 
                         border-[3px] 
                         border-solid
-                        ${emailError ? (
+                        ${emailError || invalidEmail ? (
                             'border-error'
                         ) : 'border-primary'}
                         mt-[1.8rem]`}
