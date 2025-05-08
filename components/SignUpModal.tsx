@@ -1,23 +1,34 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { router } from "expo-router"
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import Modal from 'react-native-modal'
-import { 
-    TouchableWithoutFeedback,
-    View,
-    KeyboardAvoidingView,
-    Platform,
+import {
+    InputModeOptions,
     Keyboard,
+    KeyboardAvoidingView,
+    KeyboardTypeOptions,
+    Platform,
     ScrollView,
     Text,
-    TouchableOpacity,
     TextInput,
-    KeyboardTypeOptions,
-    InputModeOptions
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View
 } from "react-native"
+import Modal from 'react-native-modal'
+import { SafeAreaProvider } from "react-native-safe-area-context"
+
+import { app } from "@/firebase/firebaseApp"
+import { auth } from "@/firebase/firebaseApp"
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { addDoc, collection, getFirestore } from "firebase/firestore"
+
+const db = getFirestore(app)
 
 interface SignupModalProps {
   signupModal: boolean,
-  setSignupModal: (value: boolean) => void
+  setSignupModal: (value: boolean) => void,
+  signedIn: boolean,
+  setSignedIn: Dispatch<SetStateAction<boolean>>
 }
 
 interface FormInputProps {
@@ -47,7 +58,7 @@ export const FormInput = ({ placeholder, keyboardType, inputMode, className, val
 
 const closeModal = (
     setSignupModal: (value: boolean) => void,
-    setPassword: Dispatch<SetStateAction<string | null>>, 
+    setPassword: Dispatch<SetStateAction<string>>, 
     setConfirmPassword: Dispatch<SetStateAction<string | null>>,
     setErrors: Dispatch<SetStateAction<string[]>>,
     setInvalidEmail: Dispatch<SetStateAction<boolean>>
@@ -59,13 +70,14 @@ const closeModal = (
     setInvalidEmail(false)
 }
 
-const signInUser = (
+const signInUser = async (
     username: string | null, 
-    email: string | null, 
-    password: string | null, 
-    confirmPassword: string | null, 
-    errors: string[],
-    setErrors: Dispatch<SetStateAction<string[]>>
+    email: string, 
+    password: string, 
+    confirmPassword: string | null,
+    setErrors: Dispatch<SetStateAction<string[]>>,
+    setSignedIn: Dispatch<SetStateAction<boolean>>,
+    setInvalidEmail: Dispatch<SetStateAction<boolean>>
 ) => {
     const errorArray: string[] = []
 
@@ -80,6 +92,16 @@ const signInUser = (
             : errorArray.push('Email cannot be empty')
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (email) {
+        const isValidEmail = emailRegex.test(email)
+        if (!isValidEmail) {
+            setInvalidEmail(true)
+        } else {
+            setInvalidEmail(false)
+        }
+    }
+
     if (!password) {
         errorArray?.includes('Password cannot be empty')
             ? errorArray
@@ -92,12 +114,28 @@ const signInUser = (
     }
 
     setErrors(errorArray)
+
+    if (errorArray?.length === 0) {
+        setSignedIn(true)
+
+        try {
+            // const docRef = await addDoc(collection(db, "users"), {
+            //     email: email,
+            //     username: username
+            // })
+
+            // const newUser = await createUserWithEmailAndPassword(auth, email, password)
+            // const user = newUser.user
+        } catch (err) {
+            console.log(`Firebase error: ${err}`)
+        }
+    }
 }
 
-const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
+const SignUpModal = ({ signupModal, setSignupModal, signedIn, setSignedIn }: SignupModalProps) => {
   const [username, setUsername] = useState<string | null>(null)
-  const [email, setEmail] = useState<string | null>(null)
-  const [password, setPassword] = useState<string | null>(null)
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
   const [confirmPassword, setConfirmPassword] = useState<string | null>(null)
   const [errors, setErrors] = useState<string[]>([])
   const [usernameError, setUsernameError] = useState<boolean>(false)
@@ -112,35 +150,31 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
     setPasswordError(errors.includes('Password cannot be empty'))
     setConfirmPasswordError(errors.includes('Password and confirm password do not match'))
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (email) {
-        const isValidEmail = emailRegex.test(email)
-        if (!isValidEmail) {
-            setInvalidEmail(true)
-        } else {
-            setInvalidEmail(false)
-        }
+    const signInLocalStorage = async () => {
+        const signIn = await AsyncStorage.setItem('loggedIn', 'true')
     }
-  }, [errors, email])
+
+    if (signedIn) {
+        signInLocalStorage()
+        router.replace('/')
+    }
+  }, [errors, email, signedIn])
 
   return (
     <SafeAreaProvider>
       <Modal
         isVisible={signupModal}
-        onBackdropPress={() => closeModal(setSignupModal, setPassword, setConfirmPassword, setErrors, setInvalidEmail)}
         swipeDirection="down"
         onSwipeComplete={() => closeModal(setSignupModal, setPassword, setConfirmPassword, setErrors, setInvalidEmail)}
         backdropOpacity={0.45}
-        hideModalContentWhileAnimating
         useNativeDriver
-        useNativeDriverForBackdrop
         style={{ margin: 0 }}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View className="flex-1 justify-end">
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30, backgroundColor: '#f2f2f2' }}
+              className="bg-light-100 rounded-t-[2.78rem]"
             >
               <ScrollView
                 contentContainerStyle={{ alignItems: 'center', paddingBottom: 40 }}
@@ -244,7 +278,7 @@ const SignUpModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
                     />
                 </View>
                 <TouchableOpacity 
-                  onPress={() => signInUser(username, email, password, confirmPassword, errors, setErrors)}
+                  onPress={() => signInUser(username, email, password, confirmPassword, setErrors, setSignedIn, setInvalidEmail)}
                   className='
                   mt-12 
                   bg-primary 

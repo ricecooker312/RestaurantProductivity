@@ -3,19 +3,30 @@ import {
   View, 
   Image, 
   TouchableOpacity, 
-  TextInput, 
   Keyboard,
-  KeyboardTypeOptions, 
-  InputModeOptions, 
   TouchableWithoutFeedback
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { images } from '@/constants/images'
 import SignUpModal from '@/components/SignUpModal';
+import LoginModal from '@/components/LoginModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const onboarding = () => {
+export default function OnBoarding () {
   const [signupModal, setSignupModal] = useState<boolean>(false)
+  const [loginModal, setLoginModal] = useState<boolean>(true)
+  const [signedIn, setSignedIn] = useState<boolean>(false)
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const loggedIn = await AsyncStorage.getItem('loggedIn')
+
+      
+    }
+
+    checkLoggedIn()
+  }, [])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -33,6 +44,7 @@ const onboarding = () => {
         <TouchableOpacity 
           activeOpacity={0.38} 
           className='w-3/5 h-42 mt-4 items-center justify-center mb-24' 
+          onPress={() => setLoginModal(true)}
         >
           <Text 
             className='color-black 
@@ -45,10 +57,9 @@ const onboarding = () => {
                       text-xl'
             >Login</Text> 
         </TouchableOpacity>
-        <SignUpModal signupModal={signupModal} setSignupModal={setSignupModal} />
+        <SignUpModal signupModal={signupModal} setSignupModal={setSignupModal} signedIn={signedIn} setSignedIn={setSignedIn} />
+        <LoginModal loginModal={loginModal} setLoginModal={setLoginModal} />
       </View>
     </TouchableWithoutFeedback>
   )
 }
-
-export default onboarding

@@ -15,7 +15,7 @@ export default function RootLayout() {
       if (!hasLaunched) {
         await AsyncStorage.setItem('hasLaunched', 'true');
         console.log("routing to /onboarding")
-        router.replace('/onboarding');
+        router.replace('/OnBoarding');
       } else {
         setLoading(false);
       }
