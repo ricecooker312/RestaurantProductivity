@@ -8,6 +8,7 @@ module.exports = {
       colors: {
         dfbg: '#B1A2FF',
         primary: '#5060EE',
+        primaryLight: '#9EA8FF',
         error: '#EE5052',
         light: {
           100: '#ECECEC',

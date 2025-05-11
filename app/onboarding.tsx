@@ -1,65 +1,50 @@
-import { 
-  Text, 
-  View, 
-  Image, 
-  TouchableOpacity, 
-  Keyboard,
-  TouchableWithoutFeedback
-} from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { router } from 'expo-router'
+import {
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    Keyboard
+} from "react-native"
+import React, { useEffect, useState } from "react"
+import { router } from "expo-router"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
+import SignupModal from "@/components/SignupModal"
+
 import { images } from '@/constants/images'
-import SignUpModal from '@/components/SignUpModal';
-import LoginModal from '@/components/LoginModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function OnBoarding () {
-  const [signupModal, setSignupModal] = useState<boolean>(false)
-  const [loginModal, setLoginModal] = useState<boolean>(true)
-  const [signedIn, setSignedIn] = useState<boolean>(false)
+export default function onboarding() {
+    const [signUpModal, setSignUpModal] = useState(false)
+    const [logInModal, setLogInModal] = useState(false)
+    const [signedIn, setSignedIn] = useState(false)
+    const [signupModal, setSignupModal] = useState(false)
 
-  useEffect(() => {
-    const checkLoggedIn = async () => {
-      const loggedIn = await AsyncStorage.getItem('loggedIn')
+    useEffect(() => {
+        
+    }, [])
 
-      
-    }
-
-    checkLoggedIn()
-  }, [])
-
-  return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View className='flex-1 items-center justify-start bg-dfbg gap-1'>
-        <Image source={images.logo} className='w-40 h-32 mt-48 p-4' />
-        <Text className='font-bold text-5xl text-center p-4 color-dark-primary'>Welcome to Restaurant Productivity!</Text>
-        <Text className='p-4 text-xl text-center'>Ready for a complete change in your productivity?</Text>
-        <TouchableOpacity 
-          activeOpacity={0.38} 
-          className='w-3/5 h-42 mt-24 items-center justify-center' 
-          onPress={() => setSignupModal(true)}
-        >
-          <Text className='color-white rounded-xl p-5 w-full text-center bg-primary text-xl'>Get Started</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          activeOpacity={0.38} 
-          className='w-3/5 h-42 mt-4 items-center justify-center mb-24' 
-          onPress={() => setLoginModal(true)}
-        >
-          <Text 
-            className='color-black 
-                      rounded-xl 
-                      bg-light-100 
-                      p-5 
-                      w-full 
-                      text-center 
-                      corner-rounded 
-                      text-xl'
-            >Login</Text> 
-        </TouchableOpacity>
-        <SignUpModal signupModal={signupModal} setSignupModal={setSignupModal} signedIn={signedIn} setSignedIn={setSignedIn} />
-        <LoginModal loginModal={loginModal} setLoginModal={setLoginModal} />
-      </View>
-    </TouchableWithoutFeedback>
-  )
+    return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View className="bg-dfbg flex-1 justify-start items-center gap-1">
+                <Image source={images.logo} className="w-40 h-32 mt-48 p-4" />
+                <Text className="font-bold text-5xl text-center p-4 color-dark-heading">Welcome to Restaurant Productivity!</Text>
+                <Text className="p-4 text-xl text-center">Ready for a complete change in your productivity?</Text>
+                <TouchableOpacity
+                    activeOpacity={0.38}
+                    onPress={() => setSignUpModal(true)}
+                    className="w-3/5 mt-24 p-5 bg-primary items-center rounded-xl"
+                >
+                    <Text className="color-white text-xl">Get Started</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    activeOpacity={0.38}
+                    className="w-3/5 mt-4 p-5 bg-light-100 items-center rounded-xl"
+                >
+                    <Text className="text-xl">Login</Text>
+                </TouchableOpacity>
+                <SignupModal signupModal={signUpModal} setSignupModal={setSignUpModal} />
+            </View>
+        </TouchableWithoutFeedback>
+    )
 }
