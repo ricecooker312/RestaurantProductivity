@@ -7,8 +7,6 @@ import {
     Keyboard
 } from "react-native"
 import React, { useEffect, useState } from "react"
-import { router } from "expo-router"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import SignupModal from "@/components/SignupModal"
 
