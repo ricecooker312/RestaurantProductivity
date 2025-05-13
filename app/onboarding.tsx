@@ -8,8 +8,7 @@ import {
 } from "react-native"
 import React, { useEffect, useState } from "react"
 
-import SignupModal from "@/components/SignupModal"
-
+import SignupModal from "@/components/SignUpModal"
 import { images } from '@/constants/images'
 
 export default function onboarding() {

@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect } from 'react'
 import { Link, router } from 'expo-router'
 
+export const ipAddress = process.env.IP_ADDRESS
+
 const index = () => {
   useEffect(() => {
     router.replace('/onboarding')

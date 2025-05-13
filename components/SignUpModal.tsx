@@ -84,7 +84,24 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
         }
 
         if (!errors) {
-            
+            console.log('signing up...')
+
+            const signupPayload = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+
+            const res = await fetch(`http://192.168.1.204:3000/api/users/register`, signupPayload)
+
+            const data = await res.json()
+            console.log(data)
         }
     }
 
