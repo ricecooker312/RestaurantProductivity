@@ -12,6 +12,8 @@ import { AdvancedCheckbox } from 'react-native-advanced-checkbox'
 import FormInput from './FormInput'
 import TermsAndConditions from './TermsAndConditions'
 import PrivacyPolicy from './PrivacyPolicy'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router } from 'expo-router'
 
 const closeModal = (
     setSignupModal: (value: boolean) => void
@@ -33,6 +35,7 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
     const [privPolModal, setPrivPolModal] = useState(false)
     const [emptyEmail, setEmptyEmail] = useState(false)
     const [invalidEmail, setInvalidEmail] = useState(false)
+    const [emailExists, setEmailExists] = useState(false)
     const [emptyPassword, setEmptyPassword] = useState(false)
     const [passwordNotMatch, setPasswordNotMatch] = useState(false)
 
@@ -84,8 +87,6 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
         }
 
         if (!errors) {
-            console.log('signing up...')
-
             const signupPayload = {
                 method: 'POST',
                 headers: {
@@ -99,9 +100,15 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
             }
 
             const res = await fetch(`http://192.168.1.204:3000/api/users/register`, signupPayload)
-
             const data = await res.json()
-            console.log(data)
+
+            if (data.emailError) {
+                setEmailExists(true)
+            } else {
+                const accessToken = data.accessToken
+                AsyncStorage.setItem('accessToken', accessToken)
+                router.navigate('/')
+            }
         }
     }
 
@@ -115,23 +122,25 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
             useNativeDriver
             hideModalContentWhileAnimating
             useNativeDriverForBackdrop
-            style={{ margin: 0, marginBottom: 0 }}
+            style={{ margin: 0 }}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View className='bg-white w-full mt-[10vh] rounded-3xl flex-1 items-center relative'>
+                <View className='bg-white w-full mt-[15vh] rounded-3xl flex-1 items-center relative'>
                     <Text className='color-dark-heading text-5xl font-bold text-center absolute top-0 mt-16'>Sign Up</Text>
                     <View className='absolute top-0 mt-32 w-screen h-screen items-center'>
                             {emptyEmail ? (
                                 <Text className='absolute top-[1.8rem] left-[2.75rem] color-error'>Email cannot be empty</Text>
-                            ) : invalidEmail && (
+                            ) : invalidEmail ? (
                                 <Text className='absolute top-[1.8rem] left-[2.75rem] color-error'>Invalid email</Text>
+                            ) : emailExists && (
+                                <Text className='absolute top-[1.8rem] left-[2.75rem] color-error'>That email already exists</Text>
                             )}
                             <FormInput 
                                 placeholder='Email' 
                                 value={email} 
                                 onChangeText={(text) => setEmail(text)} 
                                 className={`
-                                    ${emptyEmail || invalidEmail ? (
+                                    ${emptyEmail || invalidEmail || emailExists ? (
                                         'border-error'
                                     ) : 'border-primary'}
                                 `}

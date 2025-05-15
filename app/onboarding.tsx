@@ -10,6 +10,9 @@ import React, { useEffect, useState } from "react"
 
 import SignupModal from "@/components/SignUpModal"
 import { images } from '@/constants/images'
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { router } from "expo-router"
+import LoginModal from "@/components/LoginModal"
 
 export default function onboarding() {
     const [signUpModal, setSignUpModal] = useState(false)
@@ -18,7 +21,13 @@ export default function onboarding() {
     const [signupModal, setSignupModal] = useState(false)
 
     useEffect(() => {
-        
+        const isAuthenticated = async () => {
+            if (await AsyncStorage.getItem('accessToken')) {
+                router.navigate('/')
+            }
+        }
+
+        // isAuthenticated()
     }, [])
 
     return (
@@ -37,10 +46,12 @@ export default function onboarding() {
                 <TouchableOpacity
                     activeOpacity={0.38}
                     className="w-3/5 mt-4 p-5 bg-light-100 items-center rounded-xl"
+                    onPress={() => setLogInModal(true)}
                 >
                     <Text className="text-xl">Login</Text>
                 </TouchableOpacity>
                 <SignupModal signupModal={signUpModal} setSignupModal={setSignUpModal} />
+                <LoginModal loginModal={logInModal} setLoginModal={setLogInModal} />
             </View>
         </TouchableWithoutFeedback>
     )
