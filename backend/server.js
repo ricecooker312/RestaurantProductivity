@@ -11,6 +11,8 @@ const path = require('path')
 const dotenv = require('dotenv')
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
+const bcrypt = require('bcrypt')
+
 const mongoClient = require('./dbconn')
 
 const database = mongoClient.db('restaurantpd')
@@ -31,7 +33,10 @@ app.post('/api/users/register', async (req, res) => {
     const emailCheck = await users.find({ email: 'email' }).toArray()
 
     if (emailCheck.length === 0) {
-        const doc = { email: email, password: password }
+        const salt = await bcrypt.genSalt()
+        const hashedPassword = await bcrypt.hash(password, salt)
+
+        const doc = { email: email, password: hashedPassword }
         const result = await users.insertOne(doc)
 
         const user = { id: result.insertedId, email: email }
@@ -40,6 +45,26 @@ app.post('/api/users/register', async (req, res) => {
         res.send({ accessToken: accessToken })
     } else {
         res.send({ emailError: 'That email already exists' })
+    }
+})
+
+app.post('/api/users/login', async (req, res) => {
+    const { email, password } = req.body
+
+    const usersFind = await users.find({ email: email }).toArray()
+    if (usersFind.length > 1) res.send({ error: 'An error occurred' })
+    else if (usersFind.length < 1) res.send({ error: 'Email or password is incorrect' })
+    else if (usersFind.length === 1) {
+        const compare = bcrypt.compare(password, usersFind[0].password)
+
+        if (compare) {
+            const foundUser = usersFind[0]
+            const accessToken = jwt.sign({ id: foundUser._id, username: foundUser.username })
+            
+            res.send({ accessToken: accessToken })
+        } else {
+            res.send({ error: 'Email or password is incorrect' })
+        }
     }
 })
 
