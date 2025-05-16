@@ -16,7 +16,8 @@ module.exports = {
         },
         dark: {
           heading: '#292626'
-        }
+        },
+        link: '#705DFF'
       }
     },
   },

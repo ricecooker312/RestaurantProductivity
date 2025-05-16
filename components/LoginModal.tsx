@@ -21,16 +21,9 @@ const LoginModal = ({ loginModal, setLoginModal }: LoginModal) => {
     const [invalidDetails, setInvalidDetails] = useState(false)
 
     useEffect(() => {
-        const isAuthenticated = async () => {
-            if (!await AsyncStorage.getItem('accessToken')) {
-                router.navigate('/')
-            }
-        }
+        setError(false)
+        setErrorMessage('')
 
-        // isAuthenticated()
-    }, [])
-
-    useEffect(() => {
         if (!email)
             setEmptyEmail(true)
         else {
@@ -45,6 +38,9 @@ const LoginModal = ({ loginModal, setLoginModal }: LoginModal) => {
     }, [email])
 
     useEffect(() => {
+        setError(false)
+        setErrorMessage('')
+
         if (!password)
             setEmptyPassword(true)
         else
@@ -52,6 +48,8 @@ const LoginModal = ({ loginModal, setLoginModal }: LoginModal) => {
     }, [password])
     
     useEffect(() => {
+        setError(false)
+        setErrorMessage('')
         setEmptyEmail(false)
         setEmptyPassword(false)
         setInvalidEmail(false)
@@ -91,7 +89,8 @@ const LoginModal = ({ loginModal, setLoginModal }: LoginModal) => {
                 setError(true)
                 setErrorMessage(data.error)
             } else if (data.accessToken) {
-                console.log(data.accessToken)
+                AsyncStorage.setItem('accessToken', data.accessToken)
+                router.navigate('/')
             }
         }
     }
