@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       colors: {
         dfbg: '#B1A2FF',
+        footerbg: '#8C79EA',
         primary: '#5060EE',
         primaryLight: '#9EA8FF',
         error: '#EE5052',
@@ -15,7 +16,9 @@ module.exports = {
           200: '#EAE7FF'
         },
         dark: {
-          heading: '#292626'
+          heading: '#292626',
+          footer: '#6448F4',
+          button: '#0014C7'
         },
         link: '#705DFF'
       }

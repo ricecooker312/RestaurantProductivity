@@ -55,11 +55,9 @@ app.post('/api/users/login', async (req, res) => {
     if (usersFind.length > 1) res.send({ error: 'An error occurred' })
     else if (usersFind.length < 1) res.send({ error: 'Email or password is incorrect' })
     else if (usersFind.length === 1) {
-        console.log(usersFind[0].password)
         const compare = await bcrypt.compare(password, usersFind[0].password)
 
         if (compare) {
-            console.log('correct password')
             const foundUser = usersFind[0]
 
             const user = { id: foundUser._id, email: foundUser.email }
