@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
 import TabFooter from '@/components/TabFooter'
+import GoalCard from '@/components/GoalCard'
 
 const index = () => {
   useEffect(() => {
@@ -49,7 +50,7 @@ const index = () => {
             </TouchableOpacity>
           </View>
 
-          <View className='flex-col items-center w-[85vw] p-4 pt-8 pb-8 mt-12 bg-light-100 rounded-3xl border-2'>
+          <View className='flex-col items-center w-[85vw] p-4 pt-8 pb-8 mt-12 bg-light-100 rounded-3xl'>
             <Image source={images.restuarant} className='w-full' />
             <TouchableHighlight 
               className='bg-primary w-9/12 rounded-2xl mt-8 h-16 flex flex-row items-center'
@@ -62,7 +63,8 @@ const index = () => {
         </View>
 
         <View className='border-2'>
-          <Text>Goals</Text>
+          <Text className='font-bold color-dark-heading text-3xl p-6'>Goals</Text>
+          <GoalCard completed={false} name='Read for...' priority='high' difficulty='easy' />
         </View>
       </ScrollView>
       <TabFooter page='home' />

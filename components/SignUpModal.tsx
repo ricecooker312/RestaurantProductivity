@@ -31,6 +31,7 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [checkbox, setCheckbox] = useState<string | boolean>(false)
+    const [noCheckBox, setNoCheckBox] = useState(false)
     const [tacModal, setTacModal] = useState(false)
     const [privPolModal, setPrivPolModal] = useState(false)
     const [emptyEmail, setEmptyEmail] = useState(false)
@@ -62,10 +63,16 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
     }, [password, confirmPassword])
 
     useEffect(() => {
+        if (!checkbox) setNoCheckBox(true)
+            else setNoCheckBox(false)
+    }, [checkbox])
+
+    useEffect(() => {
         setEmptyEmail(false)
         setInvalidEmail(false)
         setEmptyPassword(false)
         setPasswordNotMatch(false)
+        setNoCheckBox(false)
     }, [])
 
     const signInUser = async () => {
@@ -83,6 +90,11 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
 
         if (confirmPassword && confirmPassword !== password) {
             setPasswordNotMatch(true)
+            errors = true
+        }
+
+        if (!checkbox) {
+            setNoCheckBox(true)
             errors = true
         }
 
@@ -177,10 +189,18 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
                             />
 
                             <View className="w-[85vw] mt-12 flex-row items-center px-2">
-                                <AdvancedCheckbox
-                                    value={checkbox}
-                                    onValueChange={setCheckbox}
-                                />
+                                {noCheckBox ? (
+                                    <AdvancedCheckbox
+                                        value={checkbox}
+                                        onValueChange={setCheckbox}
+                                        containerStyle={{ borderColor: 'red', borderWidth: 2, borderRadius: 5 }}
+                                    />
+                                ) : (
+                                    <AdvancedCheckbox
+                                        value={checkbox}
+                                        onValueChange={setCheckbox}
+                                    />
+                                )}
                                 <Text className="ml-3">
                                     I agree with the{' '}
                                     <Text

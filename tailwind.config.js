@@ -20,6 +20,11 @@ module.exports = {
           footer: '#6448F4',
           button: '#0014C7'
         },
+        button: {
+          error: '#FF9F9F',
+          good: '#AEF9AE',
+          warning: '#F9E1AE'
+        },
         link: '#705DFF'
       }
     },

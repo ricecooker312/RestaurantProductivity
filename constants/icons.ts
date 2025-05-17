@@ -3,11 +3,23 @@ import streak from '@/assets/icons/streak.png'
 import clock from '@/assets/icons/clock.png'
 import hometab from '@/assets/icons/hometab.png'
 import profiletab from '@/assets/icons/profiletab.png'
+import lowpriority from '@/assets/icons/lowpriority.png'
+import mediumpriority from '@/assets/icons/mediumpriority.png'
+import highpriority from '@/assets/icons/highpriority.png'
+import easydifficulty from '@/assets/icons/easydifficulty.png'
+import mediumdifficulty from '@/assets/icons/mediumdifficulty.png'
+import harddifficulty from '@/assets/icons/harddifficulty.png'
 
 export const icons = {
   logo,
   streak,
   clock,
   hometab,
-  profiletab
+  profiletab,
+  lowpriority,
+  mediumpriority,
+  highpriority,
+  easydifficulty,
+  mediumdifficulty,
+  harddifficulty
 }
