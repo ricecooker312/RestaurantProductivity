@@ -21,7 +21,7 @@ const index = () => {
 
   return (
     <>
-      <ScrollView className='bg-dfbg w-screen h-screen'>
+      <ScrollView className='bg-dfbg w-screen h-screen' showsVerticalScrollIndicator={false}>
         <View className='flex flex-row flex-wrap mt-12 items-center justify-center'>
 
           <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
@@ -36,7 +36,7 @@ const index = () => {
           <TouchableHighlight
             className='p-4 px-8 bg-primary justify-self-end ml-auto mr-8 rounded-xl'
             underlayColor={'#0014C7'}
-            onPress={() => {}}
+            onPress={() => router.navigate('/newGoal')}
           >
             <Text className='color-white text-lg'>Set a New Goal</Text>
           </TouchableHighlight>
@@ -62,9 +62,21 @@ const index = () => {
           </View>
         </View>
 
-        <View className='border-2'>
+        <View className='flex flex-row items-center'>
           <Text className='font-bold color-dark-heading text-3xl p-6'>Goals</Text>
+          <TouchableHighlight 
+            className='ml-auto p-4 m-6 bg-primary rounded-xl px-8'
+            onPress={() => {}}
+            underlayColor={'#0014C7'}
+          >
+            <Text className='color-white text-lg'>See All Goals</Text>
+          </TouchableHighlight>
+        </View>
+
+        <View className=''>
           <GoalCard completed={false} name='Read for...' priority='high' difficulty='easy' />
+          <GoalCard completed={false} name='Workout' priority='low' difficulty='medium' />
+          <GoalCard completed={false} name='Homework' priority='medium' difficulty='high' />
         </View>
       </ScrollView>
       <TabFooter page='home' />

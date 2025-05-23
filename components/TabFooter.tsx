@@ -16,7 +16,9 @@ const TabFooter = ({ page }: { page: string }) => {
         <Image source={icons.hometab} />
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'goals' && 'bg-dark-footer'}`}>
-        <Image source={icons.hometab} />
+        <TouchableWithoutFeedback onPress={() => router.navigate('/goals')}>
+            <Image source={icons.goalstab} className='w-12 h-12' />
+        </TouchableWithoutFeedback>
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'stats' && 'bg-dark-footer'}`}>
         <Image source={icons.hometab} />

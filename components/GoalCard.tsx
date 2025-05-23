@@ -39,7 +39,7 @@ const GoalCard = ({ completed, name, priority, difficulty }: GoalCardProps) => {
     } else if (difficulty === 'medium') {
         difficultyBg = 'bg-button-warning'
         difficultyImg = icons.mediumdifficulty
-    } else if (difficulty === 'hard') {
+    } else if (difficulty === 'high') {
         difficultyBg = 'bg-button-error'
         difficultyImg = icons.harddifficulty
     }
@@ -51,12 +51,12 @@ const GoalCard = ({ completed, name, priority, difficulty }: GoalCardProps) => {
                 onValueChange={setChecked}
             />
             <Text className='ml-4 text-lg'>{name}</Text>
-            <View className={`flex flex-row p-2 w-28 ${priorityBg} items-center justify-center ml-auto`}>
-                <Text className=''>{priority}</Text>
+            <View className={`flex flex-row p-4 w-30 ${priorityBg} items-center justify-center ml-auto`}>
+                <Text className=''>{priority.charAt(0).toUpperCase() + priority.slice(1)}</Text>
                 <Image className='m-2 w-8 h-8' source={priorityImg} />
             </View>
-            <View className={`flex flex-row p-2 w-28 ${difficultyBg} items-center justify-center ml-auto`}>
-                <Text className=''>{difficulty}</Text>
+            <View className={`flex flex-row p-4 w-30 ${difficultyBg} items-center justify-center ml-auto`}>
+                <Text className=''>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</Text>
                 <Image className='m-2 w-8 h-8 translate-y-2' source={difficultyImg} />
             </View>
         </View>

@@ -9,14 +9,19 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.saihanr.RestaurantProductivity",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.saihanr.RestaurantProductivity"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +42,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "67f603da-5bd3-4eec-a71f-6a5f073b73c5"
+      }
     }
   }
 }
