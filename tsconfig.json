@@ -13,6 +13,10 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "nativewind-env.d.ts"
-, "backend/server.js", "backend/dbconn.js", "env.Js"  ]
+    "nativewind-env.d.ts",
+    "declarations.d.ts",
+    "backend/server.js", 
+    "backend/dbconn.js", 
+    "env.js"  
+  ]
 }

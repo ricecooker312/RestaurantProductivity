@@ -1,4 +1,4 @@
 declare module '*.png' {
-    const value: string,
+    const value: ImageSourcePropType | undefined
     export default value
 }
