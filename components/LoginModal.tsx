@@ -116,9 +116,9 @@ const LoginModal = ({ loginModal, setLoginModal }: LoginModal) => {
                             <Text className='w-10/12 color-error'>Email cannot be empty</Text>
                         ) : error ? (
                             <Text className='w-10/12 color-error'>{errorMessage}</Text>
-                        ) : invalidEmail && (
+                        ) : invalidEmail ? (
                             <Text className='w-10/12 color-error'>Invalid email</Text>
-                        )}
+                        ) : <Text></Text>}
                         <FormInput
                             placeholder='Email'
                             value={email}
@@ -136,9 +136,9 @@ const LoginModal = ({ loginModal, setLoginModal }: LoginModal) => {
                     <View className='flex w-full items-center mt-12'>
                         {emptyPassword ? (
                             <Text className='w-10/12 color-error'>Password cannot be empty</Text>
-                        ) : error && (
+                        ) : error ? (
                             <Text className='w-10/12 color-error'>{errorMessage}</Text>
-                        )}
+                        ): <Text></Text>}
                         <FormInput
                             placeholder='Password'
                             value={password}

@@ -34,7 +34,7 @@ const checkToken = (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
-            console.log(`JWT Error: ${err}`)
+            console.log(err)
             return res.send({
                 'error': 'Unauthorized'
             })
@@ -103,7 +103,7 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
 
         return res.send(goalFind)
     } catch (err) {
-        console.log(err)
+        console.log(`Goal Find Error: ${err}`)
         return res.send({
             error: err
         })
@@ -111,16 +111,18 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
 })
 
 app.post('/api/goals/new', checkToken, async (req, res) => {
-    const { name, completed, type, priority, difficulty } = req.body
+    const { name, description, completed, type, priority, difficulty, deadline } = req.body
 
     const time = new Date()
     const goalsDoc = { 
         name: name, 
+        description: description,
         completed: completed, 
         type: type,
         priority: priority, 
         difficulty: difficulty, 
         userId: req.user.id,
+        deadline: deadline,
         time: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
     }
 
@@ -147,18 +149,19 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
             })
         }
 
+        const time = new Date()
         const updateGoal = await goals.updateOne(goalFind, 
             {
                 $set: {
-                    completed: true
-                },
-                $currentDate: { lastUpdated: true }
+                    completed: true,
+                    lastUpdated: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
+                }
             }
         )
 
         return res.send(updateGoal)
     } catch (err) {
-        console.log(err)
+        console.log(`Goal Complete Error: ${err}`)
     }
 })
 
@@ -178,7 +181,7 @@ app.delete('/api/goals/:goalId/delete', checkToken, async (req, res) => {
 
         return res.send(goalDelete)
     } catch (err) {
-        console.log(err)
+        console.log(`Goal Delete Error: ${err}`)
     }
 })
 

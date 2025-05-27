@@ -8,22 +8,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 
 const goals = () => {
+    const [accessToken, setAccessToken] = useState<string | null>(null)
     const [currentGoals, setCurrentGoals] = useState()
 
     useEffect(() => {
         const isAuthenticated = async () => {
-            const accessToken = await AsyncStorage.getItem('accessToken')
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
 
-            if (!accessToken) {
-                router.navigate('/onboarding')
-                return null;
+            if (!useEffectToken) {
+                router.replace('/onboarding')
             } else {
-                return accessToken
+                setAccessToken(useEffectToken)
             }
         }
 
-        const accessToken = isAuthenticated()
+        isAuthenticated()
+    }, [])
 
+    useEffect(() => {
         const fetchGoals = async () => {
             const goalPayload = {
                 headers: {
@@ -39,10 +41,8 @@ const goals = () => {
             setCurrentGoals(data)
         }
 
-        fetchGoals()
-
-        console.log(currentGoals)
-    }, [])
+        if (accessToken) fetchGoals()
+    }, [accessToken])
     
     return (
         <>

@@ -39,7 +39,7 @@ const GoalCard = ({ completed, name, priority, difficulty }: GoalCardProps) => {
     } else if (difficulty === 'medium') {
         difficultyBg = 'bg-button-warning'
         difficultyImg = icons.mediumdifficulty
-    } else if (difficulty === 'high') {
+    } else if (difficulty === 'hard') {
         difficultyBg = 'bg-button-error'
         difficultyImg = icons.harddifficulty
     }

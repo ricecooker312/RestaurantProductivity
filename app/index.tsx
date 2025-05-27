@@ -73,10 +73,10 @@ const index = () => {
           </TouchableHighlight>
         </View>
 
-        <View className=''>
+        <View className='mb-28'>
           <GoalCard completed={false} name='Read for...' priority='high' difficulty='easy' />
-          <GoalCard completed={false} name='Workout' priority='low' difficulty='medium' />
-          <GoalCard completed={false} name='Homework' priority='medium' difficulty='high' />
+          <GoalCard completed={false} name='Workout' priority='medium' difficulty='hard' />
+          <GoalCard completed={false} name='Homework' priority='low' difficulty='medium' />
         </View>
       </ScrollView>
       <TabFooter page='home' />

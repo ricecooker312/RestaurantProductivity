@@ -6,10 +6,11 @@ interface FormInputProps {
     value: string,
     onChangeText: (text: string) => void,
     className?: string
-    secureTextEntry?: boolean
+    secureTextEntry?: boolean,
+    multiline?: boolean
 }
 
-export default function FormInput({ placeholder, value, onChangeText, className, secureTextEntry = false }: FormInputProps) {
+export default function FormInput({ placeholder, value, onChangeText, className, secureTextEntry = false, multiline = false }: FormInputProps) {
     return (
         <TextInput
             placeholder={placeholder}
@@ -17,6 +18,7 @@ export default function FormInput({ placeholder, value, onChangeText, className,
             value={value}
             secureTextEntry={secureTextEntry}
             onChangeText={onChangeText}
+            multiline={multiline}
             className={`
                 border-[3px]
                 w-10/12

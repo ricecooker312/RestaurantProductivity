@@ -11,6 +11,7 @@ import easydifficulty from '@/assets/icons/easydifficulty.png'
 import mediumdifficulty from '@/assets/icons/mediumdifficulty.png'
 import harddifficulty from '@/assets/icons/harddifficulty.png'
 import backicon from '@/assets/icons/backicon.png'
+import dropdown from '@/assets/icons/dropdown.png'
 
 export const icons = {
   logo,
@@ -25,5 +26,6 @@ export const icons = {
   easydifficulty,
   mediumdifficulty,
   harddifficulty,
-  backicon
+  backicon,
+  dropdown
 }
