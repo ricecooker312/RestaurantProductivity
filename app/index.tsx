@@ -14,7 +14,7 @@ const index = () => {
       if (!await AsyncStorage.getItem('accessToken')) {
         router.navigate('/onboarding')
       } else {
-        router.navigate('/newGoal')
+        router.navigate('/goals')
       }
     }
 

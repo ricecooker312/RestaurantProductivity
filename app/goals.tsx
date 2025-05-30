@@ -7,9 +7,21 @@ import TabFooter from '@/components/TabFooter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 
+type Goal = {
+    _id: string,
+    title: string,
+    description: string,
+    completed: boolean,
+    type: string,
+    priority: string,
+    difficulty: string,
+    userId: string,
+    time: string
+}
+
 const goals = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
-    const [currentGoals, setCurrentGoals] = useState()
+    const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -67,8 +79,43 @@ const goals = () => {
                 </TouchableHighlight>
                 </View>
 
-                <View className='flex flex-row flex-wrap'>
-                    <Text className='font-bold color-dark-heading text-3xl p-6'>Today's Goals</Text>
+                <View className='flex flex-row flex-wrap justify-center mb-28'>
+                    <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>
+
+                    {currentGoals.map(goal => (
+                        <View key={goal._id} className='w-11/12 bg-light-100 rounded-lg mb-8'>
+                            <View className='flex flex-row items-center'>
+                                <Text className='font-bold text-2xl p-6'>{goal.title}</Text>
+                                <Text 
+                                    className={`
+                                    ${goal.type === 'habit' ? 'bg-[#4EC47A]' : 'bg-[#4ED9FF]'} 
+                                    w-20 
+                                    p-2 
+                                    text-center
+                                `}>{goal.type.charAt(0).toUpperCase() + goal.type.slice(1)}</Text>
+                            </View>
+                            <Text className='p-6 color-[#4A4A4A]'>{goal.description}</Text> 
+                            <View className='flex flex-row p-6 items-center'>
+                                <Text className='color-[#4A4A4A]'>Priority: </Text>
+                                {goal.priority === 'low' ? (
+                                    <View className='flex flex-row gap-1 bg-button-good p-4 w-24 justify-around ml-2'>
+                                        <Text>Low</Text>
+                                        <Image source={icons.lowpriority} />
+                                    </View>
+                                ) : goal.priority === 'medium' ? (
+                                    <View className='flex flex-row gap-1 bg-button-warning p-4 w-32 justify-around ml-2'>
+                                        <Text>Medium</Text>
+                                        <Image source={icons.mediumpriority} />
+                                    </View>
+                                ) : goal.priority === 'high' && (
+                                    <View className='flex flex-row gap-1 bg-button-error p-4 w-24 justify-around ml-2'>
+                                        <Text>High</Text>
+                                        <Image source={icons.highpriority} />
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    ))}
                 </View>
             </ScrollView>
             <TabFooter page='goals' />
