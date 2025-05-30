@@ -13,6 +13,8 @@ const index = () => {
     const isAuthenticated = async () => {
       if (!await AsyncStorage.getItem('accessToken')) {
         router.navigate('/onboarding')
+      } else {
+        router.navigate('/newGoal')
       }
     }
 

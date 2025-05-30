@@ -111,18 +111,17 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
 })
 
 app.post('/api/goals/new', checkToken, async (req, res) => {
-    const { name, description, completed, type, priority, difficulty, deadline } = req.body
+    const { title, description, completed, type, priority, difficulty } = req.body
 
     const time = new Date()
     const goalsDoc = { 
-        name: name, 
+        title: title, 
         description: description,
         completed: completed, 
         type: type,
         priority: priority, 
         difficulty: difficulty, 
         userId: req.user.id,
-        deadline: deadline,
         time: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
     }
 

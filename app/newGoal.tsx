@@ -1,11 +1,12 @@
 import { View, Text, Image, TouchableHighlight, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { icons } from '@/constants/icons'
 import { router } from 'expo-router'
 import FormInput from '@/components/FormInput'
 import DropDownPicker from 'react-native-dropdown-picker'
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const newGoal = () => {
+    const [accessToken, setAccessToken] = useState<string | null>(null)
     const [title, setTitle] = useState("")
     const [typeDropdown, setTypeDropdown] = useState(false)
     const [typeValue, setTypeValue] = useState(null)
@@ -16,6 +17,123 @@ const newGoal = () => {
     const [description, setDescription] = useState("")
     const [priority, setPriority] = useState('')
     const [difficulty, setDifficulty] = useState('')
+    const [errors, setErrors] = useState<string[]>([])
+
+    useEffect(() => {
+        const isAuthenticated = async () => {
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
+
+            if (!useEffectToken) {
+                router.navigate('/onboarding')
+            } else {
+                setAccessToken(useEffectToken)
+            }
+        }
+
+        isAuthenticated()
+    }, [])
+
+    useEffect(() => {
+        if (!title) {
+            setErrors(prevErrors => [...prevErrors, 'title'])
+        } else {
+            setErrors(prevErrors => prevErrors.filter(err => err !== 'title'))
+        }
+    }, [title])
+
+    useEffect(() => {
+        if (!typeValue) {
+            setErrors(prevErrors => [...prevErrors, 'type'])
+        } else {
+            setErrors(prevErrors => prevErrors.filter(err => err !== 'type'))
+        }
+    }, [typeValue])
+
+    useEffect(() => {
+        if (!description) {
+            setErrors(prevErrors => [...prevErrors, 'description'])
+        } else {
+            setErrors(prevErrors => prevErrors.filter(err => err !== 'description'))
+        }
+    }, [description])
+
+    useEffect(() => {
+        if (!priority) {
+            setErrors(prevErrors => [...prevErrors, 'priority'])
+        } else {
+            setErrors(prevErrors => prevErrors.filter(err => err != 'priority'))
+        }
+    }, [priority])
+
+    useEffect(() => {
+        if (!difficulty) {
+            setErrors(prevErrors => [...prevErrors, 'difficulty'])
+        } else {
+            setErrors(prevErrors => prevErrors.filter(err => err !== 'difficulty'))
+        }
+    }, [difficulty])
+    
+    useEffect(() => {
+        setErrors(prevErrors => prevErrors.filter(err => err !== 'title'))
+        setErrors(prevErrors => prevErrors.filter(err => err !== 'type'))
+        setErrors(prevErrors => prevErrors.filter(err => err !== 'description'))
+        setErrors(prevErrors => prevErrors.filter(err => err !== 'priority'))
+        setErrors(prevErrors => prevErrors.filter(err => err !== 'difficulty'))
+    }, [])
+
+    const setGoal = async () => {
+        const newErrors: string[] = []
+
+        if (!title) {
+            newErrors.push('title')
+        }
+
+        if (!typeValue) {
+            newErrors.push('type')
+        }
+        
+        if (!description) {
+            newErrors.push('description')
+        }
+
+        if (!priority) {
+            newErrors.push('priority')
+        }
+
+        if (!difficulty) {
+            newErrors.push('difficulty')
+        }
+
+        setErrors(newErrors)
+
+        if (newErrors.length === 0) {
+            const newGoalPayload = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    completed: false,
+                    type: typeValue,
+                    priority: priority,
+                    difficulty: difficulty
+                })
+            }
+
+            const res = await fetch('http://192.168.1.204:3000/api/goals/new', newGoalPayload)
+            const data = await res.json()
+
+            if (data.error) {
+                console.log(data.error)
+            } else {
+                router.navigate('/goals')
+            }
+        }
+    }
 
     return (
         <View className='bg-dfbg w-screen h-screen'>
@@ -28,13 +146,20 @@ const newGoal = () => {
                     <Text className='color-dark-heading text-3xl font-bold ml-auto mr-auto -translate-x-1/4'>Make a New Goal</Text>
 
                     <View className='bg-light-100 flex flex-col w-[95vw] h-[80vh] rounded-lg items-center'>
-                        <View className='flex-row flex-wrap justify-around items-center w-full'>
-                            <FormInput
-                                placeholder='Title'
-                                value={title}
-                                onChangeText={setTitle}
-                                className='w-[60%]'
-                            />
+                        <View className='flex-row flex-wrap justify-around items-center w-full mt-2'>
+                            <View className='w-[60%]'>
+                                {errors.find(error => error === 'title') ? (
+                                    <Text className='color-error'>Title cannot be empty</Text>
+                                ) : <Text></Text>}
+                                <FormInput
+                                    placeholder='Title'
+                                    value={title}
+                                    onChangeText={setTitle}
+                                    className={`w-full mt-2 ${errors.find(error => error === 'title') && (
+                                        'border-2 border-error'
+                                    )}`}
+                                />
+                            </View>
                             <DropDownPicker
                                 open={typeDropdown}
                                 value={typeValue}
@@ -50,22 +175,43 @@ const newGoal = () => {
                                 }}
                                 style={{
                                     backgroundColor: 'transparent',
-                                    borderWidth: 2
+                                    borderWidth: 2,
+                                    borderColor: errors.find(error => error === 'type') ? '#EE5052' : '',
+                                    marginTop: 30
                                 }}
                                 listItemContainerStyle={{
-                                    backgroundColor: 'transparent'
+                                    backgroundColor: 'transparent',
+                                }}
+                                dropDownContainerStyle={{
+                                    marginTop: 30,
                                 }}
                             />
                         </View>
-                        <FormInput
-                            placeholder='Description'
-                            value={description}
-                            onChangeText={setDescription}
-                            multiline={true}
-                            className='mt-4 w-[95%] h-48'
-                        />
+                        
+                        <View className='w-full mt-4 flex flex-col items-center'>
+                            {errors.find(error => error === 'description') ? (
+                                <Text className='mr-auto ml-2 color-error'>Description cannot be empty</Text>
+                            ) : <Text className='mr-auto ml-2'></Text>}
+                            <FormInput
+                                placeholder='Description'
+                                value={description}
+                                onChangeText={setDescription}
+                                multiline={true}
+                                className={`mt-2 w-[95%] h-48 ${errors.find(error => error === 'description') && (
+                                    'border-2 border-error'
+                                )}`}
+                            />
+                        </View>
 
-                        <View className='w-full flex-row p-4 mt-12 items-center'>
+                        <View 
+                            className={`
+                            w-full 
+                            flex-row 
+                            p-4 
+                            mt-16 
+                            items-center
+                            ${errors.find(error => error === 'priority') && 'border-2 border-error'}
+                        `}>
                             <Text>Priority: </Text>
                             <TouchableWithoutFeedback onPress={() => setPriority('low')}>
                                 <View 
@@ -126,7 +272,15 @@ const newGoal = () => {
                             </TouchableWithoutFeedback>
                         </View>
 
-                        <View className='w-full flex-row p-4 items-center'>
+                        <View 
+                            className={`
+                            w-full 
+                            flex-row 
+                            p-4 
+                            items-center 
+                            mt-4
+                            ${errors.find(error => error === 'difficulty') && 'border-2 border-error'}
+                        `}>
                             <Text>Difficulty: </Text>
                             <TouchableWithoutFeedback onPress={() => setDifficulty('easy')}>
                                 <View 
@@ -191,9 +345,9 @@ const newGoal = () => {
                         </View>
 
                         <TouchableHighlight 
-                            className='mt-12 w-10/12 bg-primary p-4 rounded-2xl'
+                            className='mt-16 w-10/12 bg-primary p-4 rounded-2xl'
                             underlayColor={'#0014C7'}
-                            onPress={() => {}}
+                            onPress={setGoal}
                         >
                             <Text className='text-center text-xl color-white'>Set Goal</Text>
                         </TouchableHighlight>
