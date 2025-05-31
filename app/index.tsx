@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Alert, ScrollView } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -7,19 +7,48 @@ import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
 import TabFooter from '@/components/TabFooter'
 import GoalCard from '@/components/GoalCard'
+import { Goal } from '@/components/FullGoalCard'
 
 const index = () => {
+  const [accessToken, setAccessToken] = useState<string | undefined>()
+  const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
+
   useEffect(() => {
     const isAuthenticated = async () => {
-      if (!await AsyncStorage.getItem('accessToken')) {
+      const useEffectToken = await AsyncStorage.getItem('accessToken')
+
+      if (!useEffectToken) {
         router.navigate('/onboarding')
       } else {
-        router.navigate('/goals')
+        setAccessToken(useEffectToken)
       }
     }
 
     isAuthenticated()
   }, [])
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      const goalsPayload = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      }
+
+      const res = await fetch('http://192.168.1.204:3000/api/goals/find/all', goalsPayload)
+      const data = await res.json()
+
+      if (data.error) {
+        console.log(data.error)
+      } else {
+        setCurrentGoals(data)
+      }
+    }
+
+    if (accessToken) fetchGoals()
+  }, [accessToken])
 
   return (
     <>
@@ -68,7 +97,7 @@ const index = () => {
           <Text className='font-bold color-dark-heading text-3xl p-6'>Goals</Text>
           <TouchableHighlight 
             className='ml-auto p-4 m-6 bg-primary rounded-xl px-8'
-            onPress={() => {}}
+            onPress={() => router.navigate('/goals')}
             underlayColor={'#0014C7'}
           >
             <Text className='color-white text-lg'>See All Goals</Text>
@@ -76,9 +105,9 @@ const index = () => {
         </View>
 
         <View className='mb-28'>
-          <GoalCard completed={false} name='Read for...' priority='high' difficulty='easy' />
-          <GoalCard completed={false} name='Workout' priority='medium' difficulty='hard' />
-          <GoalCard completed={false} name='Homework' priority='low' difficulty='medium' />
+          {currentGoals.map(goal => (
+            <GoalCard key={goal._id} name={goal.title} completed={goal.completed} priority={goal.priority} />
+          ))}
         </View>
       </ScrollView>
       <TabFooter page='home' />
