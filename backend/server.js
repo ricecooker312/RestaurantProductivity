@@ -8,8 +8,7 @@ app.use( cors() )
 const port = 3000
 
 const path = require('path')
-const dotenv = require('dotenv')
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
+require('dotenv').config()
 
 const bcrypt = require('bcrypt')
 

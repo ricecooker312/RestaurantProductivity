@@ -1,10 +1,11 @@
-import { View, Text, Image, TouchableHighlight, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, Text, Image, TouchableHighlight, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { icons } from '@/constants/icons'
 import { router } from 'expo-router'
 import FormInput from '@/components/FormInput'
 import DropDownPicker from 'react-native-dropdown-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const newGoal = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
     const [title, setTitle] = useState("")
@@ -136,7 +137,7 @@ const newGoal = () => {
     }
 
     return (
-        <View className='bg-dfbg w-screen h-screen'>
+        <ScrollView className='bg-dfbg w-screen h-screen border-2'>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View className='flex flex-row flex-wrap mt-12 items-center justify-center relative'>
                     <TouchableWithoutFeedback onPress={() => router.navigate('/goals')}>
@@ -145,19 +146,20 @@ const newGoal = () => {
 
                     <Text className='color-dark-heading text-3xl font-bold ml-auto mr-auto -translate-x-1/4'>Make a New Goal</Text>
 
-                    <View className='bg-light-100 flex flex-col w-[95vw] h-[80vh] rounded-lg items-center'>
+                    <View className='flex flex-col w-[95vw] h-[80vh] rounded-lg items-center'>
                         <View className='flex-row flex-wrap justify-around items-center w-full mt-2'>
                             <View className='w-[60%]'>
                                 {errors.find(error => error === 'title') ? (
-                                    <Text className='color-error'>Title cannot be empty</Text>
+                                    <Text className='color-errorDark'>Title cannot be empty</Text>
                                 ) : <Text></Text>}
                                 <FormInput
                                     placeholder='Title'
                                     value={title}
                                     onChangeText={setTitle}
                                     className={`w-full mt-2 ${errors.find(error => error === 'title') && (
-                                        'border-2 border-error'
+                                        'border-2 border-errorDark'
                                     )}`}
+                                    placeholderTextColor='black'
                                 />
                             </View>
                             <DropDownPicker
@@ -176,7 +178,7 @@ const newGoal = () => {
                                 style={{
                                     backgroundColor: 'transparent',
                                     borderWidth: 2,
-                                    borderColor: errors.find(error => error === 'type') ? '#EE5052' : '',
+                                    borderColor: errors.find(error => error === 'type') ? '#D74042' : '',
                                     marginTop: 30
                                 }}
                                 listItemContainerStyle={{
@@ -190,27 +192,28 @@ const newGoal = () => {
                         
                         <View className='w-full mt-4 flex flex-col items-center'>
                             {errors.find(error => error === 'description') ? (
-                                <Text className='mr-auto ml-2 color-error'>Description cannot be empty</Text>
+                                <Text className='mr-auto ml-2 color-errorDark'>Description cannot be empty</Text>
                             ) : <Text className='mr-auto ml-2'></Text>}
                             <FormInput
                                 placeholder='Description'
                                 value={description}
                                 onChangeText={setDescription}
                                 multiline={true}
-                                className={`mt-2 w-[95%] h-48 ${errors.find(error => error === 'description') && (
-                                    'border-2 border-error'
+                                className={`mt-2 w-[95%] h-48 align-text-top ${errors.find(error => error === 'description') && (
+                                    'border-2 border-errorDark'
                                 )}`}
+                                placeholderTextColor='black'
                             />
                         </View>
 
                         <View 
                             className={`
-                            w-full 
+                            w-[98vw]  
                             flex-row 
                             p-4 
                             mt-16 
                             items-center
-                            ${errors.find(error => error === 'priority') && 'border-2 border-error'}
+                            ${errors.find(error => error === 'priority') && 'border-2 border-errorDark'}
                         `}>
                             <Text>Priority: </Text>
                             <TouchableWithoutFeedback onPress={() => setPriority('low')}>
@@ -274,12 +277,12 @@ const newGoal = () => {
 
                         <View 
                             className={`
-                            w-full 
+                            w-[98vw] 
                             flex-row 
                             p-4 
                             items-center 
                             mt-4
-                            ${errors.find(error => error === 'difficulty') && 'border-2 border-error'}
+                            ${errors.find(error => error === 'difficulty') && 'border-2 border-errorDark'}
                         `}>
                             <Text>Difficulty: </Text>
                             <TouchableWithoutFeedback onPress={() => setDifficulty('easy')}>
@@ -354,7 +357,7 @@ const newGoal = () => {
                     </View>
                 </View>
             </TouchableWithoutFeedback>
-        </View>
+        </ScrollView>
     )
 }
 

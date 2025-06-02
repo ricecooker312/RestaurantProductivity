@@ -5,16 +5,17 @@ interface FormInputProps {
     placeholder: string,
     value: string,
     onChangeText: (text: string) => void,
+    placeholderTextColor?: string,
     className?: string
     secureTextEntry?: boolean,
     multiline?: boolean
 }
 
-export default function FormInput({ placeholder, value, onChangeText, className, secureTextEntry = false, multiline = false }: FormInputProps) {
+export default function FormInput({ placeholder, value, onChangeText, className, placeholderTextColor, secureTextEntry = false, multiline = false }: FormInputProps) {
     return (
         <TextInput
             placeholder={placeholder}
-            placeholderTextColor='#4A4A4A'
+            placeholderTextColor={placeholderTextColor ? placeholderTextColor : '#4A4A4A'}
             value={value}
             secureTextEntry={secureTextEntry}
             onChangeText={onChangeText}
