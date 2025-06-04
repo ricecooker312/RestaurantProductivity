@@ -111,7 +111,7 @@ const SignupModal = ({ signupModal, setSignupModal }: SignupModalProps) => {
                 })
             }
 
-            const res = await fetch(`http://192.168.1.204:3000/api/users/register`, signupPayload)
+            const res = await fetch(`https://restaurantproductivity.onrender.com/api/users/register`, signupPayload)
             const data = await res.json()
 
             if (data.emailError) {

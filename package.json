@@ -22,7 +22,7 @@
     "babel-preset-expo": "~13.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "eas-cli": "^16.6.2",
+    "eas-cli": "^16.7.0",
     "expo": "^53.0.8",
     "expo-blur": "~14.1.4",
     "expo-constants": "~17.1.6",

@@ -37,7 +37,7 @@ const goals = () => {
                 }
             }
 
-            const res = await fetch('http://192.168.1.204:3000/api/goals/find/all', goalPayload)
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/all', goalPayload)
             const data = await res.json()
 
             setCurrentGoals(data)
