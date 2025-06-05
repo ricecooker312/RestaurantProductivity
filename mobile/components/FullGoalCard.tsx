@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 import { icons } from '@/constants/icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Link } from 'expo-router'
+import { Link, RelativePathString, router } from 'expo-router'
 
 export type Goal = {
     _id: string,
@@ -120,7 +120,7 @@ const FullGoalCard = ({ goal }: { goal: Goal }) => {
                         w-36 
                         rounded-xl'
                         underlayColor={'#0014C7'}
-                        onPress={() => {}}
+                        onPress={() => router.navigate(`/edit/${currentGoal._id}` as RelativePathString)}
                     >
                         <Text className='text-lg color-white text-center'>Edit Goal</Text>
                     </TouchableHighlight>

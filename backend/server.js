@@ -128,6 +128,28 @@ app.get('/api/goals/find/incomplete', checkToken, async (req, res) => {
     }
 })
 
+app.get('/api/goals/find/:goalId', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const goalId = req.params.goalId
+
+    try {
+        const goalFind = await goals.findOne({ _id: new ObjectId(goalId) })
+
+        if (goalFind.userId !== userId) {
+            return res.send({
+                'error': 'Unauthorized'
+            })
+        }
+
+        return res.send(goalFind)
+    } catch (err) {
+        console.log(`One Goal Find Error: ${err}`)
+        return res.send({
+            'error': err
+        })
+    }
+})
+
 app.post('/api/goals/new', checkToken, async (req, res) => {
     const { title, description, completed, type, priority, difficulty } = req.body
 
