@@ -113,6 +113,21 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
     }
 })
 
+app.get('/api/goals/find/incomplete', checkToken, async (res, req) => {
+    const userId = req.user.id
+
+    try {
+        const goalFind = await goals.find({ completed: false, userId: userId }).toArray()
+
+        return res.send(goalFind)
+    } catch (err) {
+        console.log(`Incomlete Goal Find error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
 app.post('/api/goals/new', checkToken, async (req, res) => {
     const { title, description, completed, type, priority, difficulty } = req.body
 
@@ -155,7 +170,7 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
         const updateGoal = await goals.updateOne(goalFind, 
             {
                 $set: {
-                    completed: true,
+                    completed: completed ? false : true,
                     lastUpdated: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
                 }
             }

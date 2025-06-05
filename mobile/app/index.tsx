@@ -37,7 +37,7 @@ const index = () => {
         }
       }
 
-      const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/all', goalsPayload)
+      const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/incomplete', goalsPayload)
       const data = await res.json()
 
       if (data.error) {

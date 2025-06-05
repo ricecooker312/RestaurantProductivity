@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 
 import { icons } from '@/constants/icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Link } from 'expo-router'
 
 export type Goal = {
     _id: string,
@@ -19,7 +20,7 @@ export type Goal = {
 const FullGoalCard = ({ goal }: { goal: Goal }) => {
     const [currentGoal, setCurrentGoal] = useState(goal)
 
-    const completeGoal = async () => {
+    const completeGoal = async (complete: boolean) => {
         const accessToken = await AsyncStorage.getItem('accessToken')
 
         const goalCompletePayload = {
@@ -39,9 +40,8 @@ const FullGoalCard = ({ goal }: { goal: Goal }) => {
         } else {
             setCurrentGoal(cGoal => ({
                 ...cGoal,
-                completed: true
+                completed: complete ? false : true
             }))
-            console.log(data)
         }
     }
 
@@ -107,7 +107,7 @@ const FullGoalCard = ({ goal }: { goal: Goal }) => {
                         w-36 
                         rounded-xl'
                         underlayColor={'#0014C7'}
-                        onPress={completeGoal}
+                        onPress={() => completeGoal(false)}
                     >
                         <Text className='text-lg color-white text-center'>Complete</Text>
                     </TouchableHighlight>
@@ -126,7 +126,12 @@ const FullGoalCard = ({ goal }: { goal: Goal }) => {
                     </TouchableHighlight>
                 </>
             ) : (
-                <Text className='text-center text-xl w-full p-4 bg-[#65FF65]'>Goal is completed!</Text>
+                <Text className='text-center text-lg w-full p-4 bg-[#65FF65]'>
+                    Goal is completed!{' '}
+                    <Link href='/goals' onPress={() => completeGoal(true)} className='border-2'>
+                        <Text className='text-lg color-primary'>Undo</Text>
+                    </Link>
+                </Text>
             )}
         </View>
     )
