@@ -113,7 +113,7 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
     }
 })
 
-app.get('/api/goals/find/incomplete', checkToken, async (res, req) => {
+app.get('/api/goals/find/incomplete', checkToken, async (req, res) => {
     const userId = req.user.id
 
     try {
