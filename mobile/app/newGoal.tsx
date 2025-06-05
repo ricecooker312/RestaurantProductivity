@@ -137,7 +137,7 @@ const newGoal = () => {
     }
 
     return (
-        <ScrollView className='bg-dfbg w-screen h-screen border-2'>
+        <View className='bg-dfbg flex-1'>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View className='flex flex-row flex-wrap mt-12 items-center justify-center relative'>
                     <TouchableWithoutFeedback onPress={() => router.navigate('/goals')}>
@@ -199,7 +199,7 @@ const newGoal = () => {
                                 value={description}
                                 onChangeText={setDescription}
                                 multiline={true}
-                                className={`mt-2 w-[95%] h-48 align-text-top ${errors.find(error => error === 'description') && (
+                                className={`mt-2 w-[95%] align-text-top ${errors.find(error => error === 'description') && (
                                     'border-2 border-errorDark'
                                 )}`}
                                 placeholderTextColor='black'
@@ -357,7 +357,7 @@ const newGoal = () => {
                     </View>
                 </View>
             </TouchableWithoutFeedback>
-        </ScrollView>
+        </View>
     )
 }
 

@@ -190,7 +190,7 @@ const SignupModal = () => {
 
                                 <View className='flex w-full items-center mt-6'>
                                     {passwordNotMatch ? (
-                                        <Text className='w-10/12 color-errorDark'>Password cannot be empty</Text>
+                                        <Text className='w-10/12 color-errorDark'>Passwords do not match</Text>
                                     ) : <Text></Text>}
                                     <FormInput
                                         placeholder='Confirm Password'
@@ -200,7 +200,7 @@ const SignupModal = () => {
                                         placeholderTextColor='black'
                                         className={`
                                             mt-2
-                                            ${emptyPassword ? (
+                                            ${passwordNotMatch ? (
                                                 'border-errorDark'
                                             ) : 'border-primary'}    
                                         `}

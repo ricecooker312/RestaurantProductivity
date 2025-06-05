@@ -20,6 +20,7 @@ export default function FormInput({ placeholder, value, onChangeText, className,
             secureTextEntry={secureTextEntry}
             onChangeText={onChangeText}
             multiline={multiline}
+            numberOfLines={6}
             className={`
                 border-[3px]
                 w-10/12
