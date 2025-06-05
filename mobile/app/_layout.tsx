@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { ActivityIndicator } from "react-native";
 
 import './global.css'
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   const [loading, setLoading] = useState(true)
@@ -27,5 +28,9 @@ export default function RootLayout() {
     return <ActivityIndicator className="flex-1 justify-center items-center mt-[25rem]" size={'large'} color={'#FFFFFF'} />
   }
 
-  return <Slot />
+  return (
+    <SafeAreaProvider>
+      <Slot />
+    </SafeAreaProvider>
+  )
 }

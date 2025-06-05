@@ -5,7 +5,7 @@ const app = express()
 app.use( express.json() )
 app.use( cors() )
 
-const port = 3000
+const port = process.env.PORT
 
 const path = require('path')
 require('dotenv').config()
@@ -44,6 +44,10 @@ const checkToken = (req, res, next) => {
         return next()
     })
 }
+
+app.get('/', (req, res) => {
+    return res.send('Welcome to the app!')
+})
 
 app.get('/api/users/all', async (req, res) => {
     const allUsers = await users.find({}).toArray()
