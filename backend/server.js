@@ -170,7 +170,7 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
         const updateGoal = await goals.updateOne(goalFind, 
             {
                 $set: {
-                    completed: completed ? false : true,
+                    completed: goalFind.completed ? false : true,
                     lastUpdated: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
                 }
             }

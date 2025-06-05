@@ -6,8 +6,6 @@ const uri = process.env.MONGODB_CONNECTION_STR
 
 const client = new MongoClient(uri, {
     tls: true,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
 })
 
 module.exports = client
