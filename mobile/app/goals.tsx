@@ -12,6 +12,7 @@ import FullGoalCard, { Goal } from '@/components/FullGoalCard'
 const goals = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
     const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
+    const [goalCompleted, setGoalCompleted] = useState(false)
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -37,7 +38,7 @@ const goals = () => {
                 }
             }
 
-            const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/all', goalPayload)
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/incomplete', goalPayload)
             const data = await res.json()
 
             setCurrentGoals(data)
@@ -45,6 +46,29 @@ const goals = () => {
 
         if (accessToken) fetchGoals()
     }, [accessToken])
+
+    const completeGoal = async (goal: Goal) => {
+        const completeGoalPayload = {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        }
+
+        const res = await fetch(`https://restaurantproductivity.onrender.com/api/goals/${goal._id}/complete`, completeGoalPayload)
+        const data = await res.json()
+
+        if (data.error) {
+            console.log(data.error)
+        } else {
+            console.log(data)
+            setGoalCompleted(true)
+        }
+    }
+
+    console.log('Goal copmleted: ', goalCompleted)
     
     return (
         <>
@@ -73,9 +97,15 @@ const goals = () => {
                     <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>
 
                     {currentGoals.map(goal => (
-                        <FullGoalCard key={goal._id} goal={goal} />
+                        <FullGoalCard key={goal._id} goal={goal} completeGoal={() => completeGoal(goal)} />
                     ))}
                 </View>
+
+                {goalCompleted && (
+                    <View className='p-4 bg-white'>
+                        <Text>You completed a goal!</Text>
+                    </View>
+                )}
             </ScrollView>
             <TabFooter page='goals' />
         </>

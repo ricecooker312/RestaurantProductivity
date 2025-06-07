@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Goal } from '@/components/FullGoalCard'
 
 const edit = () => {
     const [accessToken, setAccessToken] = useState<string | undefined>()
+    const [goal, setGoal] = useState<Goal>()
 
     const insets = useSafeAreaInsets()
 
@@ -21,6 +23,8 @@ const edit = () => {
                 setAccessToken(useEffectToken)
             }
         }
+
+        isAuthenticated()
     }, [])
 
     useEffect(() => {
@@ -35,7 +39,15 @@ const edit = () => {
 
             const res = await fetch(`https://restaurantproductivity.onrender.com/api/goals/find/${id}`, goalPayload)
             const data = await res.json()
+
+            if (data.error) {
+                console.log(`One Goal Find Error: ${data.error}`)
+            } else {
+                setGoal(data)
+            }
         }
+
+        if (accessToken) fetchGoal()
     }, [accessToken])
 
     return (
@@ -61,6 +73,7 @@ const edit = () => {
                         >
                             <View className='flex-1 items-center justify-start'>
                                 <Text className='text-3xl font-bold'>Edit Goal</Text>
+                                <Text>{goal?.title}</Text>
                             </View>
                         </ScrollView>
                     </SafeAreaView>

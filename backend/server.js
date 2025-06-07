@@ -5,10 +5,10 @@ const app = express()
 app.use( express.json() )
 app.use( cors() )
 
-const port = process.env.PORT
-
 const path = require('path')
 require('dotenv').config()
+
+const port = process.env.PORT
 
 const bcrypt = require('bcrypt')
 
@@ -58,7 +58,7 @@ app.get('/api/users/all', async (req, res) => {
 app.post('/api/users/register', async (req, res) => {
     const { email, password } = req.body
 
-    const emailCheck = await users.find({ email: 'email' }).toArray()
+    const emailCheck = await users.find({ email: email }).toArray()
 
     if (emailCheck.length === 0) {
         const salt = await bcrypt.genSalt()
@@ -204,8 +204,44 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
     }
 })
 
+app.patch('/api/goals/:goalId/update', checkToken, async (req, res) => {
+    const goalId = req.params.goalId
+    const userId = req.user.id
+
+    const { title, description, completed, type, priority, difficulty } = req.body
+
+    try {
+        const goalFind = await goals.findOne({ _id: new ObjectId(goalId) })
+        if (goalFind.userId !== userId) {
+            return res.send({
+                'error': 'Unauthorized'
+            })
+        }
+
+        const time = new Date()
+        const updateGoal = await goals.updateOne(goalFind, {
+            $set: {
+                title: title,
+                description: description,
+                completed: completed,
+                type: type,
+                priority: priority,
+                difficulty: difficulty,
+                lastUpdated: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
+            }
+        })
+
+        return res.send(updateGoal)
+    } catch (err) {
+        console.log(`Update Goal Error: ${err}`)
+        return res.send({
+            'error': err
+        })
+    }
+})
+
 app.delete('/api/goals/:goalId/delete', checkToken, async (req, res) => {
-    const goalId = req.param.goalId
+    const goalId = req.params.goalId
     const userId = req.user.id
     
     try {

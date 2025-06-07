@@ -7,7 +7,8 @@ import {
     TouchableHighlight, 
     KeyboardAvoidingView, 
     Platform, 
-    ScrollView 
+    ScrollView, 
+    TouchableOpacity
 } from 'react-native'
 import Modal from 'react-native-modal'
 import FormInput from '@/components/FormInput'
@@ -181,10 +182,12 @@ const LoginModal = () => {
                                     <Text className='text-center color-white text-xl'>Login</Text>
                                 </TouchableHighlight>
 
-                                <Text className='mt-[10%]'>
-                                    Don't have an account? Sign up{' '}
-                                    <Link className='color-primary' href={'/signup'}>here</Link>
-                                </Text>
+                                <View className='mt-[10%] p-4 flex flex-row items-center'>
+                                    <Text>Don't have an account? Sign up{' '}</Text>
+                                    <TouchableOpacity className='py-4' onPress={() => router.navigate('/signup')}>
+                                        <Text className='color-primary'>here</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </ScrollView>
                     </SafeAreaView>

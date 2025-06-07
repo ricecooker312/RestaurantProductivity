@@ -8,7 +8,8 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView, 
-    Image
+    Image,
+    TouchableOpacity
 } from 'react-native'
 import { AdvancedCheckbox } from 'react-native-advanced-checkbox'
 
@@ -246,10 +247,12 @@ const SignupModal = () => {
                                     <Text className='text-center color-white text-xl'>Sign Up</Text>
                                 </TouchableHighlight>
 
-                                <Text className='mt-[10%]'>
-                                    Already have an account? Log in{' '}
-                                    <Link className='color-primary' href={'/login'}>here</Link>
-                                </Text>
+                                <View className='mt-[10%] p-4 flex flex-row items-center'>
+                                    <Text>Already have an account? Login{' '}</Text>
+                                    <TouchableOpacity className='py-4' onPress={() => router.navigate('/login')}>
+                                        <Text className='color-primary'>here</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </ScrollView>
                     </SafeAreaView>

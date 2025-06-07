@@ -17,33 +17,13 @@ export type Goal = {
     time: string
 }
 
-const FullGoalCard = ({ goal }: { goal: Goal }) => {
+interface FullGoalCardProps {
+    goal: Goal,
+    completeGoal: (goal: Goal) => void
+}
+
+const FullGoalCard = ({ goal, completeGoal }: FullGoalCardProps) => {
     const [currentGoal, setCurrentGoal] = useState(goal)
-
-    const completeGoal = async (complete: boolean) => {
-        const accessToken = await AsyncStorage.getItem('accessToken')
-
-        const goalCompletePayload = {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            }
-        }
-
-        const res = await fetch(`https://restaurantproductivity.onrender.com/api/goals/${goal._id}/complete`, goalCompletePayload)
-        const data = await res.json()
-
-        if (data.error) {
-            console.log(`Goal Complete Error: ${data.error}`)
-        } else {
-            setCurrentGoal(cGoal => ({
-                ...cGoal,
-                completed: complete ? false : true
-            }))
-        }
-    }
 
     return (
         <View className='w-11/12 bg-light-100 rounded-lg mb-8 flex flex-row flex-wrap'>
@@ -107,7 +87,7 @@ const FullGoalCard = ({ goal }: { goal: Goal }) => {
                         w-36 
                         rounded-xl'
                         underlayColor={'#0014C7'}
-                        onPress={() => completeGoal(false)}
+                        onPress={() => completeGoal(goal)}
                     >
                         <Text className='text-lg color-white text-center'>Complete</Text>
                     </TouchableHighlight>
@@ -128,8 +108,8 @@ const FullGoalCard = ({ goal }: { goal: Goal }) => {
             ) : (
                 <Text className='text-center text-lg w-full p-4 bg-[#65FF65]'>
                     Goal is completed!{' '}
-                    <Link href='/goals' onPress={() => completeGoal(true)} className='border-2'>
-                        <Text className='text-lg color-primary'>Undo</Text>
+                    <Link href='/goals' onPress={() => completeGoal(goal)}>
+                        <Text className='text-lg color-primary border-2'>Undo</Text>
                     </Link>
                 </Text>
             )}
