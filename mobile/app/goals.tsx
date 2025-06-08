@@ -1,4 +1,4 @@
-import { View, Text, TouchableHighlight, TouchableWithoutFeedback, TouchableOpacity, Image, Alert, ScrollView } from 'react-native'
+import { View, Text, TouchableHighlight, TouchableWithoutFeedback, TouchableOpacity, Image, Alert, ScrollView, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { icons } from '@/constants/icons'
@@ -9,10 +9,13 @@ import { router } from 'expo-router'
 
 import FullGoalCard, { Goal } from '@/components/FullGoalCard'
 
+const screenWidth = Dimensions.get('window').width
+const alertWidth = screenWidth * 0.8
+
 const goals = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
     const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
-    const [goalCompleted, setGoalCompleted] = useState(false)
+    const [goalCompleted, setGoalCompleted] = useState(true)
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -67,12 +70,10 @@ const goals = () => {
             setGoalCompleted(true)
         }
     }
-
-    console.log('Goal copmleted: ', goalCompleted)
     
     return (
-        <>
-            <ScrollView className='bg-dfbg w-screen h-screen' showsVerticalScrollIndicator={false}>
+        <View className='flex-1 relative'>
+            <ScrollView className='bg-dfbg' showsVerticalScrollIndicator={false}>
                 <View className='flex flex-row flex-wrap mt-12 items-center justify-center'>
 
                 <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
@@ -100,15 +101,23 @@ const goals = () => {
                         <FullGoalCard key={goal._id} goal={goal} completeGoal={() => completeGoal(goal)} />
                     ))}
                 </View>
-
-                {goalCompleted && (
-                    <View className='p-4 bg-white'>
-                        <Text>You completed a goal!</Text>
-                    </View>
-                )}
             </ScrollView>
+            {goalCompleted && (
+                <View 
+                    className='absolute bottom-[15%] flex flex-row justify-center items-center bg-button-good p-4'
+                    style={{
+                        left: (screenWidth - alertWidth) / 2,
+                        width: alertWidth
+                    }}
+                >
+                    <Text className='text-center text-lg'>You completed a goal!{' '}</Text>
+                    <TouchableOpacity className='absolute right-0'>
+                        <Text className='color-primary mr-4'>Undo</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             <TabFooter page='goals' />
-        </>
+        </View>
     )
 }
 
