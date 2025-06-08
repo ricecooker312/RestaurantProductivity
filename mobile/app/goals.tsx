@@ -1,8 +1,17 @@
-import { View, Text, TouchableHighlight, TouchableWithoutFeedback, TouchableOpacity, Image, Alert, ScrollView, Dimensions } from 'react-native'
+import { 
+    View, 
+    Text, 
+    TouchableHighlight, 
+    TouchableWithoutFeedback, 
+    TouchableOpacity, 
+    Image, 
+    Alert, 
+    ScrollView, 
+    Dimensions 
+} from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { icons } from '@/constants/icons'
-import { images } from '@/constants/images'
 import TabFooter from '@/components/TabFooter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
@@ -15,7 +24,8 @@ const alertWidth = screenWidth * 0.8
 const goals = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
     const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
-    const [goalCompleted, setGoalCompleted] = useState(true)
+    const [goalCompleted, setGoalCompleted] = useState(false)
+    const [completedGoalName, setCompletedGoalName] = useState('')
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -48,9 +58,9 @@ const goals = () => {
         }
 
         if (accessToken) fetchGoals()
-    }, [accessToken])
+    }, [accessToken, goalCompleted])
 
-    const completeGoal = async (goal: Goal) => {
+    const completeGoal = async (goal: Goal, completing: boolean) => {
         const completeGoalPayload = {
             method: 'PATCH',
             headers: {
@@ -67,7 +77,12 @@ const goals = () => {
             console.log(data.error)
         } else {
             console.log(data)
-            setGoalCompleted(true)
+            if (completing) {
+                setGoalCompleted(true)
+                setCompletedGoalName(goal.title)
+            } else {
+                setGoalCompleted(false)
+            }
         }
     }
     
@@ -98,7 +113,7 @@ const goals = () => {
                     <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>
 
                     {currentGoals.map(goal => (
-                        <FullGoalCard key={goal._id} goal={goal} completeGoal={() => completeGoal(goal)} />
+                        <FullGoalCard key={goal._id} goal={goal} completeGoal={completeGoal} />
                     ))}
                 </View>
             </ScrollView>
@@ -110,10 +125,12 @@ const goals = () => {
                         width: alertWidth
                     }}
                 >
-                    <Text className='text-center text-lg'>You completed a goal!{' '}</Text>
-                    <TouchableOpacity className='absolute right-0'>
-                        <Text className='color-primary mr-4'>Undo</Text>
+                    <TouchableOpacity className='absolute left-0 ml-4' onPress={() => setGoalCompleted(false)}>
+                        <Text className='text-3xl'>&times;</Text>
                     </TouchableOpacity>
+                    <Text className='text-center text-lg'>You completed a goal: 
+                        <Text className='font-bold'>{completedGoalName}</Text>
+                    !</Text>
                 </View>
             )}
             <TabFooter page='goals' />

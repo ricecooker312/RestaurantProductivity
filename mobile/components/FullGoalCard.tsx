@@ -14,12 +14,13 @@ export type Goal = {
     priority: string,
     difficulty: string,
     userId: string,
-    time: string
+    time: string,
+    lastUpdated?: string
 }
 
 interface FullGoalCardProps {
     goal: Goal,
-    completeGoal: (goal: Goal) => void
+    completeGoal: (goal: Goal, completing: boolean) => void
 }
 
 const FullGoalCard = ({ goal, completeGoal }: FullGoalCardProps) => {
@@ -87,7 +88,7 @@ const FullGoalCard = ({ goal, completeGoal }: FullGoalCardProps) => {
                         w-36 
                         rounded-xl'
                         underlayColor={'#0014C7'}
-                        onPress={() => completeGoal(goal)}
+                        onPress={() => completeGoal(goal, true)}
                     >
                         <Text className='text-lg color-white text-center'>Complete</Text>
                     </TouchableHighlight>
@@ -108,7 +109,7 @@ const FullGoalCard = ({ goal, completeGoal }: FullGoalCardProps) => {
             ) : (
                 <Text className='text-center text-lg w-full p-4 bg-[#65FF65]'>
                     Goal is completed!{' '}
-                    <Link href='/goals' onPress={() => completeGoal(goal)}>
+                    <Link href='/goals' onPress={() => completeGoal(goal, true)}>
                         <Text className='text-lg color-primary border-2'>Undo</Text>
                     </Link>
                 </Text>
