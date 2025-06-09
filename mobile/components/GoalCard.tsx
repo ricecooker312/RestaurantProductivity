@@ -1,17 +1,35 @@
 import { View, Text, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { AdvancedCheckbox } from 'react-native-advanced-checkbox'
-import { icons } from '@/constants/icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router } from 'expo-router'
 
 interface GoalCardProps {
+    id: string,
     completed: boolean,
     name: string,
-    priority: string
+    priority: string,
+    completeGoal: (id: string) => void
 }
 
-const GoalCard = ({ completed, name, priority }: GoalCardProps) => {
+const GoalCard = ({ id, completed, name, priority, completeGoal }: GoalCardProps) => {
     const [checked, setChecked] = useState<string | boolean>(completed)
+    const [accessToken, setAccessToken] = useState<string>('')
+
+    useEffect(() => {
+        const isAuthenticated = async () => {
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
+
+            if (!useEffectToken) {
+                router.navigate('/onboarding')
+            } else {
+                setAccessToken(useEffectToken)
+            }
+        }
+
+        isAuthenticated()
+    }, [])
 
     let border
 
@@ -23,6 +41,10 @@ const GoalCard = ({ completed, name, priority }: GoalCardProps) => {
     }
     else if (priority === 'high') {
         border = 'border-button-error'
+    }
+
+    if (checked) {
+        completeGoal(id)
     }
     
     return (

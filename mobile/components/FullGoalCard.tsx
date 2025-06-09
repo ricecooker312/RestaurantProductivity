@@ -2,7 +2,6 @@ import { View, Text, Image, TouchableOpacity, TouchableHighlight } from 'react-n
 import React, { useState } from 'react'
 
 import { icons } from '@/constants/icons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Link, RelativePathString, router } from 'expo-router'
 
 export type Goal = {

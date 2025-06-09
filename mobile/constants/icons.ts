@@ -2,6 +2,7 @@ import logo from './../assets/icons/logo.png'
 import streak from '@/assets/icons/streak.png'
 import clock from '@/assets/icons/clock.png'
 import hometab from '@/assets/icons/hometab.png'
+import restauranttab from '@/assets/icons/restauranttab.png'
 import goalstab from '@/assets/icons/goalstab.png'
 import profiletab from '@/assets/icons/profiletab.png'
 import lowpriority from '@/assets/icons/lowpriority.png'
@@ -18,6 +19,7 @@ export const icons = {
   streak,
   clock,
   hometab,
+  restauranttab,
   goalstab,
   profiletab,
   lowpriority,

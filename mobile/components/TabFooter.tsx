@@ -12,8 +12,10 @@ const TabFooter = ({ page }: { page: string }) => {
             <Image source={icons.hometab} />
         </TouchableWithoutFeedback>
       </View>
-      <View className={`h-full flex-1 items-center justify-center ${page === 'restuarant' && 'bg-dark-footer'}`}>
-        <Image source={icons.hometab} />
+      <View className={`h-full flex-1 items-center justify-center ${page === 'restaurant' && 'bg-dark-footer'}`}>
+        <TouchableWithoutFeedback onPress={() => router.navigate('/restaurant')}>
+          <Image source={icons.restauranttab} className='size-12' />
+        </TouchableWithoutFeedback>
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'goals' && 'bg-dark-footer'}`}>
         <TouchableWithoutFeedback onPress={() => router.navigate('/goals')}>

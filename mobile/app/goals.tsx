@@ -19,7 +19,7 @@ import { router } from 'expo-router'
 import FullGoalCard, { Goal } from '@/components/FullGoalCard'
 
 const screenWidth = Dimensions.get('window').width
-const alertWidth = screenWidth * 0.8
+const alertWidth = screenWidth * 0.9
 
 const goals = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -76,7 +76,6 @@ const goals = () => {
         if (data.error) {
             console.log(data.error)
         } else {
-            console.log(data)
             if (completing) {
                 setGoalCompleted(true)
                 setCompletedGoalName(goal.title)
@@ -91,22 +90,23 @@ const goals = () => {
             <ScrollView className='bg-dfbg' showsVerticalScrollIndicator={false}>
                 <View className='flex flex-row flex-wrap mt-12 items-center justify-center'>
 
-                <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
-                    <Image source={icons.logo} className='w-[3.875rem] h-[2.9375rem] m-4 ml-8' />
-                </TouchableWithoutFeedback>
+                    <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
+                        <Image source={icons.logo} className='w-[3.875rem] h-[2.9375rem] m-4 ml-8' />
+                    </TouchableWithoutFeedback>
 
-                <View className='flex-row items-center mx-[1rem]'>
-                    <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
-                    <Text className='text-xl'>6</Text>
-                </View>
+                    <View className='flex-row items-center mx-[1rem]'>
+                        <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
+                        <Text className='text-xl'>6</Text>
+                    </View>
 
-                <TouchableHighlight
-                    className='p-4 px-8 bg-primary justify-self-end ml-auto mr-8 rounded-xl'
-                    underlayColor={'#0014C7'}
-                    onPress={() => router.navigate('/newGoal')}
-                >
-                    <Text className='color-white text-lg'>Set a New Goal</Text>
-                </TouchableHighlight>
+                    <TouchableHighlight
+                        className='p-4 px-8 bg-primary justify-self-end ml-auto mr-8 rounded-xl'
+                        underlayColor={'#0014C7'}
+                        onPress={() => router.navigate('/newGoal')}
+                    >
+                        <Text className='color-white text-lg'>Set a New Goal</Text>
+                    </TouchableHighlight>
+                    
                 </View>
 
                 <View className='flex flex-row flex-wrap justify-center mb-28'>
@@ -125,10 +125,10 @@ const goals = () => {
                         width: alertWidth
                     }}
                 >
-                    <TouchableOpacity className='absolute left-0 ml-4' onPress={() => setGoalCompleted(false)}>
+                    <TouchableOpacity className='absolute left-0 m-4' onPress={() => setGoalCompleted(false)}>
                         <Text className='text-3xl'>&times;</Text>
                     </TouchableOpacity>
-                    <Text className='text-center text-lg'>You completed a goal: 
+                    <Text className='text-center text-lg'>You completed a goal:{' '}
                         <Text className='font-bold'>{completedGoalName}</Text>
                     !</Text>
                 </View>
