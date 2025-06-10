@@ -16,10 +16,13 @@ import { icons } from '@/constants/icons'
 import TabFooter from '@/components/TabFooter'
 import { images } from '@/constants/images'
 import ItemModal from '@/components/ItemModal'
+import NewItemModal from '@/components/NewItemModal'
 
 const restaurant = () => {
     const [chairModal, setChairModal] = useState(false)
     const [tableModal, setTableModal] = useState(false)
+    const [burgerModal, setBurgerModal] = useState(false)
+    const [newItem, setNewItem] = useState(false)
 
     const insets = useSafeAreaInsets()
 
@@ -124,10 +127,11 @@ const restaurant = () => {
 
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                            onPress={() => {}}
+                            onPress={() => setNewItem(true)}
                         >
                             <Text className='text-5xl'>+</Text>
                         </TouchableOpacity>
+                        <NewItemModal open={newItem} setOpen={setNewItem} itemType='furniture' />
 
                     </View>
 
@@ -135,6 +139,34 @@ const restaurant = () => {
 
                     <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
 
+                        <TouchableOpacity
+                            className='border-2 bg-light-100 rounded-lg items-center justify-center w-24 h-24'
+                            onPress={() => setBurgerModal(true)}
+                        >
+                            <Image source={images.lvloneburger} className='size-full' />
+                        </TouchableOpacity>
+                        <ItemModal
+                            open={burgerModal}
+                            setOpen={setBurgerModal}
+                            item='Burger'
+                            image={images.lvloneburger}
+                            level='1'
+                            features={[
+                                {
+                                    feature: 'Average profit',
+                                    amount: '$5'
+                                },
+                                {
+                                    feature: 'Average customers',
+                                    amount: '10'
+                                },
+                                {
+                                    feature: 'Average rating',
+                                    amount: '3 stars'
+                                }
+                            ]}
+                        />    
+                        
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
                             onPress={() => {}}

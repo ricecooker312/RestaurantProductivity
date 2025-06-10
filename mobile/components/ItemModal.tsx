@@ -1,10 +1,7 @@
 import { View, Text, Modal, Image, TouchableHighlight, TouchableOpacity, ImageSourcePropType } from 'react-native'
 import React from 'react'
 
-type Feature = {
-    feature: string,
-    amount: string
-}
+import { Feature } from '@/types/restaurantTypes'
 
 interface ItemModalProps {
     open: boolean,
@@ -31,7 +28,7 @@ const ItemModal = ({ open, setOpen, image, item, level, features }: ItemModalPro
                         <Text className='text-3xl'>&times;</Text>
                     </TouchableOpacity>
 
-                    <Text className='text-center font-bold text-2xl color-dark-heading mb-8'>
+                    <Text className='text-left font-bold text-2xl color-dark-heading mb-8'>
                         {item}{' '}
                         <Text className='color-primary'>Level {level}</Text>
                     </Text>

@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { icons } from '@/constants/icons'
 import TabFooter from '@/components/TabFooter'
 import GoalCard from '@/components/GoalCard'
-import { Goal } from '@/components/FullGoalCard'
+import { Goal } from '@/types/goalTypes'
 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 

@@ -16,7 +16,8 @@ import TabFooter from '@/components/TabFooter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 
-import FullGoalCard, { Goal } from '@/components/FullGoalCard'
+import FullGoalCard from '@/components/FullGoalCard'
+import { Goal } from '@/types/goalTypes'
 
 const screenWidth = Dimensions.get('window').width
 const alertWidth = screenWidth * 0.9
@@ -106,7 +107,7 @@ const goals = () => {
                     >
                         <Text className='color-white text-lg'>Set a New Goal</Text>
                     </TouchableHighlight>
-                    
+
                 </View>
 
                 <View className='flex flex-row flex-wrap justify-center mb-28'>

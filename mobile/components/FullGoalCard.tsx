@@ -3,19 +3,7 @@ import React, { useState } from 'react'
 
 import { icons } from '@/constants/icons'
 import { Link, RelativePathString, router } from 'expo-router'
-
-export type Goal = {
-    _id: string,
-    title: string,
-    description: string,
-    completed: boolean,
-    type: string,
-    priority: string,
-    difficulty: string,
-    userId: string,
-    time: string,
-    lastUpdated?: string
-}
+import { Goal } from '@/types/goalTypes'
 
 interface FullGoalCardProps {
     goal: Goal,

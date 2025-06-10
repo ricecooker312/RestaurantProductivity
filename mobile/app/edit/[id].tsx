@@ -13,7 +13,7 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Goal } from '@/components/FullGoalCard'
+import { Goal } from '@/types/goalTypes'
 
 import { icons } from '@/constants/icons'
 import FormInput from '@/components/FormInput'
