@@ -8,7 +8,7 @@ import {
     Alert,
     TouchableOpacity
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -17,14 +17,55 @@ import TabFooter from '@/components/TabFooter'
 import { images } from '@/constants/images'
 import ItemModal from '@/components/ItemModal'
 import NewItemModal from '@/components/NewItemModal'
+import Item from '@/components/Item'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import { UserItem } from '@/types/restaurantTypes'
 
 const restaurant = () => {
-    const [chairModal, setChairModal] = useState(false)
-    const [tableModal, setTableModal] = useState(false)
     const [burgerModal, setBurgerModal] = useState(false)
     const [newItem, setNewItem] = useState(false)
+    const [accessToken, setAccessToken] = useState('')
+    const [items, setItems] = useState<UserItem[]>([])
 
     const insets = useSafeAreaInsets()
+
+    useEffect(() => {
+        const isAuthenticated = async () => {
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
+
+            if (!useEffectToken) {
+                router.navigate('/onboarding')
+            } else {
+                setAccessToken(useEffectToken)
+            }
+        }
+
+        isAuthenticated()
+    }, [])
+
+    useEffect(() => {
+        const getItems = async () => {
+            const getItemPayload = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/find/all', getItemPayload)
+            const data = await res.json()
+
+            if (data.error) {
+                console.log(`All Items Find Error: ${data.error}`)
+            } else {
+                setItems(data)
+            }
+        }
+
+        if (accessToken) getItems()
+    }, [accessToken])
 
     return (
         <View className='flex-1 bg-dfbg'>
@@ -77,53 +118,9 @@ const restaurant = () => {
 
                     <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
 
-                        <TouchableOpacity 
-                            className='border-2 bg-light-100 rounded-lg w-24 h-24'
-                            onPress={() => setChairModal(true)}
-                        >
-                            <Image source={images.lvlonechair} className='size-full' />
-                        </TouchableOpacity>
-                        <ItemModal 
-                            open={chairModal} 
-                            setOpen={setChairModal} 
-                            item='Chair'
-                            image={images.lvlonechair} 
-                            level='1'
-                            features={[
-                                {
-                                    feature: 'Average stay time',
-                                    amount: '20 minutes'
-                                },
-                                {
-                                    feature: 'Average profit',
-                                    amount: '$20'
-                                }
-                            ]}
-                        />
-
-                        <TouchableOpacity 
-                            className='border-2 bg-light-100 rounded-lg w-24 h-24'
-                            onPress={() => setTableModal(true)}
-                        >
-                            <Image source={images.lvlonetable} className='size-full' />
-                        </TouchableOpacity>
-                        <ItemModal
-                            open={tableModal}
-                            setOpen={setTableModal}
-                            item='Table'
-                            image={images.lvlonetable}
-                            level='1'
-                            features={[
-                                {
-                                    feature: 'Average customers',
-                                    amount: '1'
-                                },
-                                {
-                                    feature: 'Average profit',
-                                    amount: '$25'
-                                }
-                            ]}
-                        />
+                        {items && items.map(item => (
+                            <Item key={item._id} itemId={item.itemId} accessToken={accessToken} />
+                        ))}
 
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'

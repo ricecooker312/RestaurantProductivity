@@ -279,18 +279,32 @@ app.get('/api/items/find/all', async (req, res) => {
     }
 })
 
-app.get('/api/items/user/find', checkToken, async (req, res) => {
+app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
     const userId = req.user.id
+    const itemId = req.params.itemId
 
     try {
-        const owned = await userItems.find({ userId: userId }).toArray()
+        const uItem = await userItems.find({ userId: userId, itemId: itemId }).toArray()
 
-        return res.send(owned)
+        return res.send(uItem)
     } catch (err) {
         console.log(err)
         return res.send({
             error: err
         })
+    }
+})
+
+app.get('/api/items/user/find/all', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const uItems = await userItems.find({ userId: userId }).toArray()
+
+        return res.send(uItems)
+    } catch (err) {
+        console.log(err)
+        return res.send(err)
     }
 })
 
@@ -337,19 +351,6 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         return res.send({
             error: err
         })
-    }
-})
-
-app.get('/api/items/user/find/all', checkToken, async (req, res) => {
-    const userId = req.user.id
-
-    try {
-        const uItems = await userItems.find({ userId: userId }).toArray()
-
-        return res.send(uItems)
-    } catch (err) {
-        console.log(err)
-        return res.send(err)
     }
 })
 
