@@ -54,7 +54,7 @@ const restaurant = () => {
                 }
             }
 
-            const res = await fetch('http://localhost:8000/api/items/user/find/all', getItemPayload)
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/find/all', getItemPayload)
             const data = await res.json()
 
             if (data.error) {

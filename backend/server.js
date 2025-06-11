@@ -279,6 +279,24 @@ app.get('/api/items/find/all', async (req, res) => {
     }
 })
 
+app.get('/api/items/find/:itemId', async (req, res) => {
+    const itemId = req.params.itemId
+    
+    try {
+        const item = await items.findOne({ _id: new ObjectId(itemId) })
+        if (!item) {
+            return res.send({
+                'error': 'That item does not exist'
+            })
+        }
+
+        return res.send(item)
+    } catch (err) {
+        console.log(err)
+        return res.send(err)
+    }
+})
+
 app.get('/api/items/user/find/all', checkToken, async (req, res) => {
     const userId = req.user.id
 

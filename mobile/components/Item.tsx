@@ -47,7 +47,6 @@ const Item = ({ itemId, accessToken }: { itemId: string, accessToken: string }) 
     }, [])
 
     const image = imagesMap[item.image as keyof typeof imagesMap]
-    console.log(item)
 
     return (
         <>
@@ -55,7 +54,7 @@ const Item = ({ itemId, accessToken }: { itemId: string, accessToken: string }) 
                 className='border-2 bg-light-100 rounded-lg w-24 h-24'
                 onPress={() => setOpen(true)}
             >
-                <Image source={image} className='size-full' />
+                <Image source={image ?? require('../assets/images/lvloneburger.png')} className='size-full' />
             </TouchableOpacity>
             <ItemModal 
                 open={open} 
