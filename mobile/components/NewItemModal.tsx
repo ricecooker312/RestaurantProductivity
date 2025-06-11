@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableOpacity } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native'
 import React from 'react'
 
 import NewItem from './NewItem'
@@ -18,7 +18,13 @@ const NewItemModal = ({ open, setOpen, itemType }: NewItemModalProps) => {
             visible={open}
         >
             <View className='flex-1 justify-center items-center'>
-                <View style={{ padding: 15, margin: 20 }} className='bg-light-100 items-center rounded-lg w-10/12 border-2'>
+                <ScrollView 
+                    style={{ padding: 15, margin: 20, maxHeight: '70%' }} 
+                    className='bg-light-100 rounded-lg w-10/12 border-2'
+                    contentContainerClassName='items-center'
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    showsVerticalScrollIndicator={false}
+                >
                     <View className='p-6 z-50 w-full m-0'>
                         <TouchableOpacity
                             className='absolute top-0 left-0'
@@ -30,7 +36,10 @@ const NewItemModal = ({ open, setOpen, itemType }: NewItemModalProps) => {
                     </View>
 
                     <NewItem item='Sofa' image={images.lvloneburger} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
-                </View>
+                    <NewItem item='Sofa' image={images.lvloneburger} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
+                    <NewItem item='Sofa' image={images.lvloneburger} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
+                    <NewItem item='Sofa' image={images.lvlonechair} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
+                </ScrollView>
             </View>
         </Modal>
     )

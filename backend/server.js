@@ -19,6 +19,8 @@ const database = mongoClient.db('restaurantpd')
 
 const users = database.collection('users')
 const goals = database.collection('goals')
+const items = database.collection('items')
+const userItems = database.collection('userItems')
 
 const jwt = require('jsonwebtoken')
 
@@ -135,7 +137,11 @@ app.get('/api/goals/find/:goalId', checkToken, async (req, res) => {
     try {
         const goalFind = await goals.findOne({ _id: new ObjectId(goalId) })
 
-        if (goalFind.userId !== userId) {
+        if (!goalFind) {
+            return res.send({
+                'error': 'That goal does not exist'
+            })
+        } else if (goalFind.userId !== userId) {
             return res.send({
                 'error': 'Unauthorized'
             })
@@ -257,6 +263,118 @@ app.delete('/api/goals/:goalId/delete', checkToken, async (req, res) => {
         return res.send(goalDelete)
     } catch (err) {
         console.log(`Goal Delete Error: ${err}`)
+    }
+})
+
+app.get('/api/items/find/all', async (req, res) => {
+    try {
+        const allItems = await items.find({}).toArray()
+
+        return res.send(allItems)
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.get('/api/items/user/find', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const owned = await userItems.find({ userId: userId }).toArray()
+
+        return res.send(owned)
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.post('/api/items/add', async (req, res) => {
+    const { name, image, type, price, maxLevel, features } = req.body
+
+    try {
+        const item = { name: name, image: image, type: type, price: price, maxLevel: maxLevel, features: features }
+        const insert = await items.insertOne(item)
+
+        return res.send(insert)
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.post('/api/items/user/buy', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { itemId } = req.body
+
+    try {
+        const item = await items.find({ _id: new ObjectId(itemId) }).toArray()
+        if (item.length === 0) {
+            return res.send({
+                error: 'That item does not exist'
+            })
+        }
+
+        const time = new Date()
+       
+        const newItemDoc = { 
+            userId: userId, 
+            itemId: itemId,
+            boughtAt: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}` 
+        }
+        const newItem = await userItems.insertOne(newItemDoc)
+
+        return res.send(newItem)
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.get('/api/items/user/find/all', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const uItems = await userItems.find({ userId: userId }).toArray()
+
+        return res.send(uItems)
+    } catch (err) {
+        console.log(err)
+        return res.send(err)
+    }
+})
+
+app.delete('/api/items/user/sell', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { itemId } = req.body
+
+    try {
+        const uItem = await userItems.findOne({ itemId: itemId })
+        if (!uItem) {
+            return res.send({
+                'error': 'That item does not exist'
+            })
+        } else if (uItem.userId !== userId) {
+            return res.send({
+                error: "You don't own this item"
+            })
+        }
+
+        const deleteItem = await userItems.deleteOne(uItem)
+
+        return res.send(deleteItem)
+    } catch (err) {
+        console.log(err)
+        return res.send(err)
     }
 })
 

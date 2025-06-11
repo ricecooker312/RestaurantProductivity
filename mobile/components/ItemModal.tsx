@@ -1,4 +1,4 @@
-import { View, Text, Modal, Image, TouchableHighlight, TouchableOpacity, ImageSourcePropType } from 'react-native'
+import { View, Text, Modal, Image, TouchableHighlight, TouchableOpacity, ImageSourcePropType, ScrollView } from 'react-native'
 import React from 'react'
 
 import { Feature } from '@/types/restaurantTypes'
@@ -20,7 +20,10 @@ const ItemModal = ({ open, setOpen, image, item, level, features }: ItemModalPro
             visible={open}
         >
             <View className='flex-1 justify-center items-center'>
-                <View style={{ padding: 15, margin: 20 }} className='bg-light-200 items-center rounded-lg w-10/12 border-2'>
+                <View 
+                    style={{ padding: 15, margin: 20, flexGrow: 1 }} 
+                    className='bg-light-200 items-center rounded-lg w-10/12 border-2'
+                >
                     <TouchableOpacity
                         className='absolute top-0 left-0 m-4'
                         onPress={() => setOpen(false)}

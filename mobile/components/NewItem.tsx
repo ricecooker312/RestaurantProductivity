@@ -2,6 +2,7 @@ import { View, Text, ImageSourcePropType, Image, TouchableHighlight} from 'react
 import React from 'react'
 
 import { Feature } from '@/types/restaurantTypes'
+import { icons } from '@/constants/icons'
 
 interface NewItemProps {
     item: string,
@@ -20,7 +21,7 @@ const NewItem = ({ item, image, price, features }: NewItemProps) => {
             </View>
 
             {features.map(feature => (
-                <Text className='text-sm color-gray m-4'>{feature.feature}:{' '}
+                <Text key={feature.amount} className='text-sm color-gray m-4'>{feature.feature}:{' '}
                     <Text className='font-bold'>{feature.amount}</Text>
                 </Text>
             ))}
@@ -30,7 +31,14 @@ const NewItem = ({ item, image, price, features }: NewItemProps) => {
                 underlayColor={'#0014C7'}
                 className='bg-primary p-4 px-8 rounded-lg mt-6'
             >
-                <Text className='color-white text-lg text-center'>Buy</Text>
+                <View className='flex flex-row items-center justify-center'>
+                    <Text className='color-white text-lg text-center mr-auto'>BUY</Text>
+
+                    <View className='flex flex-row gap-3 items-center'>
+                        <Text className='color-white text-lg'>{price}</Text>
+                        <Image source={icons.coins} className='w-8 h-8' />
+                    </View>
+                </View>
             </TouchableHighlight>
         </View>
     )
