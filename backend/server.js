@@ -297,6 +297,38 @@ app.get('/api/items/find/:itemId', async (req, res) => {
     }
 })
 
+app.get('/api/items/user/find/type/:itemType/unowned')
+
+app.get('/api/items/user/find/type/:itemType/all', checkToken, async (req, res) => {
+    const itemType = req.params.itemType
+    const userId = req.user.id
+
+    const resultItems = []
+
+    try {
+        const uItems = await userItems.find({ userId: userId }).toArray()
+        console.log(uItems)
+        if (uItems.length === 0) {
+            return res.send(uItems)
+        }
+
+        for (let i = 0; i < uItems.length; i++) {
+            console.log(itemType)
+            const item = await items.findOne({ _id: new ObjectId(uItems[i].itemId), type: itemType })
+            if (!item) {
+                return res.send([])
+            }
+
+            resultItems.push(item)
+        }
+
+        return res.send(resultItems)
+    } catch (err) {
+        console.log(err)
+        return res.send(err)
+    }
+})
+
 app.get('/api/items/user/find/all', checkToken, async (req, res) => {
     const userId = req.user.id
 

@@ -32,7 +32,7 @@ const Item = ({ itemId, accessToken }: { itemId: string, accessToken: string }) 
                 }
             }
 
-            const res = await fetch(`https://restaurantproductivity.onrender.com/api/items/user/find/${itemId}`, getItemPayload)
+            const res = await fetch(`https://restaurantproductivity.onrender.com/api/items/find/${itemId}`, getItemPayload)
             const data = await res.json()
 
             if (data.error) {
