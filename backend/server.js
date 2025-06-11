@@ -291,10 +291,9 @@ app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
 
         const unownedItemIds = allItemIds.filter(id => !ownedItemIds.includes(id))
         const unownedItems = []
-        console.log(unownedItemIds)
 
         for (let i = 0; i < unownedItemIds.length; i++) {
-            const unownedItem = await items.find({ _id: new ObjectId(unownedItemIds[i]) }).toArray()
+            const unownedItem = await items.findOne({ _id: new ObjectId(unownedItemIds[i]) })
             if (!unownedItem) {
                 return res.send({
                     'error': 'That unowned item does not exist'
@@ -325,6 +324,7 @@ app.get('/api/items/user/find/all', checkToken, async (req, res) => {
                 })
             }
 
+            item.level = uItems[i].level
             resultItems.push(item)
         }
 
@@ -388,6 +388,7 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         const newItemDoc = { 
             userId: userId, 
             itemId: itemId,
+            level: 1,
             boughtAt: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}` 
         }
         const newItem = await userItems.insertOne(newItemDoc)

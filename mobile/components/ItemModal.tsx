@@ -7,8 +7,8 @@ interface ItemModalProps {
     open: boolean,
     setOpen: (value: boolean) => void,
     item: string,
-    image: ImageSourcePropType,
-    level: string,
+    image: string,
+    level: number,
     features: Feature[]
 }
 
@@ -35,10 +35,10 @@ const ItemModal = ({ open, setOpen, image, item, level, features }: ItemModalPro
                         {item}{' '}
                         <Text className='color-primary'>Level {level}</Text>
                     </Text>
-                    <Image source={image} className='size-36' />
-                    
+                    <Image source={{ uri: image }} className='size-36' />
+
                     {features.map(feature => (
-                        <Text key={feature.amount} className='text-sm color-gray'>{feature.feature}:{' '}
+                        <Text key={feature.amount} className='text-sm color-gray mr-auto'>{feature.feature}:{' '}
                             <Text className='font-bold'>{feature.amount}</Text>
                         </Text>
                     ))}

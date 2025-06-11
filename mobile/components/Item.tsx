@@ -3,50 +3,22 @@ import React, { useEffect, useState } from 'react'
 
 import { images } from '@/constants/images'
 import ItemModal from './ItemModal'
-import { RestaurantItem } from '@/types/restaurantTypes'
+import { Feature, RestaurantItem } from '@/types/restaurantTypes'
 
 const imagesMap = {
     'lvlonechair.png': require('../assets/images/lvlonechair.png')
 }
 
-const Item = ({ itemId, accessToken }: { itemId: string, accessToken: string }) => {
+interface ItemProps {
+    name: string,
+    image: string,
+    level: number,
+    maxLevel: number,
+    features: Feature[]
+}
+
+const Item = ({ name, image, maxLevel, level, features }: ItemProps) => {
     const [open, setOpen] = useState(false)
-    const [item, setItem] = useState<RestaurantItem>({
-        _id: '',
-        name: '',
-        image: '',
-        type: '',
-        price: '',
-        maxLevel: 0,
-        features: []
-    })
-
-    useEffect(() => {
-        const getItem = async () => {
-            console.log(accessToken, itemId)
-            const getItemPayload = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            }
-
-            const res = await fetch(`https://restaurantproductivity.onrender.com/api/items/find/${itemId}`, getItemPayload)
-            const data = await res.json()
-
-            if (data.error) {
-                console.log(`One Item Find Error: ${data.error}`)
-            } else {
-                console.log(data)
-                setItem(data)
-            }
-        }
-
-        getItem()
-    }, [])
-
-    const image = imagesMap[item.image as keyof typeof imagesMap]
 
     return (
         <>
@@ -54,24 +26,15 @@ const Item = ({ itemId, accessToken }: { itemId: string, accessToken: string }) 
                 className='border-2 bg-light-100 rounded-lg w-24 h-24'
                 onPress={() => setOpen(true)}
             >
-                <Image source={image ?? require('../assets/images/lvloneburger.png')} className='size-full' />
+                <Image source={{ uri: image }} className='size-full' />
             </TouchableOpacity>
             <ItemModal 
                 open={open} 
                 setOpen={setOpen} 
-                item='Chair'
-                image={images.lvlonechair} 
-                level='1'
-                features={[
-                    {
-                        feature: 'Average stay time',
-                        amount: '20 minutes'
-                    },
-                    {
-                        feature: 'Average profit',
-                        amount: '$20'
-                    }
-                ]}
+                item={name}
+                image={image} 
+                level={level}
+                features={features}
             />
         </>
     )

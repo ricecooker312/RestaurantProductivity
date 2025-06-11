@@ -5,19 +5,19 @@ import { Feature } from '@/types/restaurantTypes'
 import { icons } from '@/constants/icons'
 
 interface NewItemProps {
-    item: string,
-    image: ImageSourcePropType,
+    name: string,
+    image: string,
     price: string,
     features: Feature[]
 }
 
-const NewItem = ({ item, image, price, features }: NewItemProps) => {
+const NewItem = ({ name, image, price, features }: NewItemProps) => {
     return (
         <View className='bg-light-200 p-4 m-16 w-10/12'>
-            <Text className='font-bold text-center text-2xl'>{item}</Text>
+            <Text className='font-bold text-center text-2xl'>{name}</Text>
             
             <View className='w-full flex items-center'>
-                <Image source={image} className='w-36 h-36' />
+                <Image source={{ uri: image }} className='w-36 h-36' />
             </View>
 
             {features.map(feature => (

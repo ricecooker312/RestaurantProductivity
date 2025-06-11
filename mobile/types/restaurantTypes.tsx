@@ -16,6 +16,7 @@ export type RestaurantItem = {
     image: string,
     type: string,
     price: string,
+    level: number,
     maxLevel: number,
     features: Feature[]
 }

@@ -3,14 +3,15 @@ import React from 'react'
 
 import NewItem from './NewItem'
 import { images } from '@/constants/images'
+import { RestaurantItem } from '@/types/restaurantTypes'
 
 interface NewItemModalProps {
     open: boolean,
     setOpen: (value: boolean) => void,
-    itemType: string
+    items: RestaurantItem[]
 }
 
-const NewItemModal = ({ open, setOpen, itemType }: NewItemModalProps) => {
+const NewItemModal = ({ open, setOpen, items }: NewItemModalProps) => {
     return (
         <Modal
             animationType='fade'
@@ -35,10 +36,9 @@ const NewItemModal = ({ open, setOpen, itemType }: NewItemModalProps) => {
                         <Text className='text-3xl font-bold text-center'>New Item</Text>
                     </View>
 
-                    <NewItem item='Sofa' image={images.lvloneburger} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
-                    <NewItem item='Sofa' image={images.lvloneburger} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
-                    <NewItem item='Sofa' image={images.lvloneburger} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
-                    <NewItem item='Sofa' image={images.lvlonechair} features={[{ feature: 'fdslij', amount: 'fdjsk' }]} price='20' />
+                    {items.map(item => (
+                        <NewItem name={item.name} image={item.image} price={item.price} features={item.features} />
+                    ))}
                 </ScrollView>
             </View>
         </Modal>

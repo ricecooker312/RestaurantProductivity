@@ -20,13 +20,13 @@ import NewItemModal from '@/components/NewItemModal'
 import Item from '@/components/Item'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { UserItem } from '@/types/restaurantTypes'
+import { RestaurantItem } from '@/types/restaurantTypes'
 
 const restaurant = () => {
-    const [burgerModal, setBurgerModal] = useState(false)
     const [newItem, setNewItem] = useState(false)
     const [accessToken, setAccessToken] = useState('')
-    const [items, setItems] = useState<UserItem[]>([])
+    const [items, setItems] = useState<RestaurantItem[]>([])
+    const [unowned, setUnowned] = useState<RestaurantItem[]>([])
 
     const insets = useSafeAreaInsets()
 
@@ -64,7 +64,30 @@ const restaurant = () => {
             }
         }
 
-        if (accessToken) getItems()
+        const getUnowned = async () => {
+            const getUnownedPayload = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/find/unowned/all', getUnownedPayload)
+            const data = await res.json()
+
+            if (data.error) {
+                console.log(data.error)
+            } else {
+                setUnowned(data)
+            }
+        }
+
+
+        if (accessToken) {
+            getItems()
+            getUnowned()
+        }
     }, [accessToken])
 
     return (
@@ -118,8 +141,17 @@ const restaurant = () => {
 
                     <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
 
-                        {items && items.map(item => (
-                            <Item key={item._id} itemId={item.itemId} accessToken={accessToken} />
+                        {items.length > 0 && items.map(item => (
+                            item.type === 'furniture' && (
+                                <Item 
+                                    key={item._id} 
+                                    name={item.name} 
+                                    image={item.image} 
+                                    level={item.level}
+                                    maxLevel={item.maxLevel}
+                                    features={item.features}
+                                />
+                            )
                         ))}
 
                         <TouchableOpacity 
@@ -128,7 +160,7 @@ const restaurant = () => {
                         >
                             <Text className='text-5xl'>+</Text>
                         </TouchableOpacity>
-                        <NewItemModal open={newItem} setOpen={setNewItem} itemType='furniture' />
+                        <NewItemModal open={newItem} setOpen={setNewItem} items={unowned.filter(item => item.type === 'furniture')} />
 
                     </View>
 
@@ -136,33 +168,18 @@ const restaurant = () => {
 
                     <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
 
-                        <TouchableOpacity
-                            className='border-2 bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                            onPress={() => setBurgerModal(true)}
-                        >
-                            <Image source={images.lvloneburger} className='size-full' />
-                        </TouchableOpacity>
-                        <ItemModal
-                            open={burgerModal}
-                            setOpen={setBurgerModal}
-                            item='Burger'
-                            image={images.lvloneburger}
-                            level='1'
-                            features={[
-                                {
-                                    feature: 'Average profit',
-                                    amount: '$5'
-                                },
-                                {
-                                    feature: 'Average customers',
-                                    amount: '10'
-                                },
-                                {
-                                    feature: 'Average rating',
-                                    amount: '3 stars'
-                                }
-                            ]}
-                        />    
+                        {items.length > 0 && items.map(item => (
+                            item.type === 'menu' && (
+                                <Item 
+                                    key={item._id} 
+                                    name={item.name} 
+                                    image={item.image} 
+                                    level={item.level}
+                                    maxLevel={item.maxLevel}
+                                    features={item.features}
+                                />
+                            )
+                        ))}
                         
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
@@ -176,6 +193,19 @@ const restaurant = () => {
                     <Text className='text-2xl font-bold color-dark-heading m-6'>Decor</Text>
 
                     <View className='flex flex-row flex-wrap m-6 mt-0 gap-5 mb-16'>
+
+                        {items.length > 0 && items.map(item => (
+                            item.type === 'decor' && (
+                                <Item 
+                                    key={item._id} 
+                                    name={item.name} 
+                                    image={item.image} 
+                                    level={item.level}
+                                    maxLevel={item.maxLevel}
+                                    features={item.features}
+                                />
+                            )
+                        ))}
 
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
