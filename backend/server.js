@@ -279,44 +279,50 @@ app.get('/api/items/find/all', async (req, res) => {
     }
 })
 
-app.get('/api/items/find/:itemId', async (req, res) => {
-    const itemId = req.params.itemId
-    
+app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
+    const userId = req.user.id
+
     try {
-        const item = await items.findOne({ _id: new ObjectId(itemId) })
-        if (!item) {
-            return res.send({
-                'error': 'That item does not exist'
-            })
+        const allItems = await items.find({}).project({ _id: 1 }).toArray()
+        const allItemIds = allItems.map(item => item._id.toString())
+
+        const ownedItems = await userItems.find({ userId: userId }).project({ itemId: 1 }).toArray()
+        const ownedItemIds = ownedItems.map(item => item.itemId.toString())
+
+        const unownedItemIds = allItemIds.filter(id => !ownedItemIds.includes(id))
+        const unownedItems = []
+        console.log(unownedItemIds)
+
+        for (let i = 0; i < unownedItemIds.length; i++) {
+            const unownedItem = await items.find({ _id: new ObjectId(unownedItemIds[i]) }).toArray()
+            if (!unownedItem) {
+                return res.send({
+                    'error': 'That unowned item does not exist'
+                })
+            }
+
+            unownedItems.push(unownedItem)
         }
 
-        return res.send(item)
+        return res.send(unownedItems)
     } catch (err) {
         console.log(err)
         return res.send(err)
     }
 })
 
-app.get('/api/items/user/find/type/:itemType/unowned')
-
-app.get('/api/items/user/find/type/:itemType/all', checkToken, async (req, res) => {
-    const itemType = req.params.itemType
+app.get('/api/items/user/find/all', checkToken, async (req, res) => {
     const userId = req.user.id
-
     const resultItems = []
 
     try {
         const uItems = await userItems.find({ userId: userId }).toArray()
-        console.log(uItems)
-        if (uItems.length === 0) {
-            return res.send(uItems)
-        }
-
         for (let i = 0; i < uItems.length; i++) {
-            console.log(itemType)
-            const item = await items.findOne({ _id: new ObjectId(uItems[i].itemId), type: itemType })
+            const item = await items.findOne({ _id: new ObjectId(uItems[i].itemId) })
             if (!item) {
-                return res.send([])
+                return res.send({
+                    'error': 'That item does not exist'
+                })
             }
 
             resultItems.push(item)
@@ -328,25 +334,6 @@ app.get('/api/items/user/find/type/:itemType/all', checkToken, async (req, res) 
         return res.send(err)
     }
 })
-
-app.get('/api/items/user/find/all', checkToken, async (req, res) => {
-    const userId = req.user.id
-
-    if (!userItems) {
-        console.log('userItems collection is undefined!');
-        return res.status(500).send({ error: 'Database not initialized' });
-    }
-
-    try {
-        const uItems = await userItems.find({ userId: userId }).toArray()
-
-        return res.send(uItems)
-    } catch (err) {
-        console.log(err)
-        return res.send(err)
-    }
-})
-
 app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
     const userId = req.user.id
     const itemId = req.params.itemId
