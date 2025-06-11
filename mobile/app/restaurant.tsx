@@ -23,7 +23,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RestaurantItem } from '@/types/restaurantTypes'
 
 const restaurant = () => {
-    const [newItem, setNewItem] = useState(false)
+    const [newFurniture, setNewFurniture] = useState(false)
+    const [newMenu, setNewMenu] = useState(false)
+    const [newDecor, setNewDecor] = useState(false)
     const [accessToken, setAccessToken] = useState('')
     const [items, setItems] = useState<RestaurantItem[]>([])
     const [unowned, setUnowned] = useState<RestaurantItem[]>([])
@@ -156,11 +158,17 @@ const restaurant = () => {
 
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                            onPress={() => setNewItem(true)}
+                            onPress={() => setNewFurniture(true)}
                         >
                             <Text className='text-5xl'>+</Text>
                         </TouchableOpacity>
-                        <NewItemModal open={newItem} setOpen={setNewItem} items={unowned.filter(item => item.type === 'furniture')} />
+                        <NewItemModal 
+                            open={newFurniture} 
+                            setOpen={setNewFurniture} 
+                            items={unowned.filter(item => item.type === 'furniture')} 
+                            setItems={setItems}
+                            setUnowned={setUnowned}
+                        />
 
                     </View>
 
@@ -183,10 +191,17 @@ const restaurant = () => {
                         
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                            onPress={() => {}}
+                            onPress={() => setNewMenu(true)}
                         >
                             <Text className='text-5xl'>+</Text>
                         </TouchableOpacity>
+                        <NewItemModal 
+                            open={newMenu} 
+                            setOpen={setNewMenu} 
+                            items={unowned.filter(item => item.type === 'menu')} 
+                            setItems={setItems}
+                            setUnowned={setUnowned}
+                        />
 
                     </View>
 
@@ -209,10 +224,17 @@ const restaurant = () => {
 
                         <TouchableOpacity 
                             className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                            onPress={() => {}}
+                            onPress={() => setNewDecor(true)}
                         >
                             <Text className='text-5xl'>+</Text>
                         </TouchableOpacity>
+                        <NewItemModal 
+                            open={newDecor} 
+                            setOpen={setNewDecor} 
+                            items={unowned.filter(item => item.type === 'decor')} 
+                            setItems={setItems}
+                            setUnowned={setUnowned}
+                        />
 
                     </View>
                 </ScrollView>

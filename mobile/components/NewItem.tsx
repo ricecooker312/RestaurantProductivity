@@ -1,33 +1,78 @@
-import { View, Text, ImageSourcePropType, Image, TouchableHighlight} from 'react-native'
-import React from 'react'
+import { View, Text, Image, TouchableHighlight } from 'react-native'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { Feature } from '@/types/restaurantTypes'
+import { Feature, RestaurantItem } from '@/types/restaurantTypes'
 import { icons } from '@/constants/icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router } from 'expo-router'
 
 interface NewItemProps {
-    name: string,
-    image: string,
-    price: string,
-    features: Feature[]
+    item: RestaurantItem,
+    setItems: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setOpen: (value: boolean) => void,
+    setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>
 }
 
-const NewItem = ({ name, image, price, features }: NewItemProps) => {
+const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
+    const [accessToken, setAccessToken] = useState('')
+
+    useEffect(() => {
+        const isAuthenticated = async () => {
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
+            if (!useEffectToken) {
+                router.navigate('/onboarding')
+            } else {
+                setAccessToken(useEffectToken)
+            }
+        }
+
+        isAuthenticated()
+    }, [])
+
+    const buyItem = async () => {
+        const buyPayload = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                itemId: item._id
+            })
+        }
+
+        const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/buy', buyPayload)
+        const data = await res.json()
+
+        if (data.error) {
+            console.log(data.error)
+        } else {
+            setItems(prevItems => [
+                ...prevItems,
+                item
+            ])
+            setOpen(false)
+            setUnowned(unownedItem => unownedItem.filter(uItem => uItem !== item))
+        }
+    }
+
     return (
         <View className='bg-light-200 p-4 m-16 w-10/12'>
-            <Text className='font-bold text-center text-2xl'>{name}</Text>
+            <Text className='font-bold text-center text-2xl'>{item.name}</Text>
             
             <View className='w-full flex items-center'>
-                <Image source={{ uri: image }} className='w-36 h-36' />
+                <Image source={{ uri: item.image }} className='w-36 h-36' />
             </View>
 
-            {features.map(feature => (
-                <Text key={feature.amount} className='text-sm color-gray m-4'>{feature.feature}:{' '}
+            {item.features.map(feature => (
+                <Text key={feature.feature} className='text-sm color-gray m-4'>{feature.feature}:{' '}
                     <Text className='font-bold'>{feature.amount}</Text>
                 </Text>
             ))}
 
             <TouchableHighlight
-                onPress={() => {}}
+                onPress={buyItem}
                 underlayColor={'#0014C7'}
                 className='bg-primary p-4 px-8 rounded-lg mt-6'
             >
@@ -35,7 +80,7 @@ const NewItem = ({ name, image, price, features }: NewItemProps) => {
                     <Text className='color-white text-lg text-center mr-auto'>BUY</Text>
 
                     <View className='flex flex-row gap-3 items-center'>
-                        <Text className='color-white text-lg'>{price}</Text>
+                        <Text className='color-white text-lg'>{item.price}</Text>
                         <Image source={icons.coins} className='w-8 h-8' />
                     </View>
                 </View>

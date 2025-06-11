@@ -1,17 +1,18 @@
 import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 
 import NewItem from './NewItem'
-import { images } from '@/constants/images'
 import { RestaurantItem } from '@/types/restaurantTypes'
 
 interface NewItemModalProps {
     open: boolean,
     setOpen: (value: boolean) => void,
-    items: RestaurantItem[]
+    items: RestaurantItem[],
+    setItems: Dispatch<SetStateAction<RestaurantItem[]>>
+    setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>
 }
 
-const NewItemModal = ({ open, setOpen, items }: NewItemModalProps) => {
+const NewItemModal = ({ open, setOpen, items, setItems, setUnowned }: NewItemModalProps) => {
     return (
         <Modal
             animationType='fade'
@@ -37,7 +38,7 @@ const NewItemModal = ({ open, setOpen, items }: NewItemModalProps) => {
                     </View>
 
                     {items.map(item => (
-                        <NewItem name={item.name} image={item.image} price={item.price} features={item.features} />
+                        <NewItem key={item._id} item={item} setItems={setItems} setOpen={setOpen} setUnowned={setUnowned} />
                     ))}
                 </ScrollView>
             </View>

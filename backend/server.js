@@ -283,7 +283,7 @@ app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
     const userId = req.user.id
 
     try {
-        const allItems = await items.find({}).project({ _id: 1 }).toArray()
+        const allItems = await items.find({}).project({ _id: 1 }).sort({ price: 1 }).toArray()
         const allItemIds = allItems.map(item => item._id.toString())
 
         const ownedItems = await userItems.find({ userId: userId }).project({ itemId: 1 }).toArray()
