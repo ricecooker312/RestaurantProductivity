@@ -284,7 +284,7 @@ app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
     const itemId = req.params.itemId
 
     try {
-        const uItem = await userItems.find({ userId: userId, itemId: itemId }).toArray()
+        const uItem = await userItems.findOne({ userId: userId, itemId: itemId })
 
         return res.send(uItem)
     } catch (err) {
