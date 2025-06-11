@@ -27,7 +27,7 @@ const jwt = require('jsonwebtoken')
 const checkToken = (req, res, next) => {
     const tokenHeader = req.headers['authorization']
 
-    if (!tokenHeader) return res.send({
+    if (!tokenHeader) return res.status(401).send({
         'error': 'Token not found'
     })
 
@@ -36,11 +36,11 @@ const checkToken = (req, res, next) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             console.log(err)
-            return res.send({
+            return res.status(403).send({
                 'error': 'Unauthorized'
             })
         }
-
+        
         req.user = user
 
         return next()
@@ -279,24 +279,13 @@ app.get('/api/items/find/all', async (req, res) => {
     }
 })
 
-app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
-    const userId = req.user.id
-    const itemId = req.params.itemId
-
-    try {
-        const uItem = await userItems.findOne({ userId: userId, itemId: itemId })
-
-        return res.send(uItem)
-    } catch (err) {
-        console.log(err)
-        return res.send({
-            error: err
-        })
-    }
-})
-
 app.get('/api/items/user/find/all', checkToken, async (req, res) => {
     const userId = req.user.id
+
+    if (!userItems) {
+        console.log('userItems collection is undefined!');
+        return res.status(500).send({ error: 'Database not initialized' });
+    }
 
     try {
         const uItems = await userItems.find({ userId: userId }).toArray()
@@ -305,6 +294,27 @@ app.get('/api/items/user/find/all', checkToken, async (req, res) => {
     } catch (err) {
         console.log(err)
         return res.send(err)
+    }
+})
+
+app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const itemId = req.params.itemId
+
+    try {
+        const uItem = await userItems.findOne({ userId: userId, itemId: itemId })
+        if (!uItem) {
+            return res.send({
+                'error': 'The item does not exist'
+            })
+        }
+
+        return res.send(uItem)
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
     }
 })
 
