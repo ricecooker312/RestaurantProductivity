@@ -66,7 +66,7 @@ app.post('/api/users/register', async (req, res) => {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const doc = { email: email, password: hashedPassword }
+        const doc = { email: email, password: hashedPassword, coins: 25 }
         const result = await users.insertOne(doc)
 
         const user = { id: result.insertedId, email: email }
@@ -97,6 +97,15 @@ app.post('/api/users/login', async (req, res) => {
         } else {
             return res.send({ error: 'Email or password is incorrect' })
         }
+    }
+})
+
+app.delete('/api/users/delete/all', async (req, res) => {
+    try {
+        const usersDelete = users.deleteMany({})
+        return res.send(usersDelete)
+    } catch (err) {
+        return res.send(err)
     }
 })
 
@@ -263,6 +272,15 @@ app.delete('/api/goals/:goalId/delete', checkToken, async (req, res) => {
         return res.send(goalDelete)
     } catch (err) {
         console.log(`Goal Delete Error: ${err}`)
+    }
+})
+
+app.delete('/api/goals/delete/all', async (req, res) => {
+    try {
+        const goalsDelete = goals.deleteMany({})
+        return res.send(goalsDelete)
+    } catch (err) {
+        return res.send(err)
     }
 })
 
