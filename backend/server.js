@@ -66,7 +66,7 @@ app.post('/api/users/register', async (req, res) => {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const doc = { email: email, password: hashedPassword, coins: 25 }
+        const doc = { email: email, password: hashedPassword, coins: '25' }
         const result = await users.insertOne(doc)
 
         const user = { id: result.insertedId, email: email }
@@ -93,7 +93,7 @@ app.post('/api/users/login', async (req, res) => {
             const user = { id: foundUser._id, email: foundUser.email }
             const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
             
-            return res.send({ accessToken: accessToken, coins: foundUser.coins })
+            return res.send({ accessToken: accessToken, coins: `${foundUser.coins}` })
         } else {
             return res.send({ error: 'Email or password is incorrect' })
         }

@@ -8,6 +8,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 const profile = () => {
   const signOut = async () => {
     await AsyncStorage.removeItem('accessToken')
+    await AsyncStorage.removeItem('coins')
     router.navigate('/onboarding')
   }
 

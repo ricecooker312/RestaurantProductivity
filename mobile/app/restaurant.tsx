@@ -6,7 +6,8 @@ import {
     TouchableHighlight,
     Image,
     Alert,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
@@ -14,13 +15,12 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { icons } from '@/constants/icons'
 import TabFooter from '@/components/TabFooter'
-import { images } from '@/constants/images'
-import ItemModal from '@/components/ItemModal'
 import NewItemModal from '@/components/NewItemModal'
 import Item from '@/components/Item'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { RestaurantItem } from '@/types/restaurantTypes'
+import Header from '@/components/Header'
 
 const restaurant = () => {
     const [newFurniture, setNewFurniture] = useState(false)
@@ -92,168 +92,173 @@ const restaurant = () => {
         }
     }, [accessToken])
 
-    return (
-        <View className='flex-1 bg-dfbg'>
-            <SafeAreaView style={{
-                flex: 1,
-                paddingTop: Math.max(insets.top - 50, 0),
-                paddingBottom: insets.bottom,
-                paddingRight: insets.right,
-                paddingLeft: insets.left
-            }}>
-                <ScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
-                    keyboardShouldPersistTaps='handled'
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View className='flex flex-row flex-wrap items-center justify-center'>
-                    
-                        <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
-                            <Image source={icons.logo} className='w-[3.875rem] h-[2.9375rem] m-4 ml-8' />
-                        </TouchableWithoutFeedback>
-    
-                        <View className='flex-row items-center mx-[1rem]'>
-                            <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
-                            <Text className='text-xl'>6</Text>
+    if (!accessToken || items.length + unowned.length !== 5) {
+        return (
+            <View className='flex-1 bg-dfbg'>
+                <SafeAreaView style={{
+                    flex: 1,
+                    paddingTop: Math.max(insets.top - 50, 0),
+                    paddingBottom: insets.bottom,
+                    paddingRight: insets.right,
+                    paddingLeft: insets.left
+                }}>
+                    <ScrollView
+                        contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps='handled'
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <Header />
+
+                        <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
+                    </ScrollView>
+                </SafeAreaView>
+            </View>
+        )
+    } else {
+        return (
+            <View className='flex-1 bg-dfbg'>
+                <SafeAreaView style={{
+                    flex: 1,
+                    paddingTop: Math.max(insets.top - 50, 0),
+                    paddingBottom: insets.bottom,
+                    paddingRight: insets.right,
+                    paddingLeft: insets.left
+                }}>
+                    <ScrollView
+                        contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps='handled'
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <Header />
+
+                        <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Restaurant</Text>
+                        
+                        <View className='w-screen items-center'>
+                            <TouchableHighlight 
+                                className='p-4 px-8 bg-primary w-[40%] rounded-lg'
+                                underlayColor={'#0014C7'}
+                                onPress={() => {}}
+                            >
+                                <Text className='color-white text-center text-lg'>Visit</Text>
+                            </TouchableHighlight>
                         </View>
-    
-                        <TouchableHighlight
-                            className='p-4 px-8 bg-primary justify-self-end ml-auto mr-8 rounded-xl'
-                            underlayColor={'#0014C7'}
-                            onPress={() => router.navigate('/newGoal')}
-                        >
-                            <Text className='color-white text-lg'>Set a New Goal</Text>
-                        </TouchableHighlight>
-                        
-                    </View>
 
-                    <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Restaurant</Text>
-                    
-                    <View className='w-screen items-center'>
-                        <TouchableHighlight 
-                            className='p-4 px-8 bg-primary w-[40%] rounded-lg'
-                            underlayColor={'#0014C7'}
-                            onPress={() => {}}
-                        >
-                            <Text className='color-white text-center text-lg'>Visit</Text>
-                        </TouchableHighlight>
-                    </View>
+                        <Text className='text-2xl font-bold color-dark-heading p-6'>Furniture</Text>
 
-                    <Text className='text-2xl font-bold color-dark-heading p-6'>Furniture</Text>
+                        <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
 
-                    <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
+                            {items.length > 0 && items.map(item => (
+                                item.type === 'furniture' && (
+                                    <Item 
+                                        key={item._id} 
+                                        name={item.name} 
+                                        image={item.image} 
+                                        level={item.level}
+                                        maxLevel={item.maxLevel}
+                                        features={item.features}
+                                    />
+                                )
+                            ))}
 
-                        {items.length > 0 && items.map(item => (
-                            item.type === 'furniture' && (
-                                <Item 
-                                    key={item._id} 
-                                    name={item.name} 
-                                    image={item.image} 
-                                    level={item.level}
-                                    maxLevel={item.maxLevel}
-                                    features={item.features}
-                                />
-                            )
-                        ))}
+                            {unowned.filter(item => item.type === 'furniture').length > 0 && (
+                                <>
+                                    <TouchableOpacity 
+                                        className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
+                                        onPress={() => setNewFurniture(true)}
+                                    >
+                                        <Text className='text-5xl'>+</Text>
+                                    </TouchableOpacity>
+                                    <NewItemModal 
+                                        open={newFurniture} 
+                                        setOpen={setNewFurniture} 
+                                        items={unowned.filter(item => item.type === 'furniture')} 
+                                        setItems={setItems}
+                                        setUnowned={setUnowned}
+                                    />
+                                </>
+                            )}
 
-                        {unowned.filter(item => item.type === 'furniture').length > 0 && (
-                            <>
-                                <TouchableOpacity 
-                                    className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                                    onPress={() => setNewFurniture(true)}
-                                >
-                                    <Text className='text-5xl'>+</Text>
-                                </TouchableOpacity>
-                                <NewItemModal 
-                                    open={newFurniture} 
-                                    setOpen={setNewFurniture} 
-                                    items={unowned.filter(item => item.type === 'furniture')} 
-                                    setItems={setItems}
-                                    setUnowned={setUnowned}
-                                />
-                            </>
-                        )}
+                        </View>
 
-                    </View>
+                        <Text className='text-2xl font-bold color-dark-heading m-6'>Menu</Text>
 
-                    <Text className='text-2xl font-bold color-dark-heading m-6'>Menu</Text>
+                        <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
 
-                    <View className='flex flex-row flex-wrap m-6 mt-0 gap-5'>
+                            {items.length > 0 && items.map(item => (
+                                item.type === 'menu' && (
+                                    <Item 
+                                        key={item._id} 
+                                        name={item.name} 
+                                        image={item.image} 
+                                        level={item.level}
+                                        maxLevel={item.maxLevel}
+                                        features={item.features}
+                                    />
+                                )
+                            ))}
+                            
+                            {unowned.filter(item => item.type === 'menu').length > 0 && (
+                                <>
+                                    <TouchableOpacity 
+                                        className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
+                                        onPress={() => setNewMenu(true)}
+                                    >
+                                        <Text className='text-5xl'>+</Text>
+                                    </TouchableOpacity>
+                                    <NewItemModal 
+                                        open={newMenu} 
+                                        setOpen={setNewMenu} 
+                                        items={unowned.filter(item => item.type === 'menu')} 
+                                        setItems={setItems}
+                                        setUnowned={setUnowned}
+                                    />
+                                </>
+                            )}
 
-                        {items.length > 0 && items.map(item => (
-                            item.type === 'menu' && (
-                                <Item 
-                                    key={item._id} 
-                                    name={item.name} 
-                                    image={item.image} 
-                                    level={item.level}
-                                    maxLevel={item.maxLevel}
-                                    features={item.features}
-                                />
-                            )
-                        ))}
-                        
-                        {unowned.filter(item => item.type === 'menu').length > 0 && (
-                            <>
-                                <TouchableOpacity 
-                                    className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                                    onPress={() => setNewMenu(true)}
-                                >
-                                    <Text className='text-5xl'>+</Text>
-                                </TouchableOpacity>
-                                <NewItemModal 
-                                    open={newMenu} 
-                                    setOpen={setNewMenu} 
-                                    items={unowned.filter(item => item.type === 'menu')} 
-                                    setItems={setItems}
-                                    setUnowned={setUnowned}
-                                />
-                            </>
-                        )}
+                        </View>
 
-                    </View>
+                        <Text className='text-2xl font-bold color-dark-heading m-6'>Decor</Text>
 
-                    <Text className='text-2xl font-bold color-dark-heading m-6'>Decor</Text>
+                        <View className='flex flex-row flex-wrap m-6 mt-0 gap-5 mb-16'>
 
-                    <View className='flex flex-row flex-wrap m-6 mt-0 gap-5 mb-16'>
+                            {items.length > 0 && items.map(item => (
+                                item.type === 'decor' && (
+                                    <Item 
+                                        key={item._id} 
+                                        name={item.name} 
+                                        image={item.image} 
+                                        level={item.level}
+                                        maxLevel={item.maxLevel}
+                                        features={item.features}
+                                    />
+                                )
+                            ))}
 
-                        {items.length > 0 && items.map(item => (
-                            item.type === 'decor' && (
-                                <Item 
-                                    key={item._id} 
-                                    name={item.name} 
-                                    image={item.image} 
-                                    level={item.level}
-                                    maxLevel={item.maxLevel}
-                                    features={item.features}
-                                />
-                            )
-                        ))}
+                            {unowned.filter(item => item.type === 'decor').length > 0 && (
+                                <>
+                                    <TouchableOpacity 
+                                        className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
+                                        onPress={() => setNewDecor(true)}
+                                    >
+                                        <Text className='text-5xl'>+</Text>
+                                    </TouchableOpacity>
+                                    <NewItemModal 
+                                        open={newDecor} 
+                                        setOpen={setNewDecor} 
+                                        items={unowned.filter(item => item.type === 'decor')} 
+                                        setItems={setItems}
+                                        setUnowned={setUnowned}
+                                    />
+                                </>
+                            )}
 
-                        {unowned.filter(item => item.type === 'decor').length > 0 && (
-                            <>
-                                <TouchableOpacity 
-                                    className='border-2 border-dashed bg-light-100 rounded-lg items-center justify-center w-24 h-24'
-                                    onPress={() => setNewDecor(true)}
-                                >
-                                    <Text className='text-5xl'>+</Text>
-                                </TouchableOpacity>
-                                <NewItemModal 
-                                    open={newDecor} 
-                                    setOpen={setNewDecor} 
-                                    items={unowned.filter(item => item.type === 'decor')} 
-                                    setItems={setItems}
-                                    setUnowned={setUnowned}
-                                />
-                            </>
-                        )}
-
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
-            <TabFooter page='restaurant' />
-        </View>
-    )
+                        </View>
+                    </ScrollView>
+                </SafeAreaView>
+                <TabFooter page='restaurant' />
+            </View>
+        )
+    }
 }
 
 export default restaurant

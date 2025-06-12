@@ -116,7 +116,8 @@ const SignupModal = () => {
                 setEmailExists(true)
             } else {
                 const accessToken = data.accessToken
-                AsyncStorage.setItem('accessToken', accessToken)
+                await AsyncStorage.setItem('accessToken', accessToken)
+                await AsyncStorage.setItem('coins', data.coins)
                 router.navigate('/')
             }
         }

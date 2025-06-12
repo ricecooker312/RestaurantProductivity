@@ -7,7 +7,8 @@ import {
     Image, 
     Alert, 
     ScrollView, 
-    Dimensions 
+    Dimensions,
+    ActivityIndicator 
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
@@ -15,16 +16,18 @@ import { icons } from '@/constants/icons'
 import TabFooter from '@/components/TabFooter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import FullGoalCard from '@/components/FullGoalCard'
 import { Goal } from '@/types/goalTypes'
+import Header from '@/components/Header'
 
 const screenWidth = Dimensions.get('window').width
 const alertWidth = screenWidth * 0.9
 
 const goals = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null)
-    const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
+    const [currentGoals, setCurrentGoals] = useState<Goal[]>()
     const [goalCompleted, setGoalCompleted] = useState(false)
     const [completedGoalName, setCompletedGoalName] = useState('')
 
@@ -85,39 +88,60 @@ const goals = () => {
             }
         }
     }
+
+    const insets = useSafeAreaInsets()
+
+    if (!currentGoals) {
+        return (
+            <View className='flex-1 bg-dfbg'>
+                <SafeAreaView style={{
+                    flex: 1,
+                    paddingTop: Math.max(insets.top - 50, 0),
+                    paddingBottom: insets.bottom,
+                    paddingRight: insets.right,
+                    paddingLeft: insets.left
+                }}>
+                    <ScrollView
+                        contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps='handled'
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <Header />
+
+                        <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
+                    </ScrollView>
+                </SafeAreaView>
+            </View>
+        )
+    }
     
     return (
-        <View className='flex-1 relative'>
-            <ScrollView className='bg-dfbg' showsVerticalScrollIndicator={false}>
-                <View className='flex flex-row flex-wrap mt-12 items-center justify-center'>
+        <View className='flex-1 bg-dfbg relative'>
+            <SafeAreaView
+                style={{
+                    flex: 1,
+                    paddingTop: Math.max(insets.top - 50, 0),
+                    paddingBottom: insets.bottom,
+                    paddingRight: insets.right,
+                    paddingLeft: insets.left
+                }}
+            >
+                <ScrollView 
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps='handled'
+                    showsVerticalScrollIndicator={false}
+                >
+                    <Header />
 
-                    <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
-                        <Image source={icons.logo} className='w-[3.875rem] h-[2.9375rem] m-4 ml-8' />
-                    </TouchableWithoutFeedback>
+                    <View className='flex flex-row flex-wrap justify-center mb-28'>
+                        <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>
 
-                    <View className='flex-row items-center mx-[1rem]'>
-                        <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
-                        <Text className='text-xl'>6</Text>
+                        {currentGoals && currentGoals.map(goal => (
+                            <FullGoalCard key={goal._id} goal={goal} completeGoal={completeGoal} />
+                        ))}
                     </View>
-
-                    <TouchableHighlight
-                        className='p-4 px-8 bg-primary justify-self-end ml-auto mr-8 rounded-xl'
-                        underlayColor={'#0014C7'}
-                        onPress={() => router.navigate('/newGoal')}
-                    >
-                        <Text className='color-white text-lg'>Set a New Goal</Text>
-                    </TouchableHighlight>
-
-                </View>
-
-                <View className='flex flex-row flex-wrap justify-center mb-28'>
-                    <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>
-
-                    {currentGoals.map(goal => (
-                        <FullGoalCard key={goal._id} goal={goal} completeGoal={completeGoal} />
-                    ))}
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </SafeAreaView>
             {goalCompleted && (
                 <View 
                     className='absolute bottom-[15%] flex flex-row justify-center items-center bg-button-good p-4'
