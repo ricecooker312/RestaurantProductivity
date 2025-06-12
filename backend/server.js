@@ -72,7 +72,7 @@ app.post('/api/users/register', async (req, res) => {
         const user = { id: result.insertedId, email: email }
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)  
 
-        return res.send({ accessToken: accessToken })
+        return res.send({ accessToken: accessToken, coins: 25 })
     } else {
         return res.send({ emailError: 'That email already exists' })
     }
@@ -93,7 +93,7 @@ app.post('/api/users/login', async (req, res) => {
             const user = { id: foundUser._id, email: foundUser.email }
             const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
             
-            return res.send({ accessToken: accessToken })
+            return res.send({ accessToken: accessToken, coins: foundUser.coins })
         } else {
             return res.send({ error: 'Email or password is incorrect' })
         }
