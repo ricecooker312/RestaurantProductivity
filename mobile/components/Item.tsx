@@ -1,23 +1,20 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { images } from '@/constants/images'
 import ItemModal from './ItemModal'
-import { Feature, RestaurantItem } from '@/types/restaurantTypes'
+import { RestaurantItem } from '@/types/restaurantTypes'
 
 const imagesMap = {
     'lvlonechair.png': require('../assets/images/lvlonechair.png')
 }
 
 interface ItemProps {
-    name: string,
-    image: string,
-    level: number,
-    maxLevel: number,
-    features: Feature[]
+    item: RestaurantItem,
+    setItems: Dispatch<SetStateAction<RestaurantItem[]>>
 }
 
-const Item = ({ name, image, maxLevel, level, features }: ItemProps) => {
+const Item = ({ item, setItems }: ItemProps) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -26,15 +23,13 @@ const Item = ({ name, image, maxLevel, level, features }: ItemProps) => {
                 className='border-2 bg-light-100 rounded-lg w-24 h-24'
                 onPress={() => setOpen(true)}
             >
-                <Image source={{ uri: image }} className='size-full' />
+                <Image source={{ uri: item.image }} className='size-full' />
             </TouchableOpacity>
             <ItemModal 
                 open={open} 
                 setOpen={setOpen} 
-                item={name}
-                image={image} 
-                level={level}
-                features={features}
+                item={item}
+                setItems={setItems}
             />
         </>
     )

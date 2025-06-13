@@ -499,7 +499,7 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
 
         const newLevel = userItemFind.level + 1
 
-        if (item.maxLevel > newLevel) {
+        if (item.maxLevel >= newLevel) {
             const upgrade = await userItems.updateOne(userItemFind, {
                 $set: {
                     level: newLevel

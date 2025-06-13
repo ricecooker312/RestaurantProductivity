@@ -151,11 +151,8 @@ const restaurant = () => {
                                 item.type === 'furniture' && (
                                     <Item 
                                         key={item._id} 
-                                        name={item.name} 
-                                        image={item.image} 
-                                        level={item.level}
-                                        maxLevel={item.maxLevel}
-                                        features={item.features}
+                                        item={item}
+                                        setItems={setItems}
                                     />
                                 )
                             ))}
@@ -188,11 +185,8 @@ const restaurant = () => {
                                 item.type === 'menu' && (
                                     <Item 
                                         key={item._id} 
-                                        name={item.name} 
-                                        image={item.image} 
-                                        level={item.level}
-                                        maxLevel={item.maxLevel}
-                                        features={item.features}
+                                        item={item}
+                                        setItems={setItems}
                                     />
                                 )
                             ))}
@@ -225,11 +219,8 @@ const restaurant = () => {
                                 item.type === 'decor' && (
                                     <Item 
                                         key={item._id} 
-                                        name={item.name} 
-                                        image={item.image} 
-                                        level={item.level}
-                                        maxLevel={item.maxLevel}
-                                        features={item.features}
+                                        item={item}
+                                        setItems={setItems}
                                     />
                                 )
                             ))}
