@@ -15,6 +15,21 @@ interface NewItemProps {
 
 const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
     const [accessToken, setAccessToken] = useState('')
+    const [coins, setCoins] = useState<number>(0)
+
+    useEffect(() => {
+        const getCoins = async () => {
+            const gCoins = await AsyncStorage.getItem('coins')
+            if (!gCoins) {
+                await AsyncStorage.removeItem('accessToken')
+                router.navigate('/onboarding')
+            } else {
+                setCoins(parseInt(gCoins, 10))
+            }
+        }
+
+        getCoins()
+    }, [])
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -30,30 +45,32 @@ const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
     }, [])
 
     const buyItem = async () => {
-        const buyPayload = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                itemId: item._id
-            })
-        }
+        if (item.price <= coins) {
+            const buyPayload = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    itemId: item._id
+                })
+            }
 
-        const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/buy', buyPayload)
-        const data = await res.json()
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/buy', buyPayload)
+            const data = await res.json()
 
-        if (data.error) {
-            console.log(data.error)
-        } else {
-            setItems(prevItems => [
-                ...prevItems,
-                item
-            ])
-            setOpen(false)
-            setUnowned(unownedItem => unownedItem.filter(uItem => uItem !== item))
+            if (data.error) {
+                console.log(data.error)
+            } else {
+                setItems(prevItems => [
+                    ...prevItems,
+                    item
+                ])
+                setOpen(false)
+                setUnowned(unownedItem => unownedItem.filter(uItem => uItem !== item))
+            }
         }
     }
 
@@ -73,8 +90,8 @@ const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
 
             <TouchableHighlight
                 onPress={buyItem}
-                underlayColor={'#0014C7'}
-                className='bg-primary p-4 px-8 rounded-lg mt-6'
+                underlayColor={`${item.price > coins ? '' : '#0014C7'}`}
+                className={`${item.price > coins ? 'bg-button-primaryDisabled' : 'bg-primary'} p-4 px-8 rounded-lg mt-6`}
             >
                 <View className='flex flex-row items-center justify-center'>
                     <Text className='color-white text-lg text-center mr-auto'>BUY</Text>

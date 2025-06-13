@@ -18,6 +18,8 @@ const Header = () => {
                 setCoins(parseInt(gCoins, 10))
             }
         }
+
+        getCoins()
     }, [])
 
     return (

@@ -394,12 +394,21 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
     const { itemId } = req.body
 
     try {
-        const item = await items.find({ _id: new ObjectId(itemId) }).toArray()
-        if (item.length === 0) {
+        const item = await items.findOne({ _id: new ObjectId(itemId) })
+        if (!item) {
             return res.send({
                 error: 'That item does not exist'
             })
         }
+
+        const user = await users.findOne({ _id: new ObjectId(userId) })
+        if (!user.coins) {
+            return res.send({
+                error: 'That user does not exist or does not have coins'
+            })
+        }
+        
+        const newCoins = user.coins - item.price
 
         const time = new Date()
        
@@ -411,7 +420,16 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         }
         const newItem = await userItems.insertOne(newItemDoc)
 
-        return res.send(newItem)
+        const updateUser = await users.updateOne(user, {
+            $set: {
+                coins: newCoins
+            }
+        })
+
+        return res.send({
+            ...newItem,
+            coins: newCoins
+        })
     } catch (err) {
         console.log(err)
         return res.send({
@@ -425,23 +443,123 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
     const { itemId } = req.body
 
     try {
-        const uItem = await userItems.findOne({ itemId: itemId })
+        const user = await users.findOne({ _id: new ObjectId(userId) })
+        if (!user) {
+            return res.send({
+                error: 'That user does not exist'
+            })
+        }
+
+        const uItem = await userItems.findOne({ itemId: itemId, userId: userId })
         if (!uItem) {
             return res.send({
-                'error': 'That item does not exist'
+                'error': "You don't own this item"
             })
-        } else if (uItem.userId !== userId) {
+        }
+
+        const item = await items.findOne({ _id: new ObjectId(itemId) })
+        if (!item) {
             return res.send({
-                error: "You don't own this item"
+                'error': 'That item does not exist'
             })
         }
 
         const deleteItem = await userItems.deleteOne(uItem)
 
-        return res.send(deleteItem)
+        const newCoins = user.coins + item.price
+        const addCoins = await users.updateOne(user, {
+            $set: {
+                coins: newCoins
+            }
+        })
+
+        return res.send({
+            ...deleteItem,
+            coins: newCoins
+        })
     } catch (err) {
         console.log(err)
         return res.send(err)
+    }
+})
+
+app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { itemId } = req.body
+
+    try {
+        const userItemFind = await userItems.findOne({ itemId: itemId, userId: userId })
+        if (!userItemFind) {
+            return res.send({
+                error: "You don't own this item or it doesn't exist"
+            })
+        }
+
+        const item = await items.findOne({ _id: new ObjectId(itemId) })
+
+        const newLevel = userItemFind.level + 1
+
+        if (item.maxLevel > newLevel) {
+            const upgrade = await userItems.updateOne(userItemFind, {
+                $set: {
+                    level: newLevel
+                }
+            })
+
+            return res.send({
+                ...upgrade,
+                level: newLevel
+            })
+        } else {
+            return res.send({
+                'error': 'Item is already at max level'
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.patch('/api/items/user/upgrade/final', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { itemId } = req.body
+
+    try {
+        const userItemFind = await userItems.findOne({ itemId: itemId, userId: userId })
+        if (!userItemFind) {
+            return res.send({
+                error: "You don't own this item or it doesn't exist"
+            })
+        }
+
+        const item = await items.findOne({ _id: new ObjectId(itemId) })
+
+        const newLevel = userItemFind.level + 1
+
+        if (item.maxLevel > newLevel) {
+            const upgrade = await userItems.updateOne(userItemFind, {
+                $set: {
+                    level: newLevel
+                }
+            })
+
+            return res.send({
+                ...upgrade,
+                level: newLevel
+            })
+        } else {
+            return res.send({
+                'error': 'Item is already at max level'
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
     }
 })
 

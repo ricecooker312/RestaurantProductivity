@@ -99,8 +99,9 @@ const LoginModal = () => {
                 setError(true)
                 setErrorMessage(data.error)
             } else if (data.accessToken) {
-                await AsyncStorage.setItem('accessToken', data.accessToken)
-                await AsyncStorage.setItem('coins', data.coins)
+                AsyncStorage.setItem('accessToken', data.accessToken)
+                AsyncStorage.setItem('coins', data.coins)
+                console.log(data.coins)
                 router.navigate('/')
             }
         }

@@ -24,7 +24,8 @@ module.exports = {
         button: {
           error: '#FF9F9F',
           good: '#AEF9AE',
-          warning: '#F9E1AE'
+          warning: '#F9E1AE',
+          primaryDisabled: '#A3ACFF'
         },
         link: '#705DFF'
       }
