@@ -10,26 +10,13 @@ interface NewItemProps {
     item: RestaurantItem,
     setItems: Dispatch<SetStateAction<RestaurantItem[]>>,
     setOpen: (value: boolean) => void,
-    setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>
+    setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>,
+    coins: string,
+    setCoins: (value: string) => void
 }
 
-const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
+const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewItemProps) => {
     const [accessToken, setAccessToken] = useState('')
-    const [coins, setCoins] = useState<number>(0)
-
-    useEffect(() => {
-        const getCoins = async () => {
-            const gCoins = await AsyncStorage.getItem('coins')
-            if (!gCoins) {
-                await AsyncStorage.removeItem('accessToken')
-                router.navigate('/onboarding')
-            } else {
-                setCoins(parseInt(gCoins, 10))
-            }
-        }
-
-        getCoins()
-    }, [])
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -45,7 +32,7 @@ const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
     }, [])
 
     const buyItem = async () => {
-        if (item.price <= coins) {
+        if (item.price <= parseInt(coins)) {
             const buyPayload = {
                 method: 'POST',
                 headers: {
@@ -64,12 +51,15 @@ const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
             if (data.error) {
                 console.log(data.error)
             } else {
+                item.level = 1
                 setItems(prevItems => [
                     ...prevItems,
                     item
                 ])
                 setOpen(false)
                 setUnowned(unownedItem => unownedItem.filter(uItem => uItem !== item))
+                setCoins(data.coins)
+                await AsyncStorage.setItem('coins', `${data.coins}`)
             }
         }
     }
@@ -79,7 +69,7 @@ const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
             <Text className='font-bold text-center text-2xl'>{item.name}</Text>
             
             <View className='w-full flex items-center'>
-                <Image source={{ uri: item.image }} className='w-36 h-36' />
+                <Image source={{ uri: item.image[0] }} className='w-36 h-36' />
             </View>
 
             {item.features.map(feature => (
@@ -90,8 +80,8 @@ const NewItem = ({ item, setItems, setOpen, setUnowned }: NewItemProps) => {
 
             <TouchableHighlight
                 onPress={buyItem}
-                underlayColor={`${item.price > coins ? '' : '#0014C7'}`}
-                className={`${item.price > coins ? 'bg-button-primaryDisabled' : 'bg-primary'} p-4 px-8 rounded-lg mt-6`}
+                underlayColor={`${item.price > parseInt(coins) ? '' : '#0014C7'}`}
+                className={`${item.price > parseInt(coins) ? 'bg-button-primaryDisabled' : 'bg-primary'} p-4 px-8 rounded-lg mt-6`}
             >
                 <View className='flex flex-row items-center justify-center'>
                     <Text className='color-white text-lg text-center mr-auto'>BUY</Text>

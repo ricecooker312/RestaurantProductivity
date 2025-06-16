@@ -30,6 +30,7 @@ const goals = () => {
     const [currentGoals, setCurrentGoals] = useState<Goal[]>()
     const [goalCompleted, setGoalCompleted] = useState(false)
     const [completedGoalName, setCompletedGoalName] = useState('')
+    const [coins, setCoins] = useState('')
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -64,6 +65,20 @@ const goals = () => {
         if (accessToken) fetchGoals()
     }, [accessToken, goalCompleted])
 
+    useEffect(() => {
+        const getCoins = async () => {
+            const gCoins = await AsyncStorage.getItem('coins')
+            if (!gCoins) {
+                await AsyncStorage.removeItem('accessToken')
+                router.navigate('/onboarding')
+            } else {
+                setCoins(gCoins)
+            }
+        }
+
+        if (accessToken) getCoins()
+    }, [accessToken])
+
     const completeGoal = async (goal: Goal, completing: boolean) => {
         const completeGoalPayload = {
             method: 'PATCH',
@@ -81,8 +96,10 @@ const goals = () => {
             console.log(data.error)
         } else {
             if (completing) {
+                console.log(data)
                 setGoalCompleted(true)
                 setCompletedGoalName(goal.title)
+                setCoins(`${data.coins}`)
             } else {
                 setGoalCompleted(false)
             }
@@ -106,7 +123,7 @@ const goals = () => {
                         keyboardShouldPersistTaps='handled'
                         showsVerticalScrollIndicator={false}
                     >
-                        <Header />
+                        <Header coins={coins} />
 
                         <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
                     </ScrollView>
@@ -131,7 +148,7 @@ const goals = () => {
                     keyboardShouldPersistTaps='handled'
                     showsVerticalScrollIndicator={false}
                 >
-                    <Header />
+                    <Header coins={coins} />
 
                     <View className='flex flex-row flex-wrap justify-center mb-28'>
                         <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>

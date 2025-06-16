@@ -29,6 +29,7 @@ const restaurant = () => {
     const [accessToken, setAccessToken] = useState('')
     const [items, setItems] = useState<RestaurantItem[]>([])
     const [unowned, setUnowned] = useState<RestaurantItem[]>([])
+    const [coins, setCoins] = useState<string>('')
 
     const insets = useSafeAreaInsets()
 
@@ -91,6 +92,20 @@ const restaurant = () => {
             getUnowned()
         }
     }, [accessToken])
+    
+    useEffect(() => {
+        const getCoins = async () => {
+            const gCoins = await AsyncStorage.getItem('coins')
+            if (!gCoins) {
+                await AsyncStorage.removeItem('accessToken')
+                router.navigate('/onboarding')
+            } else {
+                setCoins(gCoins)
+            }
+        }
+
+        if (accessToken) getCoins()
+    }, [accessToken])
 
     if (!accessToken || items.length + unowned.length !== 5) {
         return (
@@ -107,7 +122,7 @@ const restaurant = () => {
                         keyboardShouldPersistTaps='handled'
                         showsVerticalScrollIndicator={false}
                     >
-                        <Header />
+                        <Header coins={coins} />
 
                         <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
                     </ScrollView>
@@ -129,7 +144,7 @@ const restaurant = () => {
                         keyboardShouldPersistTaps='handled'
                         showsVerticalScrollIndicator={false}
                     >
-                        <Header />
+                        <Header coins={coins} />
 
                         <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Restaurant</Text>
                         
@@ -171,6 +186,8 @@ const restaurant = () => {
                                         items={unowned.filter(item => item.type === 'furniture')} 
                                         setItems={setItems}
                                         setUnowned={setUnowned}
+                                        coins={coins}
+                                        setCoins={setCoins}
                                     />
                                 </>
                             )}
@@ -205,6 +222,8 @@ const restaurant = () => {
                                         items={unowned.filter(item => item.type === 'menu')} 
                                         setItems={setItems}
                                         setUnowned={setUnowned}
+                                        coins={coins}
+                                        setCoins={setCoins}
                                     />
                                 </>
                             )}
@@ -239,6 +258,8 @@ const restaurant = () => {
                                         items={unowned.filter(item => item.type === 'decor')} 
                                         setItems={setItems}
                                         setUnowned={setUnowned}
+                                        coins={coins}
+                                        setCoins={setCoins}
                                     />
                                 </>
                             )}

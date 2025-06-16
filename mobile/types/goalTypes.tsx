@@ -6,6 +6,7 @@ export type Goal = {
     type: string,
     priority: string,
     difficulty: string,
+    reward: number,
     userId: string,
     time: string,
     lastUpdated?: string

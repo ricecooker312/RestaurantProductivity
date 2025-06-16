@@ -64,6 +64,10 @@ const FullGoalCard = ({ goal, completeGoal }: FullGoalCardProps) => {
                     </View>
                 )}
             </View>
+            <View className='flex flex-row absolute top-0 right-0 items-center gap-3 m-4'>
+                <Image source={icons.coins} className='w-12 h-12' />
+                <Text className='text-center text-lg'>{goal.reward}</Text>
+            </View>
             {currentGoal.completed === false ? (
                 <>
                     <TouchableHighlight 

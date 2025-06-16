@@ -100,7 +100,7 @@ const LoginModal = () => {
                 setErrorMessage(data.error)
             } else if (data.accessToken) {
                 AsyncStorage.setItem('accessToken', data.accessToken)
-                AsyncStorage.setItem('coins', data.coins)
+                AsyncStorage.setItem('coins', `${data.coins}`)
                 console.log(data.coins)
                 router.navigate('/')
             }

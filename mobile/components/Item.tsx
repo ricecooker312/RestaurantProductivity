@@ -23,7 +23,7 @@ const Item = ({ item, setItems }: ItemProps) => {
                 className='border-2 bg-light-100 rounded-lg w-24 h-24'
                 onPress={() => setOpen(true)}
             >
-                <Image source={{ uri: item.image }} className='size-full' />
+                <Image source={{ uri: item.image[item.level - 1] }} className='size-full' />
             </TouchableOpacity>
             <ItemModal 
                 open={open} 

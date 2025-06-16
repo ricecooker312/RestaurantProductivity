@@ -117,7 +117,7 @@ const SignupModal = () => {
             } else {
                 const accessToken = data.accessToken
                 await AsyncStorage.setItem('accessToken', accessToken)
-                await AsyncStorage.setItem('coins', data.coins)
+                await AsyncStorage.setItem('coins', `${data.coins}`)
                 router.navigate('/')
             }
         }

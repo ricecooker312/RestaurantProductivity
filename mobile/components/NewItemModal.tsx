@@ -9,10 +9,12 @@ interface NewItemModalProps {
     setOpen: (value: boolean) => void,
     items: RestaurantItem[],
     setItems: Dispatch<SetStateAction<RestaurantItem[]>>
-    setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>
+    setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>,
+    coins: string,
+    setCoins: Dispatch<SetStateAction<string>>
 }
 
-const NewItemModal = ({ open, setOpen, items, setItems, setUnowned }: NewItemModalProps) => {
+const NewItemModal = ({ open, setOpen, items, setItems, setUnowned, coins, setCoins }: NewItemModalProps) => {
     return (
         <Modal
             animationType='fade'
@@ -38,7 +40,15 @@ const NewItemModal = ({ open, setOpen, items, setItems, setUnowned }: NewItemMod
                     </View>
 
                     {items.map(item => (
-                        <NewItem key={item._id} item={item} setItems={setItems} setOpen={setOpen} setUnowned={setUnowned} />
+                        <NewItem 
+                            key={item._id} 
+                            item={item} 
+                            setItems={setItems} 
+                            setOpen={setOpen} 
+                            setUnowned={setUnowned} 
+                            coins={coins}
+                            setCoins={setCoins}
+                        />
                     ))}
                 </ScrollView>
             </View>

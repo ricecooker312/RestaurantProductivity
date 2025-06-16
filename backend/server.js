@@ -168,6 +168,16 @@ app.get('/api/goals/find/:goalId', checkToken, async (req, res) => {
 app.post('/api/goals/new', checkToken, async (req, res) => {
     const { title, description, completed, type, priority, difficulty } = req.body
 
+    let reward = 1
+
+    if (type === 'goal') reward *= 2
+
+    if (priority === 'medium') reward *= 2
+    else if (priority === 'high') reward *= 3
+
+    if (difficulty === 'medium') reward *= 2
+    else if (difficulty === 'hard') reward *= 3
+
     const time = new Date()
     const goalsDoc = { 
         title: title, 
@@ -176,12 +186,15 @@ app.post('/api/goals/new', checkToken, async (req, res) => {
         type: type,
         priority: priority, 
         difficulty: difficulty, 
+        reward: reward,
         userId: req.user.id,
         time: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
     }
 
     try {
         const result = await goals.insertOne(goalsDoc)
+        result.reward = reward
+
         return res.send(result)
     } catch (error) {
         console.log(`Server Error: ${error}`)
@@ -197,9 +210,15 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
 
     try {
         const goalFind = await goals.findOne({ _id: new ObjectId(goalId) })
+        if (!goalFind) {
+            return res.send({
+                error: 'This goal does not exist'
+            })
+        }
+
         if (goalFind.userId !== userId) {
             return res.send({
-                error: 'Unauthorized'
+                error: "You don't own this goal"
             })
         }
 
@@ -212,6 +231,27 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
                 }
             }
         )
+
+        if (!goalFind.completed) {
+            const userFind = await users.findOne({ _id: new ObjectId(userId) })
+            if (!userFind) {
+                return res.send({
+                    'error': 'That user does not exist'
+                })
+            }
+
+            const newCoins = userFind.coins + goalFind.reward
+            const addCoins = await users.updateOne(userFind, {
+                $set: {
+                    coins: newCoins
+                }
+            })
+
+            return res.send({
+                ...addCoins,
+                coins: newCoins
+            })
+        }
 
         return res.send(updateGoal)
     } catch (err) {

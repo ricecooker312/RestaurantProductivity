@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 
 import { RestaurantItem } from '@/types/restaurantTypes'
+import { icons } from '@/constants/icons'
 
 interface ItemModalProps {
     open: boolean,
@@ -21,6 +22,7 @@ interface ItemModalProps {
 
 const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
     const [accessToken, setAccessToken] = useState('')
+    const [maxLevel, setMaxLevel] = useState(false)
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -30,6 +32,7 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
                 router.navigate('/onboarding')
             } else {
                 setAccessToken(useEffectToken)
+                if (item.level >= item.maxLevel) setMaxLevel(true)
             }
         }
 
@@ -37,27 +40,31 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
     }, [])
 
     const upgradeItem = async () => {
-        const upgradePayload = {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                itemId: item._id
-            })
-        }
+        if (!maxLevel) {
+            const upgradePayload = {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    itemId: item._id
+                })
+            }
 
-        const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/upgrade', upgradePayload)
-        const data = await res.json()
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/upgrade', upgradePayload)
+            const data = await res.json()
 
-        if (data.error) {
-            console.log(data.error)
-        } else {
-            setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
+            if (data.error) {
+                if (data.error === 'Item is already at max level') setMaxLevel(true)
+            } else {
+                setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
+            }
         }
     }
+
+    const itemImage = item.image[item.level - 1]
 
     return (
         <Modal
@@ -81,7 +88,7 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
                         {item.name}{' '}
                         <Text className='color-primary'>Level {item.level}</Text>
                     </Text>
-                    <Image source={{ uri: item.image }} className='size-36' />
+                    <Image source={{ uri: itemImage }} className='size-36' />
 
                     {item.features.map(feature => (
                         <Text key={feature.amount} className='text-sm color-gray mr-auto'>{feature.feature}:{' '}
@@ -90,11 +97,22 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
                     ))}
 
                     <TouchableHighlight 
-                        className='p-4 m-4 mt-8 w-[90%] bg-primary rounded-lg'
-                        underlayColor={'#0014C7'}
+                        className={`p-4 m-4 mt-8 w-[90%] ${maxLevel ? 'bg-button-primaryDisabled' : 'bg-primary'} rounded-lg`}
+                        underlayColor={`${maxLevel ? '' : '#0014C7'}`}
                         onPress={upgradeItem}
                     >
-                        <Text className='color-white text-lg text-center'>Upgrade</Text>
+                        {maxLevel ? (
+                            <Text className='text-lg color-white text-center'>Max Level</Text>
+                        ) : (
+                            <View className='flex flex-row items-center justify-around'>
+                                <Text className='color-white text-lg text-center'>Upgrade</Text>
+                                
+                                <View className='flex flex-row items-center gap-3'>
+                                    <Image source={icons.coins} className='w-8 h-8' />
+                                    <Text className='color-white text-lg'>{item.price * item.level}</Text> 
+                                </View>
+                            </View>
+                        )}
                     </TouchableHighlight>
                 </View>
             </View>

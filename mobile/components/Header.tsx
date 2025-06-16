@@ -5,23 +5,7 @@ import { icons } from '@/constants/icons'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const Header = () => {
-    const [coins, setCoins] = useState<number>(0)
-
-    useEffect(() => {
-        const getCoins = async () => {
-            const gCoins = await AsyncStorage.getItem('coins')
-            if (!gCoins) {
-                await AsyncStorage.removeItem('accessToken')
-                router.navigate('/onboarding')
-            } else {
-                setCoins(parseInt(gCoins, 10))
-            }
-        }
-
-        getCoins()
-    }, [])
-
+const Header = ({ coins }: { coins: string }) => {
     return (
         <View className='flex flex-row flex-wrap items-center justify-center'>
 
