@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableHighlight } from 'react-native'
+import { View, Text, ScrollView, TouchableHighlight, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -34,6 +34,31 @@ const profile = () => {
             router.navigate('/onboarding')
         } else {
             console.log(`accessToken: ${accessToken}`)
+        }
+    }
+
+    const deleteAccount = async () => {
+        if (accessToken) {
+            const deleteAccPayload = {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/users/delete', deleteAccPayload)
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
+            } else {
+                await AsyncStorage.removeItem('accessToken')
+                await AsyncStorage.removeItem('coins')
+
+                router.navigate('/onboarding')
+            }
         }
     }
 
@@ -94,8 +119,25 @@ const profile = () => {
                         <TouchableHighlight 
                             underlayColor={'#D74042'}
                             className='p-4 mt-6 bg-error rounded-lg w-1/2'
-                            onPress={() => {}}
+                            onPress={() => {
+                                Alert.alert(
+                                    'Delete Account',
+                                    'Are you sure you want to delete your account?',
+                                    [
+                                        {
+                                            text: 'Cancel',
+                                            style: 'cancel'
+                                        },
+                                        {
+                                            text: 'Delete',
+                                            onPress: deleteAccount
+                                        }
+                                    ],
+                                    { cancelable: true }
+                                )
+                            }}
                         >
+               
                             <Text className='color-white text-center text-lg'>Delete Account</Text>
                         </TouchableHighlight>
                     </View>

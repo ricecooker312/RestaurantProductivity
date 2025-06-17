@@ -112,13 +112,13 @@ app.patch('/api/users/update', checkToken, async (req, res) => {
             })
         }
 
-        const userDelete = await users.updateOne(userFind, {
+        const userUpdate = await users.updateOne(userFind, {
             $set: {
                 email: email
             }
         })
         
-        return res.send(userDelete)
+        return res.send(userUpdate)
     } catch (err) {
         console.log(err)
         return res.send({
@@ -140,7 +140,14 @@ app.delete('/api/users/delete', checkToken, async (req, res) => {
 
         const userDelete = await users.deleteOne(userFind)
 
-        return res.send(userDelete)
+        const itemsDelete = await userItems.deleteMany({ userId: userId })
+        const goalsDelete = await goals.deleteMany({ userId: userId })
+
+        return res.send({
+            userDelete: userDelete,
+            itemsDelete: itemsDelete,
+            goalsDelete: goalsDelete
+        })
     } catch (err) {
         console.log(`One User Delete Error: ${err}`)
 
