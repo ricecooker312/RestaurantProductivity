@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react'
 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import TabFooter from '@/components/TabFooter'
-import Header from '@/components/Header'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 
 const profile = () => {
     const [accessToken, setAccessToken] = useState('')
+    const [email, setEmail] = useState('')
 
     const insets = useSafeAreaInsets()
 

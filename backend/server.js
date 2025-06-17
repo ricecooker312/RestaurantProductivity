@@ -51,10 +51,30 @@ app.get('/', (req, res) => {
     return res.send('Welcome to the app!')
 })
 
-app.get('/api/users/all', async (req, res) => {
+app.get('/api/users/find/all', async (req, res) => {
     const allUsers = await users.find({}).toArray()
 
     return res.send(allUsers)
+})
+
+app.get('/api/users/find', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const userFind = await users.findOne({ _id: new ObjectId(userId) })
+        if (!userFind) {
+            return res.send({
+                error: 'That user does not exist'
+            })
+        }
+
+        return res.send(userFind)
+    } catch (err) {
+        console.log(`One User Find Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
 })
 
 app.post('/api/users/register', async (req, res) => {
@@ -66,7 +86,7 @@ app.post('/api/users/register', async (req, res) => {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const doc = { email: email, password: hashedPassword, coins: '25' }
+        const doc = { email: email, password: hashedPassword, coins: 25 }
         const result = await users.insertOne(doc)
 
         const user = { id: result.insertedId, email: email }
