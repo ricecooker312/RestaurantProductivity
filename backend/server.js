@@ -100,6 +100,56 @@ app.post('/api/users/login', async (req, res) => {
     }
 })
 
+app.patch('/api/users/update', checkToken, async (req, res) => {
+    const { email } = req.body
+    const userId = req.user.id
+
+    try {
+        const userFind = await users.findOne({ _id: new ObjectId(userId) })
+        if (!userFind) {
+            return res.send({
+                error: 'That user does not exist'
+            })
+        }
+
+        const userDelete = await users.updateOne(userFind, {
+            $set: {
+                email: email
+            }
+        })
+        
+        return res.send(userDelete)
+    } catch (err) {
+        console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.delete('/api/users/delete', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const userFind = users.findOne({ _id: new ObjectId(userId) })
+        if (!userFind) {
+            return res.send({
+                error: 'That user does not exist'
+            })
+        }
+
+        const userDelete = await users.deleteOne(userFind)
+
+        return res.send(userDelete)
+    } catch (err) {
+        console.log(`One User Delete Error: ${err}`)
+
+        return res.send({
+            error: err
+        })
+    }
+})
+
 app.delete('/api/users/delete/all', async (req, res) => {
     try {
         const usersDelete = users.deleteMany({})

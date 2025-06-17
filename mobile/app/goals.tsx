@@ -96,7 +96,6 @@ const goals = () => {
             console.log(data.error)
         } else {
             if (completing) {
-                console.log(data)
                 setGoalCompleted(true)
                 setCompletedGoalName(goal.title)
                 setCoins(`${data.coins}`)
