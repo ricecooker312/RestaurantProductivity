@@ -127,6 +127,7 @@ const restaurant = () => {
                         <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
                     </ScrollView>
                 </SafeAreaView>
+                <TabFooter page='restaurant' />
             </View>
         )
     } else {

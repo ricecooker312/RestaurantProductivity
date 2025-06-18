@@ -96,9 +96,11 @@ const goals = () => {
             console.log(data.error)
         } else {
             if (completing) {
+                console.log(data)
                 setGoalCompleted(true)
                 setCompletedGoalName(goal.title)
                 setCoins(`${data.coins}`)
+                await AsyncStorage.setItem('coins', `${data.coins}`)
             } else {
                 setGoalCompleted(false)
             }
@@ -127,6 +129,7 @@ const goals = () => {
                         <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
                     </ScrollView>
                 </SafeAreaView>
+                <TabFooter page='goals' />
             </View>
         )
     }

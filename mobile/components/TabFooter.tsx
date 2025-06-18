@@ -4,7 +4,7 @@ import React from 'react'
 import { icons } from '@/constants/icons'
 import { router } from 'expo-router'
 
-const TabFooter = ({ page }: { page: string }) => {
+const TabFooter = ({ page }: { page: "home" | "restaurant" | "goals" | "stats" | "profile" }) => {
   return (
     <View className='absolute flex-1 flex-row items-center w-screen h-[10vh] left-0 bottom-0 z-50 bg-footerbg'>
       <View className={`h-full flex-1 items-center justify-center ${page === 'home' && 'bg-dark-footer'}`}>

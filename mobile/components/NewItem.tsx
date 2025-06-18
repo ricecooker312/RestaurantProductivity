@@ -58,7 +58,7 @@ const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewIt
                 ])
                 setOpen(false)
                 setUnowned(unownedItem => unownedItem.filter(uItem => uItem !== item))
-                setCoins(data.coins)
+                setCoins(`${data.coins}`)
                 await AsyncStorage.setItem('coins', `${data.coins}`)
             }
         }

@@ -8,10 +8,20 @@ interface FormInputProps {
     placeholderTextColor?: string,
     className?: string
     secureTextEntry?: boolean,
-    multiline?: boolean
+    multiline?: boolean,
+    noMargin?: boolean
 }
 
-export default function FormInput({ placeholder, value, onChangeText, className, placeholderTextColor, secureTextEntry = false, multiline = false }: FormInputProps) {
+export default function FormInput({ 
+    placeholder, 
+    value, 
+    onChangeText, 
+    className, 
+    placeholderTextColor, 
+    secureTextEntry = false, 
+    multiline = false,
+    noMargin = false
+}: FormInputProps) {
     return (
         <TextInput
             placeholder={placeholder}
@@ -28,7 +38,7 @@ export default function FormInput({ placeholder, value, onChangeText, className,
                 pl-4
                 rounded-2xl
                 text-xl
-                mt-14
+                ${noMargin ? '' : 'mt-12'}
                 ${className}
             `}
         />

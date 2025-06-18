@@ -132,6 +132,15 @@ app.patch('/api/users/update', checkToken, async (req, res) => {
             })
         }
 
+        if (email !== userFind.email) {
+            const emailCheck = await users.find({ email: email }).toArray()
+            if (emailCheck.length > 1) {
+                return res.send({
+                    error: 'That email already exists'
+                })
+            }
+        }
+
         const userUpdate = await users.updateOne(userFind, {
             $set: {
                 email: email
