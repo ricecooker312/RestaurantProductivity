@@ -210,6 +210,8 @@ const profile = () => {
 
                                     <TouchableHighlight 
                                         className='w-1/2 mr-auto bg-primary rounded-lg mt-6 p-4'
+                                        underlayColor={'#0014C7'}
+                                        onPress={updateUser}
                                     >
                                         <Text className='color-white text-lg text-center'>Update</Text>
                                     </TouchableHighlight>
