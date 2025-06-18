@@ -13,6 +13,9 @@ const profile = () => {
     const [edit, setEdit] = useState(false)
     const [emailError, setEmailError] = useState('')
 
+    const [totalItems, setTotalItems] = useState<number | null>(0)
+    const [completedGoals, setCompletedGoals] = useState<number | null>(0)
+
     const insets = useSafeAreaInsets()
 
     useEffect(() => {
@@ -39,17 +42,41 @@ const profile = () => {
                 }
             }
 
-            const res = await fetch('https://restaurantproductivity.onrender.com/api/users/find', userInfoPayload)
-            const data = await res.json()
+            const emailRes = await fetch('https://restaurantproductivity.onrender.com/api/users/find', userInfoPayload)
+            const emailData = await emailRes.json()
 
-            if (data.error) {
-                Alert.alert(data.error)
+            if (emailData.error) {
+                Alert.alert(emailData.error)
             } else {
-                setEmail(data.email)
+                setEmail(emailData.email)
             }
         }
 
         if (accessToken) getUserInfo()
+    }, [accessToken])
+
+    useEffect(() => {
+        const getItems = async () => {
+            const totalItemsPayload = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+
+            const itemsRes = await fetch('https://restaurantproductivity.onrender.com/api/items/user/find/all', totalItemsPayload)
+            const itemsData = await itemsRes.json()
+
+            if (itemsData.error) {
+                Alert.alert(itemsData.error)
+            } else {
+                setTotalItems(itemsData.length)
+                setCompletedGoals(itemsData.length)
+            }
+        }
+
+        if (accessToken) getItems()
     }, [accessToken])
 
     useEffect(() => {
@@ -143,7 +170,7 @@ const profile = () => {
         }
     }
 
-    if (!email && !edit && !accessToken) {
+    if ((!email && !edit) || !accessToken || totalItems === null || completedGoals === null) {
         return (
             <View className='flex-1 bg-dfbg'>
                 <SafeAreaView style={{
@@ -228,12 +255,12 @@ const profile = () => {
                         <View className='flex flex-row flex-wrap m-6 gap-3'>
                             <View className='flex flex-col flex-1 rounded-lg bg-white w-1/2 p-4'>
                                 <Text className='font-bold text-center'>Lifetime Goals</Text>
-                                <Text className='text-center text-5xl font-bold p-6'>32</Text>
+                                <Text className='text-center text-5xl font-bold p-6'>{completedGoals}</Text>
                                 <Text className='text-center text-sm font-light'>goals completed</Text>
                             </View>
                             <View className='flex flex-col flex-1 rounded-lg bg-white w-1/2 p-4'>
                                 <Text className='font-bold text-center'>Total Items</Text>
-                                <Text className='text-center text-5xl font-bold p-6'>9</Text>
+                                <Text className='text-center text-5xl font-bold p-6'>{totalItems}</Text>
                                 <Text className='text-center text-sm font-light'>items owned</Text>
                             </View>
                         </View>

@@ -191,7 +191,9 @@ app.delete('/api/users/delete/all', async (req, res) => {
         const usersDelete = users.deleteMany({})
         return res.send(usersDelete)
     } catch (err) {
-        return res.send(err)
+        return res.send({
+            error: err
+        })
     }
 })
 
@@ -204,6 +206,21 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
         return res.send(goalFind)
     } catch (err) {
         console.log(`Goal Find Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.get('/api/goals/find/complete', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const goalsFind = await goals.find({ userId: userId, completed: true }).toArray()
+
+        return res.send(goalsFind)
+    } catch (err) {
+        console.log(`Completed Goals Find Error: ${err}`)
         return res.send({
             error: err
         })
@@ -406,7 +423,9 @@ app.delete('/api/goals/delete/all', async (req, res) => {
         const goalsDelete = goals.deleteMany({})
         return res.send(goalsDelete)
     } catch (err) {
-        return res.send(err)
+        return res.send({
+            error: err
+        })
     }
 })
 
@@ -450,7 +469,9 @@ app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
         return res.send(unownedItems)
     } catch (err) {
         console.log(err)
-        return res.send(err)
+        return res.send({
+            error: err
+        })
     }
 })
 
@@ -475,7 +496,9 @@ app.get('/api/items/user/find/all', checkToken, async (req, res) => {
         return res.send(resultItems)
     } catch (err) {
         console.log(err)
-        return res.send(err)
+        return res.send({
+            error: err
+        })
     }
 })
 app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
@@ -605,7 +628,9 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
         })
     } catch (err) {
         console.log(err)
-        return res.send(err)
+        return res.send({
+            error: err
+        })
     }
 })
 
@@ -626,6 +651,14 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
         const newLevel = userItemFind.level + 1
 
         if (item.maxLevel >= newLevel) {
+            const userFind = await users.findOne({ _id: new ObjectId(userId) })
+
+            if (userFind.coins < item.price * newLevel) {
+                return res.send({
+                    error: 'You do not have enough coins'
+                })
+            }
+
             const upgrade = await userItems.updateOne(userItemFind, {
                 $set: {
                     level: newLevel
