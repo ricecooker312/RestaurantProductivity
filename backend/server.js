@@ -78,7 +78,7 @@ app.get('/api/users/find', checkToken, async (req, res) => {
     }
 })
 
-app.get('/api/users/find/byEmail', checkToken, async (req, res) => {
+app.get('/api/users/search', checkToken, async (req, res) => {
     const { email } = req.body
 
     try {

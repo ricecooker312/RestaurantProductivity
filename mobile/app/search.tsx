@@ -1,11 +1,79 @@
-import { View, Text, ScrollView, Image, TouchableWithoutFeedback, TouchableOpacity, TextInput } from 'react-native'
-import React from 'react'
+import { View, Text, ScrollView, Image, TouchableWithoutFeedback, TouchableOpacity, TextInput, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { icons } from '@/constants/icons'
 import { router } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { User } from '@/types/userTypes'
 
 const search = () => {
+    const [accessToken, setAccessToken] = useState('')
+    const [email, setEmail] = useState('')
+    const [emailError, setEmailError] = useState('')
+    const [foundUser, setFoundUser] = useState<User>({
+        _id: '',
+        email: '',
+        coins: ''
+    })
+
     const insets = useSafeAreaInsets()
+
+    useEffect(() => {
+        const isAuthenticated = async () => {
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
+            if (!useEffectToken) {
+                router.navigate('/onboarding')
+            } else {
+                setAccessToken(useEffectToken)
+            }
+        }
+
+        isAuthenticated()
+    }, [])
+
+    const searchEmail = async () => {
+        if (!email) {
+            setEmailError('Email cannot be empty')
+        } else {
+            setEmailError('')
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            if (!emailRegex.test(email)) {
+                setEmailError('Email is invalid')
+            } else {
+                setEmailError('')
+            }
+        }
+
+        if (!emailError) {
+            const findUserEmailPayload = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*',
+                    
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            }
+
+            console.log('about to run!')
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/users/find/byEmail', findUserEmailPayload)
+            console.log('finished res, about to get data!')
+            const data = await res.json()
+            console.log('finished running!')
+
+            console.log(data)
+
+            if (data.error) {
+                Alert.alert(data.error)    
+            } else {
+                console.log(`data: ${data}`)
+                setFoundUser(data)
+            }
+        }
+    }
 
     return (
         <View className='flex-1 bg-light-100'>
@@ -34,9 +102,14 @@ const search = () => {
                     </View>
 
                     <TextInput
-                        placeholder='Search'
+                        placeholder='Email'
+                        placeholderTextColor={'#292929'}
+                        value={email}
+                        onChangeText={setEmail}
                         className='p-4 border-2 rounded-xl m-6'
+                        onSubmitEditing={searchEmail}
                     />
+                    <Text>{emailError}</Text>
 
                     <View className='m-6 p-4 mt-0'>
                         <View className='bg-light-200 mt-0 p-2 rounded-lg flex flex-row items-center justify-between'>
