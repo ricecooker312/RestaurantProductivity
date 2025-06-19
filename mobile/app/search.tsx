@@ -47,7 +47,7 @@ const search = () => {
 
         if (!emailError) {
             const findUserEmailPayload = {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': '*/*',
@@ -59,7 +59,7 @@ const search = () => {
             }
 
             console.log('about to run!')
-            const res = await fetch('https://restaurantproductivity.onrender.com/api/users/find/byEmail', findUserEmailPayload)
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/users/search', findUserEmailPayload)
             console.log('finished res, about to get data!')
             const data = await res.json()
             console.log('finished running!')
