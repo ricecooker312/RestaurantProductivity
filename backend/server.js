@@ -65,7 +65,7 @@ app.get('/api/users/find', checkToken, async (req, res) => {
         const userFind = await users.findOne({ _id: new ObjectId(userId) })
         if (!userFind) {
             return res.send({
-                error: 'That user does not exist'
+                error: 'No users with that email found'
             })
         }
 
