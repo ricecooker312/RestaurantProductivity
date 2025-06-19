@@ -21,6 +21,7 @@ const users = database.collection('users')
 const goals = database.collection('goals')
 const items = database.collection('items')
 const userItems = database.collection('userItems')
+const friends = database.collection('friends')
 
 const jwt = require('jsonwebtoken')
 
@@ -71,6 +72,26 @@ app.get('/api/users/find', checkToken, async (req, res) => {
         return res.send(userFind)
     } catch (err) {
         console.log(`One User Find Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.get('/api/users/find/byEmail', checkToken, async (req, res) => {
+    const { email } = req.body
+
+    try {
+        const userFind = await users.findOne({ email: email })
+        if (!userFind) {
+            return res.send({
+                error: 'No users with that email'
+            })
+        }
+
+        return res.send(userFind)
+    } catch (err) {
+        console.log(`User Find By Email Error: ${err}`)
         return res.send({
             error: err
         })
@@ -716,6 +737,119 @@ app.patch('/api/items/user/upgrade/final', checkToken, async (req, res) => {
         }
     } catch (err) {
         console.log(err)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.get('/api/social/find/all', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const userFind = await friends.find({ userId: userId }).toArray()
+        const friendFind = await friends.find({ friendId: userId }).toArray()
+
+        if (userFind.length === 0 && friendFind.length === 0) {
+            return res.send([])
+        }
+
+        for (let i = 0; i < friendFind.length; i++) {
+            userFind.push(friendFind[i])
+        }
+
+        return res.send(userFind)
+    } catch (err) {
+        console.log(`All Friends Find Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.post('/api/social/add', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { friendId } = req.body
+
+    try {
+        if (userId === friendId) {
+            return res.send({
+                error: 'You cannot become friends with yourself'
+            })
+        }
+
+        const userFindCheck = await users.findOne({ _id: new ObjectId(userId) })
+        if (!userFindCheck) {
+            return res.send({
+                error: 'User does not exist'
+            })
+        }
+
+        const friendFindCheck = await users.findOne({ _id: new ObjectId(friendId) })
+        if (!friendFindCheck) {
+            return res.send({
+                error: 'Friend does not exist'
+            })
+        }
+
+        const time = new Date()
+        const newFriendDoc = {
+            userId: userId,
+            friendId: friendId,
+            createdAt: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
+        }
+
+        const newFriend = await friends.insertOne(newFriendDoc)
+
+        return res.send(newFriend)
+    } catch (err) {
+        console.log(`One New Friend Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.delete('/api/social/remove', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { friendId } = req.body
+
+    try {
+        if (userId === friendId) {
+            return res.send({
+                error: 'You cannot remove yourself as a friend'
+            })
+        }
+
+        const userFindCheck = await users.findOne({ _id: new ObjectId(userId) })
+        if (!userFindCheck) {
+            return res.send({
+                error: 'User does not exist'
+            })
+        }
+
+        const friendFindCheck = await users.findOne({ _id: new ObjectId(friendId) })
+        if (!friendFindCheck) {
+            return res.send({
+                error: 'Friend does not exist'
+            })
+        }
+
+        const friendDelete = await friends.deleteOne({ userId: userId, friendId: friendId })
+        if (friendDelete.deletedCount === 0) {
+            const userFriendDelete = await friends.deleteOne({ userId: friendId, friendId: userId })
+            if (userFriendDelete.deletedCount === 0) {
+                return res.send({
+                    error: 'Friend could not be removed. Please try again later'
+                })
+            } else {
+                return res.send(userFriendDelete)
+            }
+        } else {
+            return res.send(friendDelete)
+        }
+    } catch (err) {
+        console.log(`One Friend Remove Error: ${err}`)
         return res.send({
             error: err
         })

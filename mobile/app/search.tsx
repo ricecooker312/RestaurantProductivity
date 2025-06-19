@@ -39,14 +39,17 @@ const search = () => {
                     />
 
                     <View className='m-6 p-4 mt-0'>
-                        <View className='bg-light-200 mt-0 p-4 rounded-lg flex flex-row items-center justify-between'>
-                            <Text>Sarah</Text>
+                        <View className='bg-light-200 mt-0 p-2 rounded-lg flex flex-row items-center justify-between'>
+                            <Text className='ml-4 text-lg'>Sarah</Text>
                             <TouchableOpacity className='bg-button-warning p-4 rounded-lg'>
-                                <Image source={icons.restauranttab} className='size-8' />
+                                <Image source={icons.addfriend} className='size-8' />
                             </TouchableOpacity>
                         </View>
-                        <View className='bg-light-200 mt-4 p-4 rounded-lg'>
-                            <Text>Sarah</Text>
+                        <View className='bg-light-200 mt-4 p-2 rounded-lg flex flex-row items-center justify-between'>
+                            <Text className='ml-4 text-lg'>Eric</Text>
+                            <TouchableOpacity className='bg-button-warning p-4 rounded-lg'>
+                                <Image source={icons.addfriend} className='size-8' />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>

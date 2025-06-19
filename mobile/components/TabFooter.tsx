@@ -9,7 +9,7 @@ const TabFooter = ({ page }: { page: "home" | "restaurant" | "goals" | "social" 
     <View className='absolute flex-1 flex-row items-center w-screen h-[10vh] left-0 bottom-0 z-50 bg-footerbg'>
       <View className={`h-full flex-1 items-center justify-center ${page === 'home' && 'bg-dark-footer'}`}>
         <TouchableWithoutFeedback onPress={() => router.navigate('/')}>
-            <Image source={icons.hometab} />
+            <Image source={icons.hometab} className='size-12' />
         </TouchableWithoutFeedback>
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'restaurant' && 'bg-dark-footer'}`}>
@@ -19,7 +19,7 @@ const TabFooter = ({ page }: { page: "home" | "restaurant" | "goals" | "social" 
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'goals' && 'bg-dark-footer'}`}>
         <TouchableWithoutFeedback onPress={() => router.navigate('/goals')}>
-            <Image source={icons.goalstab} className='w-12 h-12' />
+            <Image source={icons.goalstab} style={{ width: 55, height: 55 }} />
         </TouchableWithoutFeedback>
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'social' && 'bg-dark-footer'}`}>
@@ -29,7 +29,7 @@ const TabFooter = ({ page }: { page: "home" | "restaurant" | "goals" | "social" 
       </View>
       <View className={`h-full flex-1 items-center justify-center ${page === 'profile' && 'bg-dark-footer'}`}>
         <TouchableWithoutFeedback onPress={() => router.navigate('/profile')}>
-            <Image source={icons.profiletab} className='w-16 h-16' />
+            <Image source={icons.profiletab} className='size-12' />
         </TouchableWithoutFeedback>
       </View>
     </View>
