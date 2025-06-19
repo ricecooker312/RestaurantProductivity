@@ -29,7 +29,7 @@ const restaurant = () => {
     const [accessToken, setAccessToken] = useState('')
     const [items, setItems] = useState<RestaurantItem[]>([])
     const [unowned, setUnowned] = useState<RestaurantItem[]>([])
-    const [coins, setCoins] = useState<string>('')
+    const [coins, setCoins] = useState('')
 
     const insets = useSafeAreaInsets()
 

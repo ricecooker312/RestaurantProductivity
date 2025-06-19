@@ -13,8 +13,8 @@ const profile = () => {
     const [edit, setEdit] = useState(false)
     const [emailError, setEmailError] = useState('')
 
-    const [totalItems, setTotalItems] = useState<number | null>(0)
-    const [completedGoals, setCompletedGoals] = useState<number | null>(0)
+    const [totalItems, setTotalItems] = useState<number | null>()
+    const [completedGoals, setCompletedGoals] = useState<number | null>()
 
     const insets = useSafeAreaInsets()
 
@@ -46,7 +46,14 @@ const profile = () => {
             const emailData = await emailRes.json()
 
             if (emailData.error) {
-                Alert.alert(emailData.error)
+                if (emailData.error === 'That user does not exist') {
+                    await AsyncStorage.removeItem('coins')
+                    await AsyncStorage.removeItem('accessToken')
+
+                    router.navigate('/onboarding')
+                } else {
+                    Alert.alert(emailData.error)
+                }
             } else {
                 setEmail(emailData.email)
             }
@@ -72,11 +79,33 @@ const profile = () => {
                 Alert.alert(itemsData.error)
             } else {
                 setTotalItems(itemsData.length)
-                setCompletedGoals(itemsData.length)
             }
         }
 
         if (accessToken) getItems()
+    }, [accessToken])
+
+    useEffect(() => {
+        const getGoals = async () => {
+            const completedGoalsPayload = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+
+            const goalsRes = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/complete', completedGoalsPayload)
+            const goalsData = await goalsRes.json()
+
+            if (goalsData.error) {
+                Alert.alert(goalsData.error)
+            } else {
+                setCompletedGoals(goalsData.length)
+            }
+        }
+
+        if (accessToken) getGoals()
     }, [accessToken])
 
     useEffect(() => {
@@ -102,8 +131,6 @@ const profile = () => {
             await AsyncStorage.removeItem('coins')
 
             router.navigate('/onboarding')
-        } else {
-            console.log(`accessToken: ${accessToken}`)
         }
     }
 
@@ -256,12 +283,16 @@ const profile = () => {
                             <View className='flex flex-col flex-1 rounded-lg bg-white w-1/2 p-4'>
                                 <Text className='font-bold text-center'>Lifetime Goals</Text>
                                 <Text className='text-center text-5xl font-bold p-6'>{completedGoals}</Text>
-                                <Text className='text-center text-sm font-light'>goals completed</Text>
+                                <Text className='text-center text-sm font-light'>
+                                    {completedGoals === 1 ? 'goal completed' : 'goals completed'}
+                                </Text>
                             </View>
                             <View className='flex flex-col flex-1 rounded-lg bg-white w-1/2 p-4'>
                                 <Text className='font-bold text-center'>Total Items</Text>
                                 <Text className='text-center text-5xl font-bold p-6'>{totalItems}</Text>
-                                <Text className='text-center text-sm font-light'>items owned</Text>
+                                <Text className='text-center text-sm font-light'>
+                                    {totalItems === 1 ? 'item owned' : 'items owned'}
+                                </Text>
                             </View>
                         </View>
 

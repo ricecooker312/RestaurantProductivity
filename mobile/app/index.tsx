@@ -24,6 +24,7 @@ const index = () => {
           router.navigate('/onboarding')
         } else {
           setAccessToken(useEffectToken)
+          router.navigate('/search')
         }
       }
 

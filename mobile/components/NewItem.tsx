@@ -80,7 +80,7 @@ const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewIt
 
             <TouchableHighlight
                 onPress={buyItem}
-                underlayColor={`${item.price > parseInt(coins) ? '' : '#0014C7'}`}
+                underlayColor={`${item.price > parseInt(coins) ? '#A3ACFF' : '#0014C7'}`}
                 className={`${item.price > parseInt(coins) ? 'bg-button-primaryDisabled' : 'bg-primary'} p-4 px-8 rounded-lg mt-6`}
             >
                 <View className='flex flex-row items-center justify-center'>
