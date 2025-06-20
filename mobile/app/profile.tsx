@@ -89,6 +89,7 @@ const profile = () => {
     useEffect(() => {
         const getGoals = async () => {
             const completedGoalsPayload = {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

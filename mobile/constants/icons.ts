@@ -18,6 +18,7 @@ import dropdown from '@/assets/icons/dropdown.png'
 import coins from '@/assets/icons/coins.png'
 import removefriend from '@/assets/icons/removefriend.png'
 import addfriend from '@/assets/icons/addfriend.png'
+import requestsicon from '@/assets/icons/requestsicon.png'
 
 export const icons = {
   logo,
@@ -39,5 +40,6 @@ export const icons = {
   dropdown,
   coins,
   removefriend,
-  addfriend
+  addfriend,
+  requestsicon
 }

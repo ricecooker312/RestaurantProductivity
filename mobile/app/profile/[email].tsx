@@ -56,6 +56,32 @@ const friendProfile = () => {
     }, [accessToken])
 
     useEffect(() => {
+        const getGoalsCompleted = async () => {
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/complete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    friendId: id
+                })
+            })
+
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
+            } else {
+                setGoalsCompleted(data.length)
+            }
+        }
+
+        if (accessToken && id) getGoalsCompleted()
+    }, [id])
+
+    useEffect(() => {
         const getItemsOwned = async () => {
             const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/find/all', {
                 method: 'POST',
@@ -102,17 +128,17 @@ const friendProfile = () => {
                     <Text className='font-bold mt-8'>Email: <Text className='font-normal'>{email}</Text></Text>
                 </View>
 
-                <View className='flex flex-row m-6'>
+                <View className='flex flex-row m-6 gap-3'>
                     <View className='bg-light-100 rounded-lg flex-1 items-center justify-center p-4'>
                         <Text className='font-bold'>Total Items</Text>
-                        <Text className='font-bold text-5xl p-6'>{itemsOwned}</Text>
-                        <Text className='font-light'>items owned</Text>
+                        <Text className='font-bold text-5xl p-6'>{goalsCompleted}</Text>
+                        <Text className='font-light'>goals completed</Text>
                     </View>
 
                     <View className='bg-light-100 rounded-lg flex-1 items-center justify-center p-4'>
                         <Text className='font-bold'>Lifetime Goals</Text>
                         <Text className='font-bold text-5xl p-6'>{itemsOwned}</Text>
-                        <Text className='font-light'>goals completed</Text>
+                        <Text className='font-light'>items owned</Text>
                     </View>
                 </View>
             </SafeAreaView>

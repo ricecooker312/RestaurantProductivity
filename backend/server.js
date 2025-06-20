@@ -52,8 +52,8 @@ app.get('/', (req, res) => {
     return res.send('Welcome to the app!')
 })
 
-app.get('/api/users/find/all', async (req, res) => {
-    const allUsers = await users.find({}).toArray()
+app.get('/api/users/find/all', checkToken, async (req, res) => {
+    const allUsers = await users.find({}).project({ password: 0 }).toArray()
 
     return res.send(allUsers)
 })
@@ -207,7 +207,7 @@ app.delete('/api/users/delete', checkToken, async (req, res) => {
     }
 })
 
-app.delete('/api/users/delete/all', async (req, res) => {
+app.delete('/api/users/delete/all', checkToken, async (req, res) => {
     try {
         const usersDelete = users.deleteMany({})
         return res.send(usersDelete)
@@ -440,7 +440,7 @@ app.delete('/api/goals/:goalId/delete', checkToken, async (req, res) => {
     }
 })
 
-app.delete('/api/goals/delete/all', async (req, res) => {
+app.delete('/api/goals/delete/all', checkToken, async (req, res) => {
     try {
         const goalsDelete = goals.deleteMany({})
         return res.send(goalsDelete)
@@ -451,7 +451,7 @@ app.delete('/api/goals/delete/all', async (req, res) => {
     }
 })
 
-app.get('/api/items/find/all', async (req, res) => {
+app.get('/api/items/find/all', checkToken, async (req, res) => {
     try {
         const allItems = await items.find({}).toArray()
 
@@ -545,7 +545,7 @@ app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
     }
 })
 
-app.post('/api/items/add', async (req, res) => {
+app.post('/api/items/add', checkToken, async (req, res) => {
     const { name, image, type, price, maxLevel, features } = req.body
 
     try {
@@ -745,12 +745,12 @@ app.patch('/api/items/user/upgrade/final', checkToken, async (req, res) => {
     }
 })
 
-app.get('/api/social/find/all', checkToken, async (req, res) => {
+app.get('/api/social/find/accepted', checkToken, async (req, res) => {
     const userId = req.user.id
 
     try {
-        const userFind = await friends.find({ userId: userId }).toArray()
-        const friendFind = await friends.find({ friendId: userId }).toArray()
+        const userFind = await friends.find({ userId: userId, accepted: true }).toArray()
+        const friendFind = await friends.find({ friendId: userId, accepted: true }).toArray()
 
         const fullFriends = []
 
@@ -799,6 +799,32 @@ app.get('/api/social/find/all', checkToken, async (req, res) => {
     }
 })
 
+app.get("/api/social/find/requested", checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    const friendFind = await friends.find({ friendId: userId, accepted: false }).toArray()
+    if (!friendFind) {
+        return res.send({
+            error: 'No new friend requests'
+        })
+    }
+
+    const userResults = []
+
+    for (let i = 0; i < friendFind.length; i++) {
+        const userFind = await users.findOne({ _id: new ObjectId(friendFind[i].userId) })
+        if (!userFind) {
+            return res.send({
+                error: 'User who sent request could not be found'
+            })
+        }
+
+        userResults.push(userFind)
+    }
+
+    return res.send(userResults)
+})
+
 app.post('/api/social/add', checkToken, async (req, res) => {
     const userId = req.user.id
     const { friendId } = req.body
@@ -828,6 +854,7 @@ app.post('/api/social/add', checkToken, async (req, res) => {
         const newFriendDoc = {
             userId: userId,
             friendId: friendId,
+            accepted: false,
             createdAt: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
         }
 
@@ -840,6 +867,35 @@ app.post('/api/social/add', checkToken, async (req, res) => {
             error: err
         })
     }
+})
+
+app.patch('/api/social/accept', checkToken, async (req, res) => {
+    const userId = req.user.id
+    const { friendId } = req.body
+
+    const userFindCheck = await users.findOne({ _id: new ObjectId(userId) })
+    const friendFindCheck = await users.findOne({ _id: new ObjectId(friendId) })
+
+    if (!userFindCheck || !friendFindCheck) {
+        return res.send({
+            error: 'User or friend not found'
+        })
+    }
+
+    const sendRequestCheck = await friends.findOne({ userId: friendId, friendId: userId })
+    if (!sendRequestCheck) {
+        return res.send({
+            error: 'You never sent a request to this person'
+        })
+    }
+
+    const acceptRequest = await friends.updateOne(sendRequestCheck, {
+        $set: {
+            accepted: true
+        }
+    })
+
+    return res.send(acceptRequest)
 })
 
 app.delete('/api/social/remove', checkToken, async (req, res) => {

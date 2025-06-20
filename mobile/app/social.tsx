@@ -100,12 +100,50 @@ const social = () => {
                 paddingRight: insets.right,
                 paddingLeft: insets.left
             }}>
-                <Header coins={coins} />
+                <View className='flex flex-row flex-wrap items-center justify-center'>
+                
+                    <View className='flex-row items-center mx-[1rem]'>
+                        <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
+                        <Text className='text-xl'>6</Text>
+                    </View>
+        
+                    <View className='flex-row items-center mx-[1rem] mr-0 relative'>
+                        <TouchableOpacity
+                            activeOpacity={0.4}
+                        >
+                            <Image source={icons.requestsicon} className='size-8' />
+                        </TouchableOpacity>
+                        <View style={{
+                            position: 'absolute',
+                            top: -10,
+                            right: -10,
+                            width: 20, 
+                            height: 20,
+                            borderRadius: 10,
+                            backgroundColor: '#EF4444',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                            }}
+                        >
+                            <Text className='text-sm color-white'>9+</Text>
+                        </View>
+                    </View>
+        
+                    <TouchableHighlight
+                        className='p-4 px-8 bg-primary justify-self-end ml-auto mr-8 rounded-xl'
+                        underlayColor={'#0014C7'}
+                        onPress={() => router.navigate('/newGoal')}
+                    >
+                        <Text className='color-white text-lg'>Set a New Goal</Text>
+                    </TouchableHighlight>
+                    
+                </View>
 
-                <View className='flex flex-row items-center justify-between mt-6'>
-                    <Text className='text-3xl color-dark-heading m-6 font-bold'>Friends</Text>
+                <View className='flex flex-row items-center justify-between p-6'>
+                    <Text className='text-3xl color-dark-heading font-bold'>Friends</Text>
                     <TouchableHighlight 
-                        className='px-8 p-4 m-6 bg-primary rounded-lg'
+                        className='px-8 p-4 bg-primary rounded-lg'
                         underlayColor={'#0014C7'}
                         onPress={() => router.navigate('/search')}
                     >
