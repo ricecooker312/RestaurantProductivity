@@ -233,11 +233,12 @@ app.get('/api/goals/find/all', checkToken, async (req, res) => {
     }
 })
 
-app.get('/api/goals/find/complete', checkToken, async (req, res) => {
+app.post('/api/goals/find/complete', checkToken, async (req, res) => {
     const userId = req.user.id
+    const { friendId } = req.body
 
     try {
-        const goalsFind = await goals.find({ userId: userId, completed: true }).toArray()
+        const goalsFind = await goals.find({ userId: friendId ? friendId : userId, completed: true }).toArray()
 
         return res.send(goalsFind)
     } catch (err) {

@@ -31,7 +31,7 @@ const FriendCard = ({ friend, removeFriend }: FriendCardProps) => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                     className='bg-primaryLight p-4 rounded-lg'
-                    
+                    onPress={() => router.navigate(`/profile/${friend.email}` as RelativePathString)}
                 >
                     <Image source={icons.profiletab} className='size-8' />
                 </TouchableOpacity>
