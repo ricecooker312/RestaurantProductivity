@@ -54,7 +54,7 @@ const social = () => {
                 }
             }
 
-            const res = await fetch('https://restaurantproductivity.onrender.com/api/social/find/all', getFriendsPayload)
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/social/find/accepted', getFriendsPayload)
             const data = await res.json()
 
             if (data.error) {
@@ -110,6 +110,7 @@ const social = () => {
                     <View className='flex-row items-center mx-[1rem] mr-0 relative'>
                         <TouchableOpacity
                             activeOpacity={0.4}
+                            onPress={() => router.navigate('/requests')}
                         >
                             <Image source={icons.requestsicon} className='size-8' />
                         </TouchableOpacity>

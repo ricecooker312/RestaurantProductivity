@@ -812,7 +812,10 @@ app.get("/api/social/find/requested", checkToken, async (req, res) => {
     const userResults = []
 
     for (let i = 0; i < friendFind.length; i++) {
-        const userFind = await users.findOne({ _id: new ObjectId(friendFind[i].userId) })
+        const userFind = await users.findOne(
+            { _id: new ObjectId(friendFind[i].userId) },
+            { projection: { password: 0 } }
+        )
         if (!userFind) {
             return res.send({
                 error: 'User who sent request could not be found'
