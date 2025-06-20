@@ -11,8 +11,8 @@ import FriendCard from '@/components/FriendCard'
 
 const social = () => {
     const [accessToken, setAccessToken] = useState('')
-    const [coins, setCoins] = useState('')
     const [friends, setFriends] = useState<User[]>([])
+    const [requests, setRequests] = useState(0)
 
     const insets = useSafeAreaInsets()
 
@@ -31,17 +31,25 @@ const social = () => {
     }, [])
 
     useEffect(() => {
-        const getCoins = async () => {
-            const gCoins = await AsyncStorage.getItem('coins')
-            if (!gCoins) {
-                await AsyncStorage.removeItem('accessToken')
-                router.navigate('/onboarding')
+        const getRequests = async () => {
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/social/find/requested', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
             } else {
-                setCoins(gCoins)
+                setRequests(data.length)
             }
         }
 
-        if (accessToken) getCoins()
+        if (accessToken) getRequests()
     }, [accessToken])
 
     useEffect(() => {
@@ -114,21 +122,23 @@ const social = () => {
                         >
                             <Image source={icons.requestsicon} className='size-8' />
                         </TouchableOpacity>
-                        <View style={{
-                            position: 'absolute',
-                            top: -10,
-                            right: -10,
-                            width: 20, 
-                            height: 20,
-                            borderRadius: 10,
-                            backgroundColor: '#EF4444',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                            }}
-                        >
-                            <Text className='text-sm color-white'>9+</Text>
-                        </View>
+                        {requests > 0 && (
+                            <View style={{
+                                position: 'absolute',
+                                top: -10,
+                                right: -10,
+                                width: 20, 
+                                height: 20,
+                                borderRadius: 10,
+                                backgroundColor: '#EF4444',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                                }}
+                            >
+                                <Text className='text-sm color-white'>{requests > 9 ? '9+' : requests}</Text>
+                            </View>
+                        )}
                     </View>
         
                     <TouchableHighlight
