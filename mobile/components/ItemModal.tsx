@@ -17,7 +17,7 @@ interface ItemModalProps {
     open: boolean,
     setOpen: (value: boolean) => void,
     item: RestaurantItem,
-    setItems: Dispatch<SetStateAction<RestaurantItem[]>>
+    setItems?: Dispatch<SetStateAction<RestaurantItem[]>>
 }
 
 const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
@@ -59,7 +59,9 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
             if (data.error) {
                 if (data.error === 'Item is already at max level') setMaxLevel(true)
             } else {
-                setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
+                if (setItems) {
+                    setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
+                }
             }
         }
     }
@@ -96,24 +98,26 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
                         </Text>
                     ))}
 
-                    <TouchableHighlight 
-                        className={`p-4 m-4 mt-8 w-[90%] ${maxLevel ? 'bg-button-primaryDisabled' : 'bg-primary'} rounded-lg`}
-                        underlayColor={`${maxLevel ? '' : '#0014C7'}`}
-                        onPress={upgradeItem}
-                    >
-                        {maxLevel ? (
-                            <Text className='text-lg color-white text-center'>Max Level</Text>
-                        ) : (
-                            <View className='flex flex-row items-center justify-around'>
-                                <Text className='color-white text-lg text-center'>Upgrade</Text>
-                                
-                                <View className='flex flex-row items-center gap-3'>
-                                    <Image source={icons.coins} className='w-8 h-8' />
-                                    <Text className='color-white text-lg'>{item.price * item.level}</Text> 
+                    {setItems && (
+                        <TouchableHighlight 
+                            className={`p-4 m-4 mt-8 w-[90%] ${maxLevel ? 'bg-button-primaryDisabled' : 'bg-primary'} rounded-lg`}
+                            underlayColor={`${maxLevel ? '' : '#0014C7'}`}
+                            onPress={upgradeItem}
+                        >
+                            {maxLevel ? (
+                                <Text className='text-lg color-white text-center'>Max Level</Text>
+                            ) : (
+                                <View className='flex flex-row items-center justify-around'>
+                                    <Text className='color-white text-lg text-center'>Upgrade</Text>
+                                    
+                                    <View className='flex flex-row items-center gap-3'>
+                                        <Image source={icons.coins} className='w-8 h-8' />
+                                        <Text className='color-white text-lg'>{item.price * item.level}</Text> 
+                                    </View>
                                 </View>
-                            </View>
-                        )}
-                    </TouchableHighlight>
+                            )}
+                        </TouchableHighlight>
+                    )}
                 </View>
             </View>
         </Modal>

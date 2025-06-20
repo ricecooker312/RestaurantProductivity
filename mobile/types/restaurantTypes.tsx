@@ -13,7 +13,7 @@ export type UserItem = {
 export type RestaurantItem = {
     _id: string,
     name: string,
-    image: string,
+    image: string[],
     type: string,
     price: number,
     level: number,

@@ -30,6 +30,7 @@ const edit = () => {
         type: '',
         priority: '',
         difficulty: '',
+        reward: 0,
         userId: '',
         time: ''
     })

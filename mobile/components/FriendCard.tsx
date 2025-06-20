@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import React from 'react'
 import { User } from '@/types/userTypes'
 import { icons } from '@/constants/icons'
+import { RelativePathString, router } from 'expo-router'
 
 interface FriendCardProps {
     friend: User,
@@ -22,10 +23,16 @@ const FriendCard = ({ friend, removeFriend }: FriendCardProps) => {
             <Text className='text-lg ml-4 mt-2'>{friend.email}</Text>
 
             <View className='flex flex-row gap-2 ml-4 my-4'>
-                <TouchableOpacity className='bg-button-warning p-4 rounded-lg'>
+                <TouchableOpacity 
+                    className='bg-button-warning p-4 rounded-lg'
+                    onPress={() => router.navigate(`/restaurant/${friend._id}` as RelativePathString)}
+                >
                     <Image source={icons.restauranttab} className='size-8' />
                 </TouchableOpacity>
-                <TouchableOpacity className='bg-primaryLight p-4 rounded-lg'>
+                <TouchableOpacity 
+                    className='bg-primaryLight p-4 rounded-lg'
+                    
+                >
                     <Image source={icons.profiletab} className='size-8' />
                 </TouchableOpacity>
                 <TouchableOpacity 

@@ -11,16 +11,17 @@ const imagesMap = {
 
 interface ItemProps {
     item: RestaurantItem,
-    setItems: Dispatch<SetStateAction<RestaurantItem[]>>
+    setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    className?: string
 }
 
-const Item = ({ item, setItems }: ItemProps) => {
+const Item = ({ item, setItems, className }: ItemProps) => {
     const [open, setOpen] = useState(false)
 
     return (
         <>
             <TouchableOpacity 
-                className='border-2 bg-light-100 rounded-lg w-24 h-24'
+                className={`${className && className} border-2 bg-light-100 rounded-lg w-24 h-24`}
                 onPress={() => setOpen(true)}
             >
                 <Image source={{ uri: item.image[item.level - 1] }} className='size-full' />
