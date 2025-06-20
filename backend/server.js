@@ -496,12 +496,13 @@ app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
     }
 })
 
-app.get('/api/items/user/find/all', checkToken, async (req, res) => {
+app.post('/api/items/user/find/all', checkToken, async (req, res) => {
     const userId = req.user.id
+    const { friendId } = req.body
     const resultItems = []
 
     try {
-        const uItems = await userItems.find({ userId: userId }).toArray()
+        const uItems = await userItems.find({ userId: friendId ? friendId : userId }).toArray()
         for (let i = 0; i < uItems.length; i++) {
             const item = await items.findOne({ _id: new ObjectId(uItems[i].itemId) })
             if (!item) {

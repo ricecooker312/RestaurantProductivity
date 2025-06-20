@@ -50,6 +50,7 @@ const restaurant = () => {
     useEffect(() => {
         const getItems = async () => {
             const getItemPayload = {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

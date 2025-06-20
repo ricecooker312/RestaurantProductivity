@@ -65,6 +65,7 @@ const profile = () => {
     useEffect(() => {
         const getItems = async () => {
             const totalItemsPayload = {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
