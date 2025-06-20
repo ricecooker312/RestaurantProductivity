@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableHighlight, TouchableOpacity, Image } from 'react-native'
+import { View, Text, ScrollView, TouchableHighlight, TouchableOpacity, Image, Alert, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '@/components/Header'
@@ -7,6 +7,7 @@ import { router } from 'expo-router'
 import TabFooter from '@/components/TabFooter'
 import { icons } from '@/constants/icons'
 import { User } from '@/types/userTypes'
+import FriendCard from '@/components/FriendCard'
 
 const social = () => {
     const [accessToken, setAccessToken] = useState('')
@@ -43,6 +44,53 @@ const social = () => {
         if (accessToken) getCoins()
     }, [accessToken])
 
+    useEffect(() => {
+        const getFriends = async () => {
+            const getFriendsPayload = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/social/find/all', getFriendsPayload)
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
+            } else {
+                setFriends(data)
+            }
+        }
+
+        if (accessToken) getFriends()
+    }, [accessToken])
+
+    const removeFriend = async (friend: User) => {
+        if (accessToken) {
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/social/remove', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    friendId: friend._id
+                })
+            })
+
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
+            } else {
+                setFriends(prevFriends => prevFriends.filter(mFriend => mFriend._id !== friend._id))
+            }
+        }
+    }
+
     return (
         <View className='flex-1 bg-dfbg'>
             <SafeAreaView style={{
@@ -52,40 +100,26 @@ const social = () => {
                 paddingRight: insets.right,
                 paddingLeft: insets.left
             }}>
-                <ScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
-                    keyboardShouldPersistTaps='handled'
-                    showsVerticalScrollIndicator={false}
-                >
-                    <Header coins={coins} />
+                <Header coins={coins} />
 
-                    <View className='flex flex-row items-center justify-between mt-6'>
-                        <Text className='text-3xl color-dark-heading m-6 font-bold'>Friends</Text>
-                        <TouchableHighlight 
-                            className='px-8 p-4 m-6 bg-primary rounded-lg'
-                            underlayColor={'#0014C7'}
-                            onPress={() => router.navigate('/search')}
-                        >
-                            <Text className='color-white text-center text-lg'>Search</Text>
-                        </TouchableHighlight>
-                    </View>
+                <View className='flex flex-row items-center justify-between mt-6'>
+                    <Text className='text-3xl color-dark-heading m-6 font-bold'>Friends</Text>
+                    <TouchableHighlight 
+                        className='px-8 p-4 m-6 bg-primary rounded-lg'
+                        underlayColor={'#0014C7'}
+                        onPress={() => router.navigate('/search')}
+                    >
+                        <Text className='color-white text-center text-lg'>Search</Text>
+                    </TouchableHighlight>
+                </View>
 
-                    <View className='m-6 bg-light-100 p-4 flex flex-row items-center rounded-md justify-between'>
-                        <Text className='text-lg ml-4'>Sarah</Text>
-
-                        <View className='flex flex-row gap-2'>
-                            <TouchableOpacity className='bg-button-warning p-4 rounded-lg'>
-                                <Image source={icons.restauranttab} className='size-8' />
-                            </TouchableOpacity>
-                            <TouchableOpacity className='bg-primaryLight p-4 rounded-lg'>
-                                <Image source={icons.profiletab} className='size-8' />
-                            </TouchableOpacity>
-                            <TouchableOpacity className='bg-button-error p-4 rounded-lg'>
-                                <Image source={icons.removefriend} className='size-8' /> 
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </ScrollView>
+                <FlatList
+                    data={friends}
+                    keyExtractor={(friend) => friend._id}
+                    renderItem={({ item }) => (
+                        <FriendCard friend={item} removeFriend={removeFriend} />
+                    )}
+                />
             </SafeAreaView>
             <TabFooter page='social' />
         </View>

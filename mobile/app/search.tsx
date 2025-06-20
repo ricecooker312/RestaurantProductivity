@@ -82,6 +82,11 @@ const search = () => {
             const data = await res.json()
 
             if (data.error) {
+                setFoundUser({
+                    _id: '',
+                    email: '',
+                    coins: ''
+                })
                 setNoUser(data.error)   
             } else {
                 setNoUser('')
