@@ -82,15 +82,39 @@ const search = () => {
             const data = await res.json()
 
             if (data.error) {
-                if (data.error)
-
-                Alert.alert(data.error)    
+                setNoUser(data.error)   
             } else {
+                setNoUser('')
                 setFoundUser({
                     _id: data._id,
                     email: data.email,
                     coins: data.coins
                 })
+            }
+        }
+    }
+
+    const addFriend = async () => {
+        if (foundUser._id) {
+            const addPayload = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    friendId: foundUser._id
+                })
+            }
+
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/social/add', addPayload)
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
+            } else {
+                router.navigate('/social')
             }
         }
     }
@@ -139,11 +163,18 @@ const search = () => {
                         <View className='m-6 p-4 mt-0'>
                             <View className='bg-light-200 mt-0 p-2 rounded-lg flex flex-row items-center justify-between'>
                                 <Text className='ml-4 text-lg'>{foundUser.email}</Text>
-                                <TouchableOpacity className='bg-button-warning p-4 rounded-lg'>
+                                <TouchableOpacity 
+                                    className='bg-button-warning p-4 rounded-lg'
+                                    onPress={addFriend}
+                                >
                                     <Image source={icons.addfriend} className='size-8' />
                                 </TouchableOpacity>
                             </View>
                         </View>
+                    )}
+
+                    {noUser && (
+                        <Text className='m-6 p-4 text-xl'>{noUser}</Text>
                     )}
                 </ScrollView>
             </SafeAreaView>

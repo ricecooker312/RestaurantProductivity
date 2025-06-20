@@ -6,10 +6,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 import TabFooter from '@/components/TabFooter'
 import { icons } from '@/constants/icons'
+import { User } from '@/types/userTypes'
 
 const social = () => {
     const [accessToken, setAccessToken] = useState('')
     const [coins, setCoins] = useState('')
+    const [friends, setFriends] = useState<User[]>([])
 
     const insets = useSafeAreaInsets()
 

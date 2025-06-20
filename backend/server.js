@@ -750,15 +750,45 @@ app.get('/api/social/find/all', checkToken, async (req, res) => {
         const userFind = await friends.find({ userId: userId }).toArray()
         const friendFind = await friends.find({ friendId: userId }).toArray()
 
+        const fullFriends = []
+
         if (userFind.length === 0 && friendFind.length === 0) {
             return res.send([])
         }
 
-        for (let i = 0; i < friendFind.length; i++) {
-            userFind.push(friendFind[i])
+        if (userFind.length > 0) {
+            for (let i = 0; i < userFind.length; i++) {
+                const user = await users.findOne(
+                    { _id: new ObjectId(userFind[i].friendId) }, 
+                    { projection: { password: 0 } }
+                )
+                if (!user) {
+                    return res.send({
+                        error: 'User in friends does not exist'
+                    })
+                }
+
+                fullFriends.push(user)
+            }
         }
 
-        return res.send(userFind)
+        if (friendFind.length > 0) {
+            for (let j = 0; j < friendFind.length; j++) {
+                const friend = await users.findOne(
+                    { _id: new ObjectId(friendFind[j].userId) },
+                    { projection: { password: 0 } }
+                )
+                if (!friend) {
+                    return res.send({
+                        error: 'Friend in users does not exist'
+                    })
+                }
+
+                fullFriends.push(friend)
+            }
+        }
+
+        return res.send(fullFriends)
     } catch (err) {
         console.log(`All Friends Find Error: ${err}`)
         return res.send({
