@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Alert, ScrollView } from 'react-native'
+import { View, Text, Image, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Alert, ScrollView, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -9,10 +9,14 @@ import GoalCard from '@/components/GoalCard'
 import { Goal } from '@/types/goalTypes'
 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { images } from '@/constants/images'
+
+const screenWidth = Dimensions.get('window').width
 
 const index = () => {
     const [accessToken, setAccessToken] = useState<string | undefined>()
     const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
+    const [aspect, setAspect] = useState(1)
 
     const insets = useSafeAreaInsets()
 
@@ -28,6 +32,11 @@ const index = () => {
       }
 
       isAuthenticated()
+    }, [])
+
+    useEffect(() => {
+      const { width, height } = Image.resolveAssetSource(images.starting_restaurant)
+      setAspect(width / height)
     }, [])
 
     useEffect(() => {
@@ -83,11 +92,11 @@ const index = () => {
           paddingLeft: insets.left
         }}>
           <ScrollView 
-            contentContainerStyle={{ flexGrow: 1 }}
+            contentContainerStyle={{ flexGrow: 1 }} 
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
-            <View className='flex flex-row flex-wrap items-center justify-center'>
+            <View className='flex flex-row items-center justify-center'>
 
               <TouchableWithoutFeedback onPress={() => Alert.alert('you clicked!')}>
                 <Image source={icons.logo} className='w-[3.875rem] h-[2.9375rem] m-4 ml-8' />
@@ -106,39 +115,68 @@ const index = () => {
                 <Text className='color-white text-lg'>Set a New Goal</Text>
               </TouchableHighlight>
 
-              <Image source={icons.clock} className='m-4' />
+            </View>
 
-              <View className='flex-col mb-[1px]'>
-                <Text className='color-dark-heading font-bold text-3xl m-4 mt-0'>8 hours 36 minutes</Text>
-                <TouchableOpacity className='ml-4' activeOpacity={0.55}>
-                  <Text className='text-lg color-link'>See your historic screen time</Text>
-                </TouchableOpacity>
-              </View>
-
+            <View className='m-4 mt-8 self-center' style={{
+              width: screenWidth * 0.9,
+              aspectRatio: aspect
+            }}>
+              <Image source={images.starting_restaurant} resizeMode='contain' className='w-full h-full' />
             </View>
 
             <View className='flex flex-row items-center'>
               <Text className='font-bold color-dark-heading text-3xl p-6'>Goals</Text>
-              <TouchableHighlight 
-                className='ml-auto p-4 m-6 bg-primary rounded-xl px-8'
-                onPress={() => router.navigate('/goals')}
-                underlayColor={'#0014C7'}
-              >
-                <Text className='color-white text-lg'>See All Goals</Text>
-              </TouchableHighlight>
             </View>
 
-            <View className='mb-28'>
+            <View className=''>
               {currentGoals.map(goal => (
                 <GoalCard 
                   key={goal._id} 
-                  id={goal._id} 
-                  name={goal.title} 
-                  completed={goal.completed} 
-                  priority={goal.priority} 
+                  goal={goal}
                   completeGoal={completeGoal}
                 />
               ))}
+
+              <TouchableOpacity 
+                className='p-4 py-6 pl-6 border-2 border-dashed mx-6 mt-4 rounded-lg' 
+                onPress={() => router.navigate('/newGoal')}
+                >
+                <View className='flex flex-row items-center justify-center gap-5'>
+                  <Image source={icons.addicon} />
+                  <Text>Add New Goal</Text>
+                </View>
+              </TouchableOpacity>
+            </View> 
+
+            <View className='m-6'>
+              <Text className='text-xl color-dark-heading font-bold'>Suggested Goals</Text>
+
+              <View className='border-button-good p-6 bg-light-100 flex flex-row items-center justify-between rounded-lg mt-4'>
+                <Text>Walk for 20 Minutes</Text>
+                <TouchableOpacity className='h-full'>
+                  <Text className='color-primary'>Add Goal</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View className='m-6 mb-24'>
+              <Text className='text-3xl color-dark-heading font-bold'>Upgrades</Text>
+
+              <View className='flex flex-row flex-wrap mt-6 gap-3'>
+                <View className='bg-light-100 rounded-lg p-6 flex-1'>
+                  <Text className='text-xl font-bold color-dark-heading text-center'>Chair</Text>
+                  <Text className='color-dark-green mt-4'>+15 minutes of customer stay time</Text>
+                  <TouchableOpacity className='bg-primary mt-6 p-4 rounded-lg'>
+                    <Text className='text-center color-white text-md'>Upgrade</Text>
+                  </TouchableOpacity>
+                </View>
+                <View className='bg-light-100 rounded-lg p-6 flex-1'>
+                  <Text className='text-xl font-bold color-dark-heading text-center'>Table</Text>
+                  <TouchableOpacity className='bg-primary mt-6 p-4 rounded-lg'>
+                    <Text className='text-center color-white text-md'>Upgrade</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           </ScrollView>
           <TabFooter page='home' />

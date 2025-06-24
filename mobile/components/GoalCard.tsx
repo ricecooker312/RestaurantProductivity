@@ -4,17 +4,16 @@ import React, { useEffect, useState } from 'react'
 import { AdvancedCheckbox } from 'react-native-advanced-checkbox'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
+import { Goal } from '@/types/goalTypes'
+import { icons } from '@/constants/icons'
 
 interface GoalCardProps {
-    id: string,
-    completed: boolean,
-    name: string,
-    priority: string,
+    goal: Goal,
     completeGoal: (id: string) => void
 }
 
-const GoalCard = ({ id, completed, name, priority, completeGoal }: GoalCardProps) => {
-    const [checked, setChecked] = useState<string | boolean>(completed)
+const GoalCard = ({ goal, completeGoal }: GoalCardProps) => {
+    const [checked, setChecked] = useState<string | boolean>(goal.completed)
     const [accessToken, setAccessToken] = useState<string>('')
 
     useEffect(() => {
@@ -33,27 +32,31 @@ const GoalCard = ({ id, completed, name, priority, completeGoal }: GoalCardProps
 
     let border
 
-    if (priority === 'low') {
+    if (goal.priority === 'low') {
         border = 'border-button-good'
     }
-    else if (priority === 'medium') {
+    else if (goal.priority === 'medium') {
         border = 'border-button-warning'
     }
-    else if (priority === 'high') {
+    else if (goal.priority === 'high') {
         border = 'border-button-error'
     }
 
     if (checked) {
-        completeGoal(id)
+        completeGoal(goal._id)
     }
     
     return (
-        <View className={`bg-light-100 m-4 p-4 py-6 pl-6 flex flex-row items-center rounded-xl border-4 ${border}`}>
+        <View className={`bg-light-100 mx-6 mt-4 p-4 py-6 pl-6 flex flex-row items-center rounded-xl border-4 ${border}`}>
             <AdvancedCheckbox 
                 value={checked}
                 onValueChange={setChecked}
             />
-            <Text className='ml-4 text-lg'>{name}</Text>
+            <Text className='ml-4 text-lg'>{goal.title}</Text>
+            <View className='mx-4 ml-auto flex flex-row gap-2 items-center'>
+                <Image source={icons.coins} className='size-8' />
+                <Text className='text-lg'>{goal.reward}</Text>
+            </View>
         </View>
     )
 }

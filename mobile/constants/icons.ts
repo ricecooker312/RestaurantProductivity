@@ -1,5 +1,6 @@
 import logo from './../assets/icons/logo.png'
 import streak from '@/assets/icons/streak.png'
+import addicon from '@/assets/icons/addicon.png'
 import clock from '@/assets/icons/clock.png'
 import hometab from '@/assets/icons/hometab.png'
 import restauranttab from '@/assets/icons/restauranttab.png'
@@ -23,6 +24,7 @@ import requestsicon from '@/assets/icons/requestsicon.png'
 export const icons = {
   logo,
   streak,
+  addicon,
   clock,
   hometab,
   restauranttab,

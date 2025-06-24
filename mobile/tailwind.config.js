@@ -19,7 +19,8 @@ module.exports = {
         dark: {
           heading: '#292626',
           footer: '#6448F4',
-          button: '#0014C7'
+          button: '#0014C7',
+          green: "#009732"
         },
         button: {
           error: '#FF9F9F',

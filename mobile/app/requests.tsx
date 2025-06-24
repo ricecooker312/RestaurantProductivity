@@ -10,6 +10,7 @@ import FriendCard from '@/components/FriendCard'
 const requests = () => {
     const [accessToken, setAccessToken] = useState('')
     const [requests, setRequests] = useState<User[]>([])
+    const [type, setType] = useState('Outgoing')
 
     const insets = useSafeAreaInsets()
 
