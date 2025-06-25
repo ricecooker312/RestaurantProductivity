@@ -17,6 +17,7 @@ const index = () => {
     const [accessToken, setAccessToken] = useState<string | undefined>()
     const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
     const [aspect, setAspect] = useState(1)
+    const [streak, setStreak] = useState(0)
 
     const insets = useSafeAreaInsets()
 
@@ -25,6 +26,8 @@ const index = () => {
         const useEffectToken = await AsyncStorage.getItem('accessToken')
 
         if (!useEffectToken) {
+          await AsyncStorage.removeItem('coins')
+          await AsyncStorage.removeItem('streak')
           router.navigate('/onboarding')
         } else {
           setAccessToken(useEffectToken)
@@ -55,7 +58,10 @@ const index = () => {
         if (data.error) {
           console.log(data.error)
         } else {
-          setCurrentGoals(data)
+          setCurrentGoals(data.goals)
+          
+          await AsyncStorage.setItem('streak', `${data.streak}`)
+          setStreak(data.streak)
         }
       }
 

@@ -277,7 +277,18 @@ app.get('/api/goals/find/incomplete', checkToken, async (req, res) => {
     try {
         const goalFind = await goals.find({ completed: false, userId: userId }).toArray()
 
-        return res.send(goalFind)
+        const user = await users.findOne({ _id: new ObjectId(userId) })
+        if (!user) {
+            return res.send({
+                error: 'The user does not exist',
+                userNotExist: true
+            })
+        }
+
+        return res.send({
+            goals: goalFind,
+            streak: user.streak
+        })
     } catch (err) {
         console.log(`Incomlete Goal Find error: ${err}`)
         return res.send({
