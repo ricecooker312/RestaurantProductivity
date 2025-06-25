@@ -12,10 +12,12 @@ const imagesMap = {
 interface ItemProps {
     item: RestaurantItem,
     setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setUnowned?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setCoins?: (value: string) => void,
     className?: string
 }
 
-const Item = ({ item, setItems, className }: ItemProps) => {
+const Item = ({ item, setItems, setUnowned, setCoins, className }: ItemProps) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -31,6 +33,8 @@ const Item = ({ item, setItems, className }: ItemProps) => {
                 setOpen={setOpen} 
                 item={item}
                 setItems={setItems}
+                setUnowned={setUnowned}
+                setCoins={setCoins}
             />
         </>
     )

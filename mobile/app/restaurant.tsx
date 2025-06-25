@@ -170,6 +170,8 @@ const restaurant = () => {
                                         key={item._id} 
                                         item={item}
                                         setItems={setItems}
+                                        setUnowned={setUnowned}
+                                        setCoins={setCoins}
                                     />
                                 )
                             ))}
@@ -206,6 +208,8 @@ const restaurant = () => {
                                         key={item._id} 
                                         item={item}
                                         setItems={setItems}
+                                        setUnowned={setUnowned}
+                                        setCoins={setCoins}
                                     />
                                 )
                             ))}
@@ -242,6 +246,8 @@ const restaurant = () => {
                                         key={item._id} 
                                         item={item}
                                         setItems={setItems}
+                                        setUnowned={setUnowned}
+                                        setCoins={setCoins}
                                     />
                                 )
                             ))}

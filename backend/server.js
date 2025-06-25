@@ -25,6 +25,8 @@ const friends = database.collection('friends')
 
 const jwt = require('jsonwebtoken')
 
+const day = 86400000
+
 const checkToken = (req, res, next) => {
     const tokenHeader = req.headers['authorization']
 
@@ -46,6 +48,17 @@ const checkToken = (req, res, next) => {
 
         return next()
     })
+}
+
+const isNewDay = (lastTime, nowTime) => {
+    const last = new Date(lastTime)
+    const now = new Date(nowTime)
+
+    return (
+        now.getUTCFullYear() !== last.getUTCFullYear() ||
+        now.getUTCMonth() !== last.getUTCMonth() ||
+        now.getUTCDate() !== last.getUTCDate()
+    )
 }
 
 app.get('/', (req, res) => {
@@ -107,7 +120,16 @@ app.post('/api/users/register', async (req, res) => {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const doc = { email: email, password: hashedPassword, coins: 25 }
+        const time = new Date()
+        const doc = { 
+            email: email, 
+            password: hashedPassword, 
+            coins: 25,
+            streak: 1,
+            gotStreak: true,
+            createdAt: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`,
+            streakTime: time.getTime()
+        }
         const result = await users.insertOne(doc)
 
         const user = { id: result.insertedId, email: email }
@@ -292,6 +314,9 @@ app.get('/api/goals/find/:goalId', checkToken, async (req, res) => {
 
 app.post('/api/goals/new', checkToken, async (req, res) => {
     const { title, description, completed, type, priority, difficulty } = req.body
+    const userId = req.user.id
+
+    const time = new Date()
 
     let reward = 1
 
@@ -303,7 +328,6 @@ app.post('/api/goals/new', checkToken, async (req, res) => {
     if (difficulty === 'medium') reward *= 2
     else if (difficulty === 'hard') reward *= 3
 
-    const time = new Date()
     const goalsDoc = { 
         title: title, 
         description: description,
@@ -320,6 +344,48 @@ app.post('/api/goals/new', checkToken, async (req, res) => {
         const result = await goals.insertOne(goalsDoc)
         result.reward = reward
 
+        const user = await users.findOne({ _id: new ObjectId(userId) })
+        if (!user) {
+            return res.send({
+                error: 'The user does not exist'
+            })
+        }
+
+        if (isNewDay(user.streakTime, time.getTime()) && user.gotStreak) {
+            await users.updateOne(user, {
+                $set: {
+                    gotStreak: false
+                }
+            })
+            user.gotStreak = false
+        }
+
+        let streak = user.streak
+
+        if (time.getTime() - user.streakTime > day && !user.gotStreak) {
+            const removeStreak = await users.updateOne(user, {
+                $set: {
+                    gotStreak: true,
+                    streak: 1,
+                    streakTime: time.getTime()
+                }
+            })
+
+            streak = 1
+        } else if (time.getTime() - user.streakTime <= day && !user.gotStreak) {
+            const newStreak = user.streak + 1
+            const addStreak = await users.updateOne(user, {
+                $set: {
+                    streak: newStreak,
+                    gotStreak: true,
+                    streakTime: time.getTime()
+                }
+            })
+
+            streak++
+        }
+
+        result.streak = streak
         return res.send(result)
     } catch (error) {
         console.log(`Server Error: ${error}`)
@@ -365,6 +431,15 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
                 })
             }
 
+            if (isNewDay(userFind.streakTime, time.getTime()) && user.gotStreak) {
+                await users.updateOne(userFind, {
+                    $set: {
+                        gotStreak: false
+                    }
+                })
+                userFind.gotStreak = false
+            }
+
             const newCoins = userFind.coins + goalFind.reward
             const addCoins = await users.updateOne(userFind, {
                 $set: {
@@ -372,9 +447,33 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
                 }
             })
 
+            let streak = userFind.streak
+            if (time.getTime() - userFind.streakTime > day && !userFind.gotStreak) {
+                const removeStreak = await users.updateOne(userFind, {
+                    $set: {
+                        streak: 1,
+                        gotStreak: true,
+                        streakTime: time.getTime()
+                    }
+                })
+
+                streak = 1
+            } else if (time.getTime() - userFind.streakTime <= day && !userFind.gotStreak) {
+                const addStreak = await users.updateOne(userFind, {
+                    $set: {
+                        streak: userFind.streak + 1,
+                        gotStreak: true,
+                        streakTime: time.getTime()
+                    }
+                })
+
+                streak++
+            }
+
             return res.send({
                 ...addCoins,
-                coins: newCoins
+                coins: newCoins,
+                streak: streak
             })
         }
 
@@ -583,6 +682,20 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         const newCoins = user.coins - item.price
 
         const time = new Date()
+
+        console.log(user.streakTime, time.getTime(), user.gotStreak)
+        console.log('is new day', isNewDay(user.streakTime, time.getTime()))
+        if (isNewDay(user.streakTime, time.getTime()) && user.gotStreak) {
+            console.log('new day!')
+            await users.updateOne(user, {
+                $set: {
+                    gotStreak: false
+                }
+            })
+            console.log('about to set gotsreak to false')
+            user.gotStreak = false
+            console.log('set gotstreak to false!')
+        }
        
         const newItemDoc = { 
             userId: userId, 
@@ -598,9 +711,38 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
             }
         })
 
+        let streak = user.streak
+        console.log(time.getTime() - user.streakTime)
+        console.log(user.gotStreak)
+
+        if (time.getTime() - user.streakTime > day && !user.gotStreak) {
+            console.log('new streak!')
+            const removeStreak = await users.updateOne(user, {
+                $set: {
+                    streak: 1,
+                    gotStreak: true,
+                    streakTime: time.getTime()
+                }
+            })
+
+            streak = 1
+        } else if (time.getTime() - user.streakTime <= day && !user.gotStreak) {
+            console.log('one streak')
+            const addStreak = await users.updateOne(user, {
+                $set: {
+                    streak: user.streak + 1,
+                    gotStreak: true,
+                    streakTime: time.getDate()
+                }
+            })
+
+            streak++
+        }
+
         return res.send({
             ...newItem,
-            coins: newCoins
+            coins: newCoins,
+            streak: streak
         })
     } catch (err) {
         console.log(err)
@@ -638,7 +780,7 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
 
         const deleteItem = await userItems.deleteOne(uItem)
 
-        const newCoins = user.coins + item.price
+        const newCoins = user.coins + (item.price * uItem.level)
         const addCoins = await users.updateOne(user, {
             $set: {
                 coins: newCoins
@@ -662,6 +804,8 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
     const { itemId } = req.body
 
     try {
+        const time = Date.now()
+
         const userItemFind = await userItems.findOne({ itemId: itemId, userId: userId })
         if (!userItemFind) {
             return res.send({
@@ -675,22 +819,69 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
 
         if (item.maxLevel >= newLevel) {
             const userFind = await users.findOne({ _id: new ObjectId(userId) })
+            if (!userFind) {
+                return res.send({
+                    error: 'The user does not exist',
+                    userNotExist: true
+                })
+            }
 
-            if (userFind.coins < item.price * newLevel) {
+            if (isNewDay(userFind.streakTime, time) && userFind.gotStreak) {
+                await users.updateOne(userFind, {
+                    $set: {
+                        gotStreak: false
+                    }
+                })
+                userFind.gotStreak = false
+            }
+
+            if (userFind.coins < item.price * (newLevel)) {
                 return res.send({
                     error: 'You do not have enough coins'
                 })
             }
+
+            const newCoins = userFind.coins - (item.price * (newLevel))
+            const removeCoins = await users.updateOne(userFind, {
+                $set: {
+                    coins: newCoins
+                }
+            })
 
             const upgrade = await userItems.updateOne(userItemFind, {
                 $set: {
                     level: newLevel
                 }
             })
+            
+            let streak = userFind.streak
+            if (time - userFind.streakTime > day && !userFind.gotStreak) {
+                const removeStreak = await users.updateOne(userFind, {
+                    $set: {
+                        streak: 1,
+                        gotStreak: true,
+                        streakTime: time
+                    }
+                })
+
+                streak = 1
+            } else if (time - userFind.streakTime <= day && !userFind.gotStreak) {
+                const addStreak = await users.updateOne(userFind, {
+                    $set: {
+                        streak: userFind.streak + 1,
+                        gotStreak: true,
+                        streakTime: time
+                    }
+                })
+
+                streak++
+            }
 
             return res.send({
                 ...upgrade,
-                level: newLevel
+                level: newLevel,
+                coins: newCoins,
+                streak: streak
             })
         } else {
             return res.send({

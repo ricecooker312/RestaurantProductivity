@@ -4,7 +4,8 @@ import {
     Modal, 
     Image, 
     TouchableHighlight, 
-    TouchableOpacity, 
+    TouchableOpacity,
+    Alert, 
 } from 'react-native'
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -17,10 +18,12 @@ interface ItemModalProps {
     open: boolean,
     setOpen: (value: boolean) => void,
     item: RestaurantItem,
-    setItems?: Dispatch<SetStateAction<RestaurantItem[]>>
+    setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setUnowned?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setCoins?: (value: string) => void
 }
 
-const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
+const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: ItemModalProps) => {
     const [accessToken, setAccessToken] = useState('')
     const [maxLevel, setMaxLevel] = useState(false)
 
@@ -59,9 +62,45 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
             if (data.error) {
                 if (data.error === 'Item is already at max level') setMaxLevel(true)
             } else {
-                if (setItems) {
+                if (setItems && setCoins) {
                     setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
+                    
+                    setCoins(`${data.coins}`)
+                    await AsyncStorage.setItem('coins', `${data.coins}`)
                 }
+            }
+        }
+    }
+
+    const sellItem = async () => {
+        const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/sell', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                itemId: item._id
+            })
+        })
+
+        const data = await res.json()
+
+        if (data.error) {
+            Alert.alert(data.error)
+        } else {
+            if (setItems && setCoins && setUnowned) {
+                setItems(prevItems => prevItems.filter(fItem => fItem._id !== item._id))
+                setUnowned(prevUnowned => [
+                    ...prevUnowned,
+                    item
+                ])
+
+                await AsyncStorage.setItem('coins', `${data.coins}`)
+                setCoins(`${data.coins}`)
+
+                setOpen(false)
             }
         }
     }
@@ -99,24 +138,41 @@ const ItemModal = ({ open, setOpen, item, setItems }: ItemModalProps) => {
                     ))}
 
                     {setItems && (
-                        <TouchableHighlight 
-                            className={`p-4 m-4 mt-8 w-[90%] ${maxLevel ? 'bg-button-primaryDisabled' : 'bg-primary'} rounded-lg`}
-                            underlayColor={`${maxLevel ? '' : '#0014C7'}`}
-                            onPress={upgradeItem}
-                        >
-                            {maxLevel ? (
-                                <Text className='text-lg color-white text-center'>Max Level</Text>
-                            ) : (
+                        <>
+                            <TouchableHighlight 
+                                className={`p-4 m-4 mt-8 w-[90%] ${maxLevel ? 'bg-button-primaryDisabled' : 'bg-primary'} rounded-lg`}
+                                underlayColor={`${maxLevel ? '' : '#0014C7'}`}
+                                onPress={upgradeItem}
+                            >
+                                {maxLevel ? (
+                                    <Text className='text-lg color-white text-center'>Max Level</Text>
+                                ) : (
+                                    <View className='flex flex-row items-center justify-around'>
+                                        <Text className='color-white text-lg text-center'>Upgrade</Text>
+                                        
+                                        <View className='flex flex-row items-center gap-3'>
+                                            <Image source={icons.coins} className='w-8 h-8' />
+                                            <Text className='color-white text-lg'>{item.price * item.level}</Text> 
+                                        </View>
+                                    </View>
+                                )}
+                            </TouchableHighlight>
+
+                            <TouchableHighlight
+                                className='p-4 mx-4 my-2 w-[90%] bg-primary rounded-lg'
+                                underlayColor={'#0014C7'}
+                                onPress={sellItem}
+                            >
                                 <View className='flex flex-row items-center justify-around'>
-                                    <Text className='color-white text-lg text-center'>Upgrade</Text>
-                                    
+                                    <Text className='color-white text-lg text-center'>Sell</Text>
+
                                     <View className='flex flex-row items-center gap-3'>
-                                        <Image source={icons.coins} className='w-8 h-8' />
-                                        <Text className='color-white text-lg'>{item.price * item.level}</Text> 
+                                        <Image source={icons.coins} className='size-8' />
+                                        <Text className='color-white text-lg'>{item.price}</Text>
                                     </View>
                                 </View>
-                            )}
-                        </TouchableHighlight>
+                            </TouchableHighlight>
+                        </>
                     )}
                 </View>
             </View>
