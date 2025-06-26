@@ -76,6 +76,7 @@ const index = () => {
           await AsyncStorage.removeItem('coins')
           router.navigate('/onboarding')
         } else {
+          console.log(fStreak)
           setStreak(parseInt(fStreak))
         }
       }

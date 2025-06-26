@@ -384,8 +384,8 @@ app.post('/api/goals/new', checkToken, async (req, res) => {
 
         let streak = user.streak
 
-        if (time.getTime() - user.streakTime > day && !user.gotStreak) {
-            const removeStreak = await users.updateOne(user, {
+        if (twoDaysPassed(user.streakTime, time.getTime()) && !user.gotStreak) {
+            await users.updateOne({ _id: user._id }, {
                 $set: {
                     gotStreak: true,
                     streak: 1,
@@ -394,9 +394,9 @@ app.post('/api/goals/new', checkToken, async (req, res) => {
             })
 
             streak = 1
-        } else if (time.getTime() - user.streakTime <= day && !user.gotStreak) {
+        } else if (!twoDaysPassed(user.streakTime, time.getTime()) && !user.gotStreak) {
             const newStreak = user.streak + 1
-            const addStreak = await users.updateOne(user, {
+            await users.updateOne(user, {
                 $set: {
                     streak: newStreak,
                     gotStreak: true,
@@ -454,6 +454,7 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
             }
 
             if (isNewDay(userFind.streakTime, time.getTime()) && userFind.gotStreak) {
+                console.log('new day, resetting streak')
                 await users.updateOne({ _id: userFind._id }, {
                     $set: {
                         gotStreak: false
@@ -470,7 +471,8 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
             })
 
             let streak = userFind.streak
-            if (twoDaysPassed(userFind.streakTime, time.getTime()) && !userFind.gotStreak) {
+            if (twoDaysPassed(userFind.streakTime, Date.now()) && !userFind.gotStreak) {
+                console.log('no streak')
                 await users.updateOne({ _id: userFind._id }, {
                     $set: {
                         streak: 1,
@@ -480,7 +482,8 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
                 })
 
                 streak = 1
-            } else if (!twoDaysPassed(userFind.streakTime, time.getTime()) && !userFind.gotStreak) {
+            } else if (!twoDaysPassed(userFind.streakTime, Date.now()) && !userFind.gotStreak) {
+                console.log('new streak')
                 const newStreak = userFind.streak + 1
                 await users.updateOne({ _id: userFind._id }, {
                     $set: {

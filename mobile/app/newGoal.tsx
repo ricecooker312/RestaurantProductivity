@@ -131,6 +131,7 @@ const newGoal = () => {
             if (data.error) {
                 console.log(data.error)
             } else {
+                await AsyncStorage.setItem('streak', `${data.streak}`)
                 router.navigate('/goals')
             }
         }
