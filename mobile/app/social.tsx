@@ -13,6 +13,7 @@ const social = () => {
     const [accessToken, setAccessToken] = useState('')
     const [friends, setFriends] = useState<User[]>([])
     const [requests, setRequests] = useState(0)
+    const [streak, setStreak] = useState(0)
 
     const insets = useSafeAreaInsets()
 
@@ -50,6 +51,21 @@ const social = () => {
         }
 
         if (accessToken) getRequests()
+    }, [accessToken])
+
+    useEffect(() => {
+        const findStreak = async () => {
+            const fStreak = await AsyncStorage.getItem('streak')
+            if (!fStreak) {
+                await AsyncStorage.removeItem('coins')
+                await AsyncStorage.removeItem('accessToken')
+                router.navigate('/onboarding')
+            } else {
+                setStreak(parseInt(fStreak))
+            }
+        }
+
+        if (accessToken) findStreak()
     }, [accessToken])
 
     useEffect(() => {
@@ -112,7 +128,7 @@ const social = () => {
                 
                     <View className='flex-row items-center mx-[1rem]'>
                         <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
-                        <Text className='text-xl'>6</Text>
+                        <Text className='text-xl'>{streak}</Text>
                     </View>
         
                     <View className='flex-row items-center mx-[1rem] mr-0 relative'>

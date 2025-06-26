@@ -5,13 +5,13 @@ import { icons } from '@/constants/icons'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const Header = ({ coins }: { coins: string }) => {
+const Header = ({ coins, streak }: { coins: string, streak: number }) => {
     return (
         <View className='flex flex-row flex-wrap items-center justify-center'>
 
             <View className='flex-row items-center mx-[1rem]'>
                 <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
-                <Text className='text-xl'>6</Text>
+                <Text className='text-xl'>{streak}</Text>
             </View>
 
             <View className='flex-row items-center mx-[1rem]'>

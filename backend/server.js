@@ -442,7 +442,7 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
                 })
             }
 
-            if (isNewDay(userFind.streakTime, time.getTime()) && user.gotStreak) {
+            if (isNewDay(userFind.streakTime, time.getTime()) && userFind.gotStreak) {
                 await users.updateOne(userFind, {
                     $set: {
                         gotStreak: false

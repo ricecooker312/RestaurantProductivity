@@ -30,6 +30,7 @@ const restaurant = () => {
     const [items, setItems] = useState<RestaurantItem[]>([])
     const [unowned, setUnowned] = useState<RestaurantItem[]>([])
     const [coins, setCoins] = useState('')
+    const [streak, setStreak] = useState(0)
 
     const insets = useSafeAreaInsets()
 
@@ -108,6 +109,21 @@ const restaurant = () => {
         if (accessToken) getCoins()
     }, [accessToken])
 
+    useEffect(() => {
+        const findStreak = async () => {
+            const fStreak = await AsyncStorage.getItem('streak')
+            if (!fStreak) {
+                await AsyncStorage.removeItem('coins')
+                await AsyncStorage.removeItem('accessToken')
+                router.navigate('/onboarding')
+            } else {
+                setStreak(parseInt(fStreak))
+            }
+        }
+
+        if (accessToken) findStreak()
+    }, [accessToken])
+
     if (!accessToken || items.length + unowned.length !== 5) {
         return (
             <View className='flex-1 bg-dfbg'>
@@ -123,7 +139,7 @@ const restaurant = () => {
                         keyboardShouldPersistTaps='handled'
                         showsVerticalScrollIndicator={false}
                     >
-                        <Header coins={coins} />
+                        <Header coins={coins} streak={streak} />
 
                         <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
                     </ScrollView>
@@ -146,7 +162,7 @@ const restaurant = () => {
                         keyboardShouldPersistTaps='handled'
                         showsVerticalScrollIndicator={false}
                     >
-                        <Header coins={coins} />
+                        <Header coins={coins} streak={streak} />
 
                         <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Restaurant</Text>
                         

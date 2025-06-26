@@ -61,11 +61,26 @@ const index = () => {
           setCurrentGoals(data.goals)
           
           await AsyncStorage.setItem('streak', `${data.streak}`)
-          setStreak(data.streak)
         }
       }
 
       if (accessToken) fetchGoals()
+    }, [accessToken])
+
+    useEffect(() => {
+      const findStreak = async () => {
+        const fStreak = await AsyncStorage.getItem('streak')
+        
+        if (!fStreak) {
+          await AsyncStorage.removeItem('accessToken')
+          await AsyncStorage.removeItem('coins')
+          router.navigate('/onboarding')
+        } else {
+          setStreak(parseInt(fStreak))
+        }
+      }
+
+      if (accessToken) findStreak()
     }, [accessToken])
 
     const completeGoal = async (id: string) => {
@@ -110,7 +125,7 @@ const index = () => {
 
               <View className='flex-row items-center mx-[1rem]'>
                 <Image source={icons.streak} className='w-[4rem] h-[4rem]' />
-                <Text className='text-xl'>6</Text>
+                <Text className='text-xl'>{streak}</Text>
               </View>
 
               <TouchableHighlight
@@ -168,7 +183,7 @@ const index = () => {
             <View className='m-6 mb-24'>
               <Text className='text-3xl color-dark-heading font-bold'>Upgrades</Text>
 
-              <View className='flex flex-row flex-wrap mt-6 gap-3'>
+              <View className='flex flex-row flex-wrap mt-6 gap-3 '>
                 <View className='bg-light-100 rounded-lg p-6 flex-1'>
                   <Text className='text-xl font-bold color-dark-heading text-center'>Chair</Text>
                   <Text className='color-dark-green mt-4'>+15 minutes of customer stay time</Text>
@@ -178,6 +193,7 @@ const index = () => {
                 </View>
                 <View className='bg-light-100 rounded-lg p-6 flex-1'>
                   <Text className='text-xl font-bold color-dark-heading text-center'>Table</Text>
+                  <Text className='color-dark-green mt-4'>+5 customers</Text>
                   <TouchableOpacity className='bg-primary mt-6 p-4 rounded-lg'>
                     <Text className='text-center color-white text-md'>Upgrade</Text>
                   </TouchableOpacity>

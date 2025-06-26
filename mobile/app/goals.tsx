@@ -31,6 +31,7 @@ const goals = () => {
     const [goalCompleted, setGoalCompleted] = useState(false)
     const [completedGoalName, setCompletedGoalName] = useState('')
     const [coins, setCoins] = useState('')
+    const [streak, setStreak] = useState(0)
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -59,7 +60,7 @@ const goals = () => {
             const res = await fetch('https://restaurantproductivity.onrender.com/api/goals/find/incomplete', goalPayload)
             const data = await res.json()
 
-            setCurrentGoals(data)
+            setCurrentGoals(data.goals)
         }
 
         if (accessToken) fetchGoals()
@@ -77,6 +78,21 @@ const goals = () => {
         }
 
         if (accessToken) getCoins()
+    }, [accessToken])
+
+    useEffect(() => {
+        const findStreak = async () => {
+            const fStreak = await AsyncStorage.getItem('streak')
+            if (!fStreak) {
+                await AsyncStorage.removeItem('accessToken')
+                await AsyncStorage.removeItem('coins')
+                router.navigate('/onboarding')
+            } else {
+                setStreak(parseInt(fStreak))
+            }
+        }
+
+        if (accessToken) findStreak()
     }, [accessToken])
 
     const completeGoal = async (goal: Goal, completing: boolean) => {
@@ -101,6 +117,9 @@ const goals = () => {
                 setCompletedGoalName(goal.title)
                 setCoins(`${data.coins}`)
                 await AsyncStorage.setItem('coins', `${data.coins}`)
+
+                setStreak(data.streak)
+                await AsyncStorage.setItem('streak', `${data.streak}`)
             } else {
                 setGoalCompleted(false)
             }
@@ -109,7 +128,7 @@ const goals = () => {
 
     const insets = useSafeAreaInsets()
 
-    if (!currentGoals) {
+    if (!currentGoals || !streak) {
         return (
             <View className='flex-1 bg-dfbg'>
                 <SafeAreaView style={{
@@ -124,7 +143,7 @@ const goals = () => {
                         keyboardShouldPersistTaps='handled'
                         showsVerticalScrollIndicator={false}
                     >
-                        <Header coins={coins} />
+                        <Header coins={coins} streak={streak} />
 
                         <ActivityIndicator className='p-4' size={'large'} color={'#292626'} />
                     </ScrollView>
@@ -150,7 +169,7 @@ const goals = () => {
                     keyboardShouldPersistTaps='handled'
                     showsVerticalScrollIndicator={false}
                 >
-                    <Header coins={coins} />
+                    <Header coins={coins} streak={streak} />
 
                     <View className='flex flex-row flex-wrap justify-center mb-28'>
                         <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Today's Goals</Text>
