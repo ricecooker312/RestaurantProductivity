@@ -20,3 +20,11 @@ export type RestaurantItem = {
     maxLevel: number,
     features: Feature[]
 }
+
+export type Restaurant = {
+    _id: string,
+    level: number,
+    stats: Feature[],
+    images: string[],
+    userId: string
+}

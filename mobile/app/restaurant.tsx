@@ -19,7 +19,7 @@ import NewItemModal from '@/components/NewItemModal'
 import Item from '@/components/Item'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { RestaurantItem } from '@/types/restaurantTypes'
+import { Restaurant, RestaurantItem } from '@/types/restaurantTypes'
 import Header from '@/components/Header'
 import { images } from '@/constants/images'
 import RestaurantStats from '@/components/RestaurantStats'
@@ -34,6 +34,7 @@ const restaurant = () => {
     const [coins, setCoins] = useState('')
     const [streak, setStreak] = useState(0)
     const [statsModal, setStatsModal] = useState(false)
+    const [restaurant, setRestaurant] = useState<Restaurant>()
 
     const insets = useSafeAreaInsets()
 
@@ -125,6 +126,26 @@ const restaurant = () => {
         }
 
         if (accessToken) findStreak()
+    }, [accessToken])
+
+    useEffect(() => {
+        const getRestaurant = async () => {
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/restaurant/find/stats', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+
+            const data = await res.json()
+
+            if (data.error) {
+                Alert.alert(data.error)
+            } else {
+                setRestaurant(data.)
+            }
+        }
     }, [accessToken])
 
     if (!accessToken || items.length + unowned.length !== 5) {

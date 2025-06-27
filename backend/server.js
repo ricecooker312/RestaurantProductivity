@@ -1248,9 +1248,10 @@ app.get('/api/restaurants/find/stats', checkToken, async (req, res) => {
             })
         }
 
+        const imageLevel = parseInt(restaurant.level) - 1
         return res.send({
-            stats: restaurant.stats,
-            level: restaurant.level
+            ...restaurant,
+            images: restaurant.images[imageLevel]
         })
     } catch (err) {
         console.log(`All Restaurant Stats Find Error: ${err}`)
