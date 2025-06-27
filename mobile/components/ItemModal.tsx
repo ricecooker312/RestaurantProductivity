@@ -133,7 +133,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
 
                     {item.features.map(feature => (
                         <Text key={feature.amount} className='text-sm color-gray mr-auto'>{feature.feature}:{' '}
-                            <Text className='font-bold'>{feature.amount}</Text>
+                            <Text className='font-bold'>{feature.amount} {feature.ending}</Text>
                         </Text>
                     ))}
 

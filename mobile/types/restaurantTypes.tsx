@@ -1,6 +1,7 @@
 export type Feature = {
     feature: string,
-    amount: string
+    amount: string,
+    ending: string
 }
 
 export type UserItem = {

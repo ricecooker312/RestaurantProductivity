@@ -68,19 +68,27 @@ const index = () => {
     }, [accessToken])
 
     useEffect(() => {
-      const findStreak = async () => {
-        const fStreak = await AsyncStorage.getItem('streak')
-        
-        if (!fStreak) {
-          await AsyncStorage.removeItem('accessToken')
-          await AsyncStorage.removeItem('coins')
-          router.navigate('/onboarding')
+      const getUserInfo = async () => {
+        const res = await fetch('https://restaurantproductivity.onrender.com/api/users/find', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        })
+
+        const data = await res.json()
+
+        if (data.error) {
+          Alert.alert(data.error)
         } else {
-          setStreak(parseInt(fStreak))
+          await AsyncStorage.setItem('coins', `${data.coins}`)
+          await AsyncStorage.setItem('streak', `${data.streak}`)
+          setStreak(data.streak)
         }
       }
 
-      if (accessToken) findStreak()
+      if (accessToken) getUserInfo()
     }, [accessToken])
 
     const completeGoal = async (id: string) => {

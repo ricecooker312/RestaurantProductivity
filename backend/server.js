@@ -146,7 +146,13 @@ app.post('/api/users/register', async (req, res) => {
 
         const restaurantDoc = {
             level: 1,
-            stats: [],
+            stats: [
+                { feature: "Average customer amount", amount: '0', ending: '' },
+                { feature: "Average customer stay time", amount: '0', ending: "minutes" },
+                { feature: "Average food prep time", amount: "0", ending: 'minutes' },
+                { feature: "Average profit", amount: "$0", ending: '' },
+                { feature: "Average review", amount: "0", ending: "stars" }
+            ],
             images: ['https://i.ibb.co/Nn79dPYn/lvlonerestaurant.png'],
             userId: result.insertedId.toString()
         }
@@ -761,6 +767,7 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
 
         features.forEach(item => {
             const feature = item.feature
+            const ending = item.ending
             let amount;
 
             if (feature === 'Average profit') {
@@ -770,15 +777,25 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
             }
 
             if (featureMap.has(feature)) {
-                featureMap.set(feature, featureMap.get(feature) + amount)
+                const prev = featureMap.get(feature)
+
+                featureMap.set(feature, {
+                    feature,
+                    amount: prev.amount + amount,
+                    ending
+                })
             } else {
-                featureMap.set(feature, amount)
+                featureMap.set(feature, {
+                    feature,
+                    amount,
+                    ending
+                })
             }
         })
 
-        const endStats = Array.from(featureMap, ([feature, amount]) => ({
-            feature,
-            amount: feature === 'Average profit' ? `$${amount}` : amount.toString()
+        const endStats = Array.from(featureMap.values()).map(item => ({
+            ...item,
+            amount: item.feature === 'Average profit' ? `$${item.amount}` : item.amount.toString()
         }))
 
         await restaurants.updateOne(restaurant, {
@@ -814,8 +831,6 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         })
 
         let streak = user.streak
-        console.log(time.getTime() - user.streakTime)
-        console.log(user.gotStreak)
 
         if (twoDaysPassed(user.streakTime, time.getTime()) && !user.gotStreak) {
             await users.updateOne({ _id: user._id }, {
@@ -842,7 +857,8 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         return res.send({
             ...newItem,
             coins: newCoins,
-            streak: streak
+            streak: streak,
+            endStats: endStats
         })
     } catch (err) {
         console.log(err)

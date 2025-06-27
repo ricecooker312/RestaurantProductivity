@@ -20,6 +20,8 @@ import coins from '@/assets/icons/coins.png'
 import removefriend from '@/assets/icons/removefriend.png'
 import addfriend from '@/assets/icons/addfriend.png'
 import requestsicon from '@/assets/icons/requestsicon.png'
+import filledstar from '@/assets/icons/filledstar.png'
+import unfilledstar from '@/assets/icons/unfilledstar.png'
 
 export const icons = {
   logo,
@@ -43,5 +45,7 @@ export const icons = {
   coins,
   removefriend,
   addfriend,
-  requestsicon
+  requestsicon,
+  filledstar,
+  unfilledstar
 }

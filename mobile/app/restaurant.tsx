@@ -130,7 +130,6 @@ const restaurant = () => {
 
     useEffect(() => {
         const getRestaurant = async () => {
-            console.log('accessToken: ', accessToken)
             const res = await fetch('https://restaurantproductivity.onrender.com/api/restaurants/find/stats', {
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,15 +143,12 @@ const restaurant = () => {
             if (data.error) {
                 Alert.alert(data.error)
             } else {
-                console.log('data: ', data)
                 setRestaurant(data)
             }
         }
 
         if (accessToken) getRestaurant()
     }, [accessToken])
-
-    console.log('restaurant: ', restaurant)
 
     if (!accessToken || items.length + unowned.length !== 5) {
         return (

@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableHighlight } from 'react-native'
+import { View, Text, Image, TouchableHighlight, Alert } from 'react-native'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Feature, RestaurantItem } from '@/types/restaurantTypes'
@@ -49,7 +49,7 @@ const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewIt
             const data = await res.json()
 
             if (data.error) {
-                console.log(data.error)
+                Alert.alert(data.error)
             } else {
                 item.level = 1
                 setItems(prevItems => [
@@ -74,7 +74,7 @@ const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewIt
 
             {item.features.map(feature => (
                 <Text key={feature.feature} className='text-sm color-gray m-4'>{feature.feature}:{' '}
-                    <Text className='font-bold'>{feature.amount}</Text>
+                    <Text className='font-bold'>{feature.amount} {feature.ending}</Text>
                 </Text>
             ))}
 
