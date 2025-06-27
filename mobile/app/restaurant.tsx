@@ -34,7 +34,13 @@ const restaurant = () => {
     const [coins, setCoins] = useState('')
     const [streak, setStreak] = useState(0)
     const [statsModal, setStatsModal] = useState(false)
-    const [restaurant, setRestaurant] = useState<Restaurant>()
+    const [restaurant, setRestaurant] = useState<Restaurant>({
+        _id: '',
+        level: 0,
+        stats: [],
+        images: [],
+        userId: ''
+    })
 
     const insets = useSafeAreaInsets()
 
@@ -240,6 +246,7 @@ const restaurant = () => {
                                         setUnowned={setUnowned}
                                         coins={coins}
                                         setCoins={setCoins}
+                                        setRestaurant={setRestaurant}
                                     />
                                 </>
                             )}
@@ -278,6 +285,7 @@ const restaurant = () => {
                                         setUnowned={setUnowned}
                                         coins={coins}
                                         setCoins={setCoins}
+                                        setRestaurant={setRestaurant}
                                     />
                                 </>
                             )}
@@ -316,6 +324,7 @@ const restaurant = () => {
                                         setUnowned={setUnowned}
                                         coins={coins}
                                         setCoins={setCoins}
+                                        setRestaurant={setRestaurant}
                                     />
                                 </>
                             )}

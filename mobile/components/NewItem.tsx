@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableHighlight, Alert } from 'react-native'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { Feature, RestaurantItem } from '@/types/restaurantTypes'
+import { Feature, Restaurant, RestaurantItem } from '@/types/restaurantTypes'
 import { icons } from '@/constants/icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
@@ -12,10 +12,11 @@ interface NewItemProps {
     setOpen: (value: boolean) => void,
     setUnowned: Dispatch<SetStateAction<RestaurantItem[]>>,
     coins: string,
-    setCoins: (value: string) => void
+    setCoins: (value: string) => void,
+    setRestaurant: Dispatch<SetStateAction<Restaurant>>
 }
 
-const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewItemProps) => {
+const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins, setRestaurant }: NewItemProps) => {
     const [accessToken, setAccessToken] = useState('')
 
     useEffect(() => {
@@ -56,6 +57,10 @@ const NewItem = ({ item, setItems, setOpen, setUnowned, coins, setCoins }: NewIt
                     ...prevItems,
                     item
                 ])
+                setRestaurant(restaurant => ({
+                    ...restaurant,
+                    stats: data.endStats
+                }))
                 setOpen(false)
                 setUnowned(unownedItem => unownedItem.filter(uItem => uItem !== item))
                 setCoins(`${data.coins}`)

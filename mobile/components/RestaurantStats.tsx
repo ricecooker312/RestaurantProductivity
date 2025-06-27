@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableWithoutFeedback, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, Modal, TouchableWithoutFeedback, FlatList, TouchableOpacity, TouchableHighlight } from 'react-native'
 import React from 'react'
 import { Restaurant } from '@/types/restaurantTypes'
 import ReviewStars from './ReviewStars'
@@ -7,11 +7,11 @@ import ReviewStars from './ReviewStars'
 interface RestaurantStatsProps {
     open: boolean,
     setOpen: (value: boolean) => void,
-    restaurant: Restaurant | undefined
+    restaurant: Restaurant
 }
 
 const RestaurantStats = ({ open, setOpen, restaurant }: RestaurantStatsProps) => {
-    if (restaurant) {
+    if (restaurant.stats.length > 0) {
         return (
             <Modal
                 animationType='fade'
@@ -52,7 +52,7 @@ const RestaurantStats = ({ open, setOpen, restaurant }: RestaurantStatsProps) =>
                                                     font-normal`
                                                 }>
                                                     {item.feature}:{' '}
-                                                <Text className='font-bold'>{item.amount}</Text>
+                                                <Text className='font-bold'>{item.amount} {item.ending}</Text>
                                             </Text>
                                         )
                                     }
@@ -69,6 +69,13 @@ const RestaurantStats = ({ open, setOpen, restaurant }: RestaurantStatsProps) =>
                                 </TouchableOpacity>
                             </>
                         )}
+                        <TouchableHighlight 
+                            className='m-6 p-4 rounded-lg bg-primary'
+                            underlayColor={'#0014C7'}
+                            onPress={() => {}}
+                        >
+                            <Text className='color-white text-lg text-center'>Upgrade</Text>
+                        </TouchableHighlight>
                     </View>
                 </View>
             </Modal>

@@ -665,6 +665,13 @@ app.post('/api/items/user/find/all', checkToken, async (req, res) => {
     const resultItems = []
 
     try {
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant'
+            })
+        }
+
         const uItems = await userItems.find({ userId: friendId ? friendId : userId }).toArray()
         for (let i = 0; i < uItems.length; i++) {
             const item = await items.findOne({ _id: new ObjectId(uItems[i].itemId) })
@@ -675,6 +682,14 @@ app.post('/api/items/user/find/all', checkToken, async (req, res) => {
             }
 
             item.level = uItems[i].level
+
+            const maxList = item.maxLevel
+            const restaurantMax = item.maxLevel[restaurant.level - 1]
+            item.maxLevel = restaurantMax
+            item.unlockedFullMax = restaurantMax === maxList[maxList.length - 1]
+
+            console.log(item.maxLevel)
+
             resultItems.push(item)
         }
 
@@ -1284,7 +1299,15 @@ app.patch('/api/restaurants/upgrade', checkToken, async (req, res) => {
     const userId = req.user.id
 
     try {
-        const restaurant = restaurants.findOne({ userId: userId })
+        const user = await users.findOne({ _id: new ObjectId(userId) })
+        if (!user) {
+            return res.send({
+                error: 'The user does not exist',
+                userNotExist: true
+            })
+        }
+
+        const restaurant = await restaurants.findOne({ userId: userId })
         if (!restaurant) {
             return res.send({
                 error: 'You do not own a restaurant'
@@ -1292,13 +1315,31 @@ app.patch('/api/restaurants/upgrade', checkToken, async (req, res) => {
         }
 
         const newLevel = restaurant.level + 1
+        console.log(restaurant)
+        if (user.coins < (220 * newLevel)) {
+            return res.send({
+                error: 'You do not have enough coins'
+            })
+        }
+
         const upgrade = await restaurants.updateOne(restaurant, {
             $set: {
                 level: newLevel
             }
         })
 
-        return res.send(upgrade)
+        const newCoins = user.coins - (220 * newLevel)
+        const removeCoins = await users.updateOne({ _id: user._id }, {
+            $set: {
+                coins: newCoins
+            }
+        })
+
+        return res.send({
+            upgrade: upgrade,
+            removeCoins: removeCoins,
+            coins: newCoins
+        })
     } catch (err) {
         console.log(`Restaurant Upgrade Error: ${err}`)
         return res.send({
