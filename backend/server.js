@@ -22,6 +22,7 @@ const goals = database.collection('goals')
 const items = database.collection('items')
 const userItems = database.collection('userItems')
 const friends = database.collection('friends')
+const restaurants = database.collection('restaurants')
 
 const jwt = require('jsonwebtoken')
 
@@ -143,10 +144,22 @@ app.post('/api/users/register', async (req, res) => {
         }
         const result = await users.insertOne(doc)
 
+        const restaurantDoc = {
+            level: 1,
+            stats: [],
+            images: ['https://i.ibb.co/Nn79dPYn/lvlonerestaurant.png'],
+            userId: result.insertedId.toString()
+        }
+        await restuarants.insertOne(restaurantDoc)
+
         const user = { id: result.insertedId, email: email }
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)  
 
-        return res.send({ accessToken: accessToken, coins: 25 })
+        return res.send({ 
+            accessToken: accessToken, 
+            coins: 25,
+            restaurantImage: 'https://i.ibb.co/Nn79dPYn/lvlonerestaurant.png'
+        })
     } else {
         return res.send({ emailError: 'That email already exists' })
     }
@@ -241,9 +254,28 @@ app.delete('/api/users/delete', checkToken, async (req, res) => {
 })
 
 app.delete('/api/users/delete/all', checkToken, async (req, res) => {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+        return res.send({
+            error: 'Email and password is required to verify identify before deleting'
+        })
+    }
+
     try {
-        const usersDelete = users.deleteMany({})
-        return res.send(usersDelete)
+        const usersDelete = await users.deleteMany({})
+        const goalsDelete = await goals.deleteMany({})
+        const friendsDelete = await friends.deleteMany({})
+        const uItemsDelete = await userItems.deleteMany({})
+        const restaurantsDelete = await restuarants.deleteMany({})
+
+        return res.send({
+            usersDelete: usersDelete,
+            goalsDelete: goalsDelete,
+            friendsDelete: friendsDelete,
+            uItemsDelete: uItemsDelete,
+            restuarantsDelete: restaurantsDelete
+        })
     } catch (err) {
         return res.send({
             error: err
@@ -454,7 +486,6 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
             }
 
             if (isNewDay(userFind.streakTime, time.getTime()) && userFind.gotStreak) {
-                console.log('new day, resetting streak')
                 await users.updateOne({ _id: userFind._id }, {
                     $set: {
                         gotStreak: false
@@ -472,7 +503,6 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
 
             let streak = userFind.streak
             if (twoDaysPassed(userFind.streakTime, Date.now()) && !userFind.gotStreak) {
-                console.log('no streak')
                 await users.updateOne({ _id: userFind._id }, {
                     $set: {
                         streak: 1,
@@ -483,7 +513,6 @@ app.patch('/api/goals/:goalId/complete', checkToken, async (req, res) => {
 
                 streak = 1
             } else if (!twoDaysPassed(userFind.streakTime, Date.now()) && !userFind.gotStreak) {
-                console.log('new streak')
                 const newStreak = userFind.streak + 1
                 await users.updateOne({ _id: userFind._id }, {
                     $set: {
@@ -691,6 +720,13 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
     const { itemId } = req.body
 
     try {
+        const uItemCheck = await userItems.find({ userId: userId, itemId: itemId }).toArray()
+        if (uItemCheck.length > 0) {
+            return res.send({
+                error: 'You already own this item'
+            })
+        }
+
         const item = await items.findOne({ _id: new ObjectId(itemId) })
         if (!item) {
             return res.send({
@@ -709,8 +745,46 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
 
         const time = new Date()
 
-        console.log(user.streakTime, time.getTime(), user.gotStreak)
-        console.log('is new day', isNewDay(user.streakTime, time.getTime()))
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'This person does not own a restaurant'
+            })
+        }
+
+        const featureMap = new Map()
+
+        const features = [...item.features, ...restaurant.stats]
+        const removeDollar = str => parseInt(str.replace(/[^0-9.-]/g, ''))
+
+        features.forEach(item => {
+            const feature = item.feature
+            let amount;
+
+            if (feature === 'Average profit') {
+                amount = removeDollar(item.amount)
+            } else {
+                amount = parseInt(item.amount)
+            }
+
+            if (featureMap.has(feature)) {
+                featureMap.set(feature, featureMap.get(feature) + amount)
+            } else {
+                featureMap.set(feature, amount)
+            }
+        })
+
+        const endStats = Array.from(featureMap, ([feature, amount]) => ({
+            feature,
+            amount: feature === 'Average profit' ? `$${amount}` : amount.toString()
+        }))
+
+        await restaurants.updateOne(restaurant, {
+            $set: {
+                stats: endStats
+            }
+        })
+
         if (isNewDay(user.streakTime, time.getTime()) && user.gotStreak) {
             console.log('new day!')
             await users.updateOne({ _id: user._id }, {
@@ -731,7 +805,7 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         }
         const newItem = await userItems.insertOne(newItemDoc)
 
-        const updateUser = await users.updateOne(user, {
+        await users.updateOne(user, {
             $set: {
                 coins: newCoins
             }
@@ -1157,6 +1231,56 @@ app.delete('/api/social/remove', checkToken, async (req, res) => {
         }
     } catch (err) {
         console.log(`One Friend Remove Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.get('/api/restaurants/find/stats', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant'
+            })
+        }
+
+        return res.send({
+            stats: restaurant.stats,
+            level: restaurant.level
+        })
+    } catch (err) {
+        console.log(`All Restaurant Stats Find Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+})
+
+app.patch('/api/restaurants/upgrade', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const restaurant = restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant'
+            })
+        }
+
+        const newLevel = restaurant.level + 1
+        const upgrade = await restaurants.updateOne(restaurant, {
+            $set: {
+                level: newLevel
+            }
+        })
+
+        return res.send(upgrade)
+    } catch (err) {
+        console.log(`Restaurant Upgrade Error: ${err}`)
         return res.send({
             error: err
         })

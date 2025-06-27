@@ -76,7 +76,6 @@ const index = () => {
           await AsyncStorage.removeItem('coins')
           router.navigate('/onboarding')
         } else {
-          console.log(fStreak)
           setStreak(parseInt(fStreak))
         }
       }
@@ -143,7 +142,7 @@ const index = () => {
               width: screenWidth * 0.9,
               aspectRatio: aspect
             }}>
-              <Image source={images.starting_restaurant} resizeMode='contain' className='w-full h-full' />
+              <Image source={images.lvlonerestaurant} resizeMode='contain' className='w-full h-full' />
             </View>
 
             <View className='flex flex-row items-center'>

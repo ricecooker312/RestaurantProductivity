@@ -21,6 +21,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { RestaurantItem } from '@/types/restaurantTypes'
 import Header from '@/components/Header'
+import { images } from '@/constants/images'
+import RestaurantStats from '@/components/RestaurantStats'
 
 const restaurant = () => {
     const [newFurniture, setNewFurniture] = useState(false)
@@ -31,6 +33,7 @@ const restaurant = () => {
     const [unowned, setUnowned] = useState<RestaurantItem[]>([])
     const [coins, setCoins] = useState('')
     const [streak, setStreak] = useState(0)
+    const [statsModal, setStatsModal] = useState(false)
 
     const insets = useSafeAreaInsets()
 
@@ -166,15 +169,21 @@ const restaurant = () => {
 
                         <Text className='font-bold color-dark-heading text-3xl p-6 mr-auto'>Restaurant</Text>
                         
-                        <View className='w-screen items-center'>
+                        <View className='w-[90vw] items-center h-36'>
+                            <Image source={images.lvlonerestaurant} resizeMode='contain' className='w-full h-full' />
+                        </View>
+
+                        <View className='flex flex-row justify-around items-center mt-6'>
+                            <Text className='text-xl'>Level 1</Text>
                             <TouchableHighlight 
-                                className='p-4 px-8 bg-primary w-[40%] rounded-lg'
+                                className='bg-primary px-8 p-4 rounded-lg'
                                 underlayColor={'#0014C7'}
-                                onPress={() => {}}
+                                onPress={() => setStatsModal(true)}
                             >
-                                <Text className='color-white text-center text-lg'>Visit</Text>
+                                <Text className='color-white text-md'>View Stats</Text>
                             </TouchableHighlight>
                         </View>
+                        <RestaurantStats open={statsModal} setOpen={setStatsModal} />
 
                         <Text className='text-2xl font-bold color-dark-heading p-6'>Furniture</Text>
 
