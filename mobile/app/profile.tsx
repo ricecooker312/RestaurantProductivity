@@ -46,8 +46,9 @@ const profile = () => {
             const emailData = await emailRes.json()
 
             if (emailData.error) {
-                if (emailData.error === 'That user does not exist') {
+                if (emailData.error === 'No users with that email found') {
                     await AsyncStorage.removeItem('coins')
+                    await AsyncStorage.removeItem('streak')
                     await AsyncStorage.removeItem('accessToken')
 
                     router.navigate('/onboarding')
@@ -130,6 +131,7 @@ const profile = () => {
     const signOut = async () => {
         if (accessToken) {
             await AsyncStorage.removeItem('accessToken')
+            await AsyncStorage.removeItem('streak')
             await AsyncStorage.removeItem('coins')
 
             router.navigate('/onboarding')

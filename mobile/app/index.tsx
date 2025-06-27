@@ -56,7 +56,7 @@ const index = () => {
         const data = await res.json()
 
         if (data.error) {
-          console.log(data.error)
+          console.log('Goal Fetch Error: ', data.error)
         } else {
           setCurrentGoals(data.goals)
           

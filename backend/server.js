@@ -150,7 +150,7 @@ app.post('/api/users/register', async (req, res) => {
             images: ['https://i.ibb.co/Nn79dPYn/lvlonerestaurant.png'],
             userId: result.insertedId.toString()
         }
-        await restuarants.insertOne(restaurantDoc)
+        await restaurants.insertOne(restaurantDoc)
 
         const user = { id: result.insertedId, email: email }
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)  
@@ -267,7 +267,7 @@ app.delete('/api/users/delete/all', checkToken, async (req, res) => {
         const goalsDelete = await goals.deleteMany({})
         const friendsDelete = await friends.deleteMany({})
         const uItemsDelete = await userItems.deleteMany({})
-        const restaurantsDelete = await restuarants.deleteMany({})
+        const restaurantsDelete = await restaurants.deleteMany({})
 
         return res.send({
             usersDelete: usersDelete,
@@ -277,6 +277,7 @@ app.delete('/api/users/delete/all', checkToken, async (req, res) => {
             restuarantsDelete: restaurantsDelete
         })
     } catch (err) {
+        console.log(`All Users Delete Error: ${err}`)
         return res.send({
             error: err
         })
@@ -316,6 +317,7 @@ app.post('/api/goals/find/complete', checkToken, async (req, res) => {
 
 app.get('/api/goals/find/incomplete', checkToken, async (req, res) => {
     const userId = req.user.id
+    console.log(userId)
 
     try {
         const goalFind = await goals.find({ completed: false, userId: userId }).toArray()
@@ -1239,6 +1241,7 @@ app.delete('/api/social/remove', checkToken, async (req, res) => {
 
 app.get('/api/restaurants/find/stats', checkToken, async (req, res) => {
     const userId = req.user.id
+    console.log(userId)
 
     try {
         const restaurant = await restaurants.findOne({ userId: userId })

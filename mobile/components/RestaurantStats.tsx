@@ -1,13 +1,16 @@
 import { View, Text, Modal, TouchableWithoutFeedback, Image } from 'react-native'
 import React from 'react'
 import { icons } from '@/constants/icons'
+import { Restaurant } from '@/types/restaurantTypes'
 
 interface RestaurantStatsProps {
     open: boolean,
-    setOpen: (value: boolean) => void
+    setOpen: (value: boolean) => void,
+    restaurant: Restaurant | undefined
 }
 
-const RestaurantStats = ({ open, setOpen }: RestaurantStatsProps) => {
+const RestaurantStats = ({ open, setOpen, restaurant }: RestaurantStatsProps) => {
+    console.log(restaurant)
     return (
         <Modal
             animationType='fade'

@@ -130,7 +130,8 @@ const restaurant = () => {
 
     useEffect(() => {
         const getRestaurant = async () => {
-            const res = await fetch('https://restaurantproductivity.onrender.com/api/restaurant/find/stats', {
+            console.log('accessToken: ', accessToken)
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/restaurants/find/stats', {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -143,10 +144,15 @@ const restaurant = () => {
             if (data.error) {
                 Alert.alert(data.error)
             } else {
-                setRestaurant(data.)
+                console.log('data: ', data)
+                setRestaurant(data)
             }
         }
+
+        if (accessToken) getRestaurant()
     }, [accessToken])
+
+    console.log('restaurant: ', restaurant)
 
     if (!accessToken || items.length + unowned.length !== 5) {
         return (
@@ -204,7 +210,7 @@ const restaurant = () => {
                                 <Text className='color-white text-md'>View Stats</Text>
                             </TouchableHighlight>
                         </View>
-                        <RestaurantStats open={statsModal} setOpen={setStatsModal} />
+                        <RestaurantStats open={statsModal} setOpen={setStatsModal} restaurant={restaurant} />
 
                         <Text className='text-2xl font-bold color-dark-heading p-6'>Furniture</Text>
 
