@@ -630,6 +630,13 @@ app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
     const userId = req.user.id
 
     try {
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant'
+            })
+        }
+
         const allItems = await items.find({}).project({ _id: 1 }).sort({ price: 1 }).toArray()
         const allItemIds = allItems.map(item => item._id.toString())
 
@@ -646,6 +653,8 @@ app.get('/api/items/user/find/unowned/all', checkToken, async (req, res) => {
                     'error': 'That unowned item does not exist'
                 })
             }
+
+            unownedItem.maxLevel = unownedItem.maxLevel[restaurant.level - 1]
 
             unownedItems.push(unownedItem)
         }

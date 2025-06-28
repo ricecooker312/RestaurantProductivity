@@ -36,6 +36,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
                 router.navigate('/onboarding')
             } else {
                 setAccessToken(useEffectToken)
+                console.log(item)
                 if (item.level >= item.maxLevel) setMaxLevel(true)
             }
         }
