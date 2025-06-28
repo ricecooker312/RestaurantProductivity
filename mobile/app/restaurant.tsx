@@ -13,7 +13,6 @@ import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { icons } from '@/constants/icons'
 import TabFooter from '@/components/TabFooter'
 import NewItemModal from '@/components/NewItemModal'
 import Item from '@/components/Item'
@@ -203,7 +202,7 @@ const restaurant = () => {
                         </View>
 
                         <View className='flex flex-row justify-around items-center mt-6'>
-                            <Text className='text-xl'>Level 1</Text>
+                            <Text className='text-xl'>Level {restaurant.level}</Text>
                             <TouchableHighlight 
                                 className='bg-primary px-8 p-4 rounded-lg'
                                 underlayColor={'#0014C7'}
@@ -212,7 +211,14 @@ const restaurant = () => {
                                 <Text className='color-white text-md'>View Stats</Text>
                             </TouchableHighlight>
                         </View>
-                        <RestaurantStats open={statsModal} setOpen={setStatsModal} restaurant={restaurant} />
+                        <RestaurantStats 
+                            open={statsModal} 
+                            setOpen={setStatsModal} 
+                            restaurant={restaurant} 
+                            setRestaurant={setRestaurant}
+                            coins={coins} 
+                            setCoins={setCoins}
+                        />
 
                         <Text className='text-2xl font-bold color-dark-heading p-6'>Furniture</Text>
 

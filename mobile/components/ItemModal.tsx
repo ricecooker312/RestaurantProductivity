@@ -26,6 +26,7 @@ interface ItemModalProps {
 const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: ItemModalProps) => {
     const [accessToken, setAccessToken] = useState('')
     const [maxLevel, setMaxLevel] = useState(false)
+    const [unlockedFullMax, setUnlockedFullMax] = useState(item.unlockedFullMax)
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -43,7 +44,9 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
     }, [])
 
     const upgradeItem = async () => {
+        console.log('is it maxLevel?')
         if (!maxLevel) {
+            console.log('not maxLevel, going to upgrade!')
             const upgradePayload = {
                 method: 'PATCH',
                 headers: {
@@ -60,11 +63,17 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
             const data = await res.json()
 
             if (data.error) {
-                if (data.error === 'Item is already at max level') setMaxLevel(true)
+                if (data.error === 'Item is already at max level') {
+                    setMaxLevel(true)
+                    Alert.alert(data.error)
+                }
             } else {
+                console.log('do we setItems and setCoins?')
                 if (setItems && setCoins) {
+                    console.log('about to upgrade')
                     setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
-                    
+                    console.log('just upgraded!')
+
                     setCoins(`${data.coins}`)
                     await AsyncStorage.setItem('coins', `${data.coins}`)
                 }
@@ -132,7 +141,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
                     <Image source={{ uri: itemImage }} className='size-36' />
 
                     {item.features.map(feature => (
-                        <Text key={feature.amount} className='text-sm color-gray mr-auto'>{feature.feature}:{' '}
+                        <Text key={feature.feature} className='text-sm color-gray mr-auto'>{feature.feature}:{' '}
                             <Text className='font-bold'>{feature.amount} {feature.ending}</Text>
                         </Text>
                     ))}
@@ -144,15 +153,19 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
                                 underlayColor={`${maxLevel ? '' : '#0014C7'}`}
                                 onPress={upgradeItem}
                             >
-                                {maxLevel ? (
+                                {maxLevel && unlockedFullMax ? (
                                     <Text className='text-lg color-white text-center'>Max Level</Text>
+                                ) : maxLevel && !unlockedFullMax ? (
+                                    <Text className='text-lg color-white text-center'>
+                                        Upgrade your restaurant first
+                                    </Text>
                                 ) : (
                                     <View className='flex flex-row items-center justify-around'>
                                         <Text className='color-white text-lg text-center'>Upgrade</Text>
-                                        
+
                                         <View className='flex flex-row items-center gap-3'>
-                                            <Image source={icons.coins} className='w-8 h-8' />
-                                            <Text className='color-white text-lg'>{item.price * item.level}</Text> 
+                                            <Image source={icons.coins} className='size-8' />
+                                            <Text className='color-white text-lg'>{item.price * item.level}</Text>
                                         </View>
                                     </View>
                                 )}

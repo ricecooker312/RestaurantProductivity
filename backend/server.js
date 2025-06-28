@@ -944,11 +944,20 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
             })
         }
 
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant'
+            })
+        }
+
         const item = await items.findOne({ _id: new ObjectId(itemId) })
 
         const newLevel = userItemFind.level + 1
+        
+        const currentMaxLevel = item.maxLevel[restaurant.level - 1]
 
-        if (item.maxLevel >= newLevel) {
+        if (currentMaxLevel >= newLevel) {
             const userFind = await users.findOne({ _id: new ObjectId(userId) })
             if (!userFind) {
                 return res.send({
@@ -1338,7 +1347,8 @@ app.patch('/api/restaurants/upgrade', checkToken, async (req, res) => {
         return res.send({
             upgrade: upgrade,
             removeCoins: removeCoins,
-            coins: newCoins
+            coins: newCoins,
+            level: newLevel
         })
     } catch (err) {
         console.log(`Restaurant Upgrade Error: ${err}`)

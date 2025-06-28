@@ -1,16 +1,79 @@
-import { View, Text, Modal, TouchableWithoutFeedback, FlatList, TouchableOpacity, TouchableHighlight } from 'react-native'
-import React from 'react'
+import { View, Text, Modal, TouchableWithoutFeedback, FlatList, TouchableOpacity, TouchableHighlight, Image, Alert } from 'react-native'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Restaurant } from '@/types/restaurantTypes'
 import ReviewStars from './ReviewStars'
+import { icons } from '@/constants/icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router } from 'expo-router'
 
 
 interface RestaurantStatsProps {
     open: boolean,
     setOpen: (value: boolean) => void,
-    restaurant: Restaurant
+    restaurant: Restaurant,
+    setRestaurant: Dispatch<SetStateAction<Restaurant>>,
+    coins: string,
+    setCoins: (value: string) => void
 }
 
-const RestaurantStats = ({ open, setOpen, restaurant }: RestaurantStatsProps) => {
+const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, coins, setCoins }: RestaurantStatsProps) => {
+    const upgradeAmount = 220 * (restaurant.level + 1)
+    const canAfford = parseInt(coins) >= upgradeAmount
+
+    const [accessToken, setAccessToken] = useState('')
+
+    useEffect(() => {
+        const isAuthenticated = async () => {
+            const useEffectToken = await AsyncStorage.getItem('accessToken')
+
+            if (!useEffectToken) {
+                await AsyncStorage.removeItem('coins')
+                await AsyncStorage.removeItem('streak')
+
+                router.navigate('/onboarding')
+            } else {
+                setAccessToken(useEffectToken)
+            }
+        }
+
+        isAuthenticated()
+    }, [])
+
+    const upgradeRestaurant = async () => {
+        if (canAfford) {
+            const res = await fetch('https://restaurantproductivity.onrender.com/api/restaurants/upgrade', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+
+            const data = await res.json()
+
+            if (data.error) {
+                if (data.userNotExist) {
+                    await AsyncStorage.removeItem('accessToken')
+                    await AsyncStorage.removeItem('coins')
+                    await AsyncStorage.removeItem('streak')
+
+                    router.navigate('/onboarding')
+                } else {
+                    Alert.alert(data.error)
+                }
+            } else {
+                await AsyncStorage.setItem('coins', `${data.coins}`)
+                setRestaurant(prevRestaurant => ({
+                    ...prevRestaurant,
+                    level: prevRestaurant.level + 1
+                }))
+                setCoins(`${data.coins}`)
+                setOpen(false)
+            }
+        }
+    }
+
     if (restaurant.stats.length > 0) {
         return (
             <Modal
@@ -70,11 +133,23 @@ const RestaurantStats = ({ open, setOpen, restaurant }: RestaurantStatsProps) =>
                             </>
                         )}
                         <TouchableHighlight 
-                            className='m-6 p-4 rounded-lg bg-primary'
-                            underlayColor={'#0014C7'}
-                            onPress={() => {}}
+                            className={`
+                                m-6 
+                                p-4 
+                                rounded-lg 
+                                ${canAfford ? 'bg-primary' : 'bg-button-primaryDisabled'}`
+                            }
+                            underlayColor={canAfford ? '#0014C7' : '#A3ACFF'}
+                            onPress={upgradeRestaurant}
                         >
-                            <Text className='color-white text-lg text-center'>Upgrade</Text>
+                            <View className='flex flex-row justify-around items-center'>
+                                <Text className='text-lg color-white'>Upgrade</Text>
+
+                                <View className='flex flex-row items-center gap-3'>
+                                    <Image source={icons.coins} className='size-8' style={{ opacity: canAfford ? 1 : 0.6 }} />
+                                    <Text className='text-lg color-white'>{upgradeAmount}</Text>
+                                </View>
+                            </View>
                         </TouchableHighlight>
                     </View>
                 </View>

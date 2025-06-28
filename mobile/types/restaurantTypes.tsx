@@ -19,7 +19,8 @@ export type RestaurantItem = {
     price: number,
     level: number,
     maxLevel: number,
-    features: Feature[]
+    features: Feature[],
+    unlockedFullMax: boolean
 }
 
 export type Restaurant = {
