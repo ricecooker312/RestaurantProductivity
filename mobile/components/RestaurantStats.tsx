@@ -70,6 +70,8 @@ const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, coins, setC
                 }))
                 setCoins(`${data.coins}`)
                 setOpen(false)
+
+                router.reload()
             }
         }
     }

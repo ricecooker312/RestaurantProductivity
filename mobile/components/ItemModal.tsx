@@ -45,9 +45,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
     }, [])
 
     const upgradeItem = async () => {
-        console.log('is it maxLevel?')
         if (!maxLevel) {
-            console.log('not maxLevel, going to upgrade!')
             const upgradePayload = {
                 method: 'PATCH',
                 headers: {
@@ -69,14 +67,25 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
                     Alert.alert(data.error)
                 }
             } else {
-                console.log('do we setItems and setCoins?')
                 if (setItems && setCoins) {
-                    console.log('about to upgrade')
-                    setItems(prevItems => prevItems.map(mItem => mItem._id === item._id ? { ...item, level: data.level } : mItem))
-                    console.log('just upgraded!')
-
+                    setItems(prevItems => prevItems.map(mItem => mItem._id === item._id 
+                        ? { ...item, 
+                            level: data.newItem.level, 
+                            unlockedFullMax: data.newItem.unlockedFullMax, 
+                            maxLevel: data.newItem.maxLevel 
+                        } 
+                        : mItem
+                    ))
                     setCoins(`${data.coins}`)
                     await AsyncStorage.setItem('coins', `${data.coins}`)
+
+                    if (data.newItem.maxLevel >= data.newItem.level) {
+                        setMaxLevel(true)
+                    }
+
+                    if (data.newItem.unlockedFullMax) {
+                        setUnlockedFullMax(true)
+                    }
                 }
             }
         }

@@ -965,6 +965,7 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
         const newLevel = userItemFind.level + 1
         
         const currentMaxLevel = item.maxLevel[restaurant.level - 1]
+        console.log(newLevel, currentMaxLevel)
 
         if (currentMaxLevel >= newLevel) {
             const userFind = await users.findOne({ _id: new ObjectId(userId) })
@@ -1027,10 +1028,15 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
                 streak++
             }
 
+            const newItem = await items.findOne({ _id: new ObjectId(itemId) })
+            const arrayMax = newItem.maxLevel
+            newItem.maxLevel = arrayMax[restaurant.level - 1]
+            newItem.unlockedFullMax = newItem.maxLevel === arrayMax[arrayMax.length - 1]
+            newItem.level = newLevel
+
             return res.send({
-                ...upgrade,
-                level: newLevel,
                 coins: newCoins,
+                newItem: newItem,
                 streak: streak
             })
         } else {
