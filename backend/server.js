@@ -1339,31 +1339,48 @@ app.patch('/api/restaurants/upgrade', checkToken, async (req, res) => {
         }
 
         const newLevel = restaurant.level + 1
-        console.log(restaurant)
         if (user.coins < (220 * newLevel)) {
             return res.send({
                 error: 'You do not have enough coins'
             })
         }
 
-        const upgrade = await restaurants.updateOne(restaurant, {
+        await restaurants.updateOne(restaurant, {
             $set: {
                 level: newLevel
             }
         })
+        restaurant.level = newLevel
+
+        const ownedItemIds = await userItems.find({ userId: userId }).project({ itemId: 1 }).toArray()
+        const ownedItems = []
+
+        for (let i = 0; i < ownedItemIds.length; i++) {
+            const id = ownedItemIds[i].itemId
+
+            const item = await items.findOne(
+                { _id: new ObjectId(id) },
+                { projection: { _id: 1, maxLevel: 1 } }
+            )
+
+            const arrayMax = item.maxLevel
+            item.maxLevel = item.maxLevel[restaurant.level - 1]
+            item.unlockedFullMax = item.maxLevel === arrayMax[arrayMax.length - 1]
+
+            ownedItems.push(item)
+        }
 
         const newCoins = user.coins - (220 * newLevel)
-        const removeCoins = await users.updateOne({ _id: user._id }, {
+        await users.updateOne({ _id: user._id }, {
             $set: {
                 coins: newCoins
             }
         })
 
         return res.send({
-            upgrade: upgrade,
-            removeCoins: removeCoins,
             coins: newCoins,
-            level: newLevel
+            level: newLevel,
+            newItems: ownedItems
         })
     } catch (err) {
         console.log(`Restaurant Upgrade Error: ${err}`)

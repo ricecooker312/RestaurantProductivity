@@ -216,6 +216,8 @@ const restaurant = () => {
                             setOpen={setStatsModal} 
                             restaurant={restaurant} 
                             setRestaurant={setRestaurant}
+                            items={items}
+                            setItems={setItems}
                             coins={coins} 
                             setCoins={setCoins}
                         />

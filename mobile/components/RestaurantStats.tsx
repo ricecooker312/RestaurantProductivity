@@ -1,6 +1,6 @@
 import { View, Text, Modal, TouchableWithoutFeedback, FlatList, TouchableOpacity, TouchableHighlight, Image, Alert } from 'react-native'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Restaurant } from '@/types/restaurantTypes'
+import { Restaurant, RestaurantItem } from '@/types/restaurantTypes'
 import ReviewStars from './ReviewStars'
 import { icons } from '@/constants/icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -12,11 +12,13 @@ interface RestaurantStatsProps {
     setOpen: (value: boolean) => void,
     restaurant: Restaurant,
     setRestaurant: Dispatch<SetStateAction<Restaurant>>,
+    items: RestaurantItem[],
+    setItems: Dispatch<SetStateAction<RestaurantItem[]>>,
     coins: string,
     setCoins: (value: string) => void
 }
 
-const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, coins, setCoins }: RestaurantStatsProps) => {
+const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, items, setItems, coins, setCoins }: RestaurantStatsProps) => {
     const upgradeAmount = 220 * (restaurant.level + 1)
     const canAfford = parseInt(coins) >= upgradeAmount
 
@@ -68,6 +70,7 @@ const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, coins, setC
                     ...prevRestaurant,
                     level: prevRestaurant.level + 1
                 }))
+
                 setCoins(`${data.coins}`)
                 setOpen(false)
 
