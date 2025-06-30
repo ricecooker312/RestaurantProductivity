@@ -939,7 +939,9 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
 
                 if (feature.feature === 'Average profit') {
                     dollar = true
-                    dollarAmount = removeDollar(feature.amount) - trueAmount(feature.amount, true)
+                    dollarAmount = removeDollar(feature.amount) - trueAmount(featureToRemove.amount, true)
+
+                    console.log(dollarAmount)
                 }
 
                 return {
@@ -947,7 +949,7 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
                     amount: 
                         dollar 
                         ? `$${dollarAmount}` 
-                        : Math.max(0, parseInt(feature.amount) - trueAmount(feature.amount, false)).toString()
+                        : Math.max(0, parseInt(feature.amount) - trueAmount(featureToRemove.amount, false)).toString()
                 }
             }
             return feature
