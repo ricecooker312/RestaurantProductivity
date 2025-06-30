@@ -904,6 +904,13 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
             })
         }
 
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant'
+            })
+        }
+
         const uItem = await userItems.findOne({ itemId: itemId, userId: userId })
         if (!uItem) {
             return res.send({
@@ -918,18 +925,88 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
             })
         }
 
-        const deleteItem = await userItems.deleteOne(uItem)
+        const itemFeatures = new Map(item.features.map(feature => [feature.feature, feature]))
+
+        const removeDollar = str => parseInt(str.replace(/[^0-9.-]/g, ''))
+
+        const restaurantUpdatedStats = restaurant.stats.map(feature => {
+            const featureToRemove = itemFeatures.get(feature.feature)
+
+            if (featureToRemove) {
+                console.log(featureToRemove, feature)
+
+                let dollar = false
+                let dollarAmount;
+                if (feature.feature === 'Average profit') {
+                    dollar = true
+                    dollarAmount = removeDollar(feature.amount) - removeDollar(featureToRemove.amount)
+
+                    console.log(dollarAmount)
+                }
+
+                return {
+                    ...feature,
+                    amount: 
+                        dollar 
+                        ? `$${dollarAmount}` 
+                        : Math.max(0, parseInt(feature.amount) - parseInt(featureToRemove.amount)).toString()
+                }
+            }
+            return feature
+        })
+
+        await userItems.deleteOne(uItem)
+        await restaurants.updateOne(restaurant, {
+            $set: {
+                stats: restaurantUpdatedStats
+            }
+        })
 
         const newCoins = user.coins + (item.price * uItem.level)
-        const addCoins = await users.updateOne(user, {
+        await users.updateOne(user, {
             $set: {
                 coins: newCoins
             }
         })
 
+        const now = Date.now()
+
+        if (isNewDay(user.streakTime, now) && user.gotStreak) {
+            await users.updateOne(user, {
+                $set: {
+                    gotStreak: false
+                }
+            })
+            user.gotStreak = false
+        }
+
+        let streak;
+
+        if (!twoDaysPassed(user.streakTime, now) && !user.gotStreak) {
+            const newStreak = user.streak + 1
+            await users.updateOne({ _id: user._id }, {
+                $set: {
+                    streak: newStreak,
+                    streakTime: now,
+                    gotStreak: true
+                }
+            })
+
+            streak = newStreak
+        } else if (twoDaysPassed(user.streakTime, now) && !user.gotStreak) {
+            await users.updateOne({ _id: user._id }, {
+                streak: 1,
+                streakTime: now,
+                gotStreak: true
+            })
+
+            streak = 1
+        }
+
         return res.send({
-            ...deleteItem,
-            coins: newCoins
+            coins: newCoins,
+            updatedStats: restaurantUpdatedStats,
+            streak: streak
         })
     } catch (err) {
         console.log(err)
@@ -965,7 +1042,6 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
         const newLevel = userItemFind.level + 1
         
         const currentMaxLevel = item.maxLevel[restaurant.level - 1]
-        console.log(newLevel, currentMaxLevel)
 
         if (currentMaxLevel >= newLevel) {
             const userFind = await users.findOne({ _id: new ObjectId(userId) })
@@ -992,13 +1068,13 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
             }
 
             const newCoins = userFind.coins - (item.price * (newLevel))
-            const removeCoins = await users.updateOne(userFind, {
+            await users.updateOne(userFind, {
                 $set: {
                     coins: newCoins
                 }
             })
 
-            const upgrade = await userItems.updateOne(userItemFind, {
+            await userItems.updateOne(userItemFind, {
                 $set: {
                     level: newLevel
                 }

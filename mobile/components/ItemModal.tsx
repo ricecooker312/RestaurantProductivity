@@ -175,7 +175,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
 
                                         <View className='flex flex-row items-center gap-3'>
                                             <Image source={icons.coins} className='size-8' />
-                                            <Text className='color-white text-lg'>{item.price * item.level}</Text>
+                                            <Text className='color-white text-lg'>{item.price * (item.level + 1)}</Text>
                                         </View>
                                     </View>
                                 )}
