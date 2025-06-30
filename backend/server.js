@@ -1096,7 +1096,7 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
                     return {
                         ...stat,
                         amount: dollar
-                            ? `$${removeDollar(stat.amount) + (removeDollar(stat.amount) * (newLevel - 1) * 1.5)}`
+                            ? `$${Math.round(removeDollar(stat.amount) + (removeDollar(stat.amount) * (newLevel - 1) * 1.5))}`
                             : (parseInt(stat.amount) + (parseInt(stat.amount) * (newLevel - 1) * 1.5)).toString()
                     }
                 }
