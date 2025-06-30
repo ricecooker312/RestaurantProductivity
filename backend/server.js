@@ -323,7 +323,6 @@ app.post('/api/goals/find/complete', checkToken, async (req, res) => {
 
 app.get('/api/goals/find/incomplete', checkToken, async (req, res) => {
     const userId = req.user.id
-    console.log(userId)
 
     try {
         const goalFind = await goals.find({ completed: false, userId: userId }).toArray()
@@ -697,8 +696,6 @@ app.post('/api/items/user/find/all', checkToken, async (req, res) => {
             item.maxLevel = restaurantMax
             item.unlockedFullMax = restaurantMax === maxList[maxList.length - 1]
 
-            console.log(item.maxLevel)
-
             resultItems.push(item)
         }
 
@@ -829,15 +826,14 @@ app.post('/api/items/user/buy', checkToken, async (req, res) => {
         })
 
         if (isNewDay(user.streakTime, time.getTime()) && user.gotStreak) {
-            console.log('new day!')
             await users.updateOne({ _id: user._id }, {
                 $set: {
                     gotStreak: false
                 }
             })
-            console.log('about to set gotsreak to false')
+            
             user.gotStreak = false
-            console.log('set gotstreak to false!')
+            
         }
        
         const newItemDoc = { 
@@ -933,17 +929,17 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
             const featureToRemove = itemFeatures.get(feature.feature)
 
             if (featureToRemove) {
+
                 const trueAmount = (str, isDollar) => isDollar 
-                    ? removeDollar(str) + (removeDollar(str) * (item.level - 1) * 1.5)
-                    : parseInt(str) + (parseInt(str) * (item.level - 1) * 1.5)
+                    ? removeDollar(str) + (removeDollar(str) * (uItem.level - 1) * 1.5)
+                    : parseInt(str) + (parseInt(str) * (uItem.level - 1) * 1.5)
 
                 let dollar = false
                 let dollarAmount;
+
                 if (feature.feature === 'Average profit') {
                     dollar = true
                     dollarAmount = removeDollar(feature.amount) - trueAmount(feature.amount, true)
-
-                    console.log(dollarAmount)
                 }
 
                 return {
@@ -1094,12 +1090,6 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
                     let dollar = false
 
                     if (stat.feature === 'Average profit') dollar = true
-
-                    if (dollar) {
-                        console.log(`$${removeDollar(stat.amount) + (removeDollar(stat.amount) * (newLevel - 1) * 1.5)}`)
-                    } else {
-                        console.log((parseInt(stat.amount) + (parseInt(stat.amount) * (newLevel - 1) * 1.5)).toString())
-                    }
 
                     return {
                         ...stat,
@@ -1411,7 +1401,6 @@ app.delete('/api/social/remove', checkToken, async (req, res) => {
 
 app.get('/api/restaurants/find/stats', checkToken, async (req, res) => {
     const userId = req.user.id
-    console.log(userId)
 
     try {
         const restaurant = await restaurants.findOne({ userId: userId })

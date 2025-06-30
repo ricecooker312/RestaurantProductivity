@@ -77,6 +77,12 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setRestaurant, s
                         } 
                         : mItem
                     ))
+
+                    setRestaurant(prevRestaurant => ({
+                        ...prevRestaurant,
+                        stats: data.restaurantStats
+                    }))
+
                     setCoins(`${data.coins}`)
                     await AsyncStorage.setItem('coins', `${data.coins}`)
 
