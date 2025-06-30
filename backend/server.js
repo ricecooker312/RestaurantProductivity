@@ -933,13 +933,15 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
             const featureToRemove = itemFeatures.get(feature.feature)
 
             if (featureToRemove) {
-                console.log(featureToRemove, feature)
+                const trueAmount = (str, isDollar) => isDollar 
+                    ? removeDollar(str) + (removeDollar(str) * (item.level - 1) * 1.5)
+                    : parseInt(str) + (parseInt(str) * (item.level - 1) * 1.5)
 
                 let dollar = false
                 let dollarAmount;
                 if (feature.feature === 'Average profit') {
                     dollar = true
-                    dollarAmount = removeDollar(feature.amount) - removeDollar(featureToRemove.amount)
+                    dollarAmount = removeDollar(feature.amount) - trueAmount(feature.amount, true)
 
                     console.log(dollarAmount)
                 }
@@ -949,7 +951,7 @@ app.delete('/api/items/user/sell', checkToken, async (req, res) => {
                     amount: 
                         dollar 
                         ? `$${dollarAmount}` 
-                        : Math.max(0, parseInt(feature.amount) - parseInt(featureToRemove.amount)).toString()
+                        : Math.max(0, parseInt(feature.amount) - trueAmount(feature.amount, false)).toString()
                 }
             }
             return feature
@@ -1079,6 +1081,42 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
                     level: newLevel
                 }
             })
+
+            const itemFeatures = new Map(item.features.map(feature => [feature.feature, feature]))
+            const restaurantStats = restaurant.stats
+
+            const removeDollar = str => parseInt(str.replace(/[^0-9.-]/g, ''))
+
+            const newStats = restaurantStats.map(stat => {
+                const feature = itemFeatures.get(stat.feature)
+                
+                if (feature) {
+                    let dollar = false
+
+                    if (stat.feature === 'Average profit') dollar = true
+
+                    if (dollar) {
+                        console.log(`$${removeDollar(stat.amount) + (removeDollar(stat.amount) * (newLevel - 1) * 1.5)}`)
+                    } else {
+                        console.log((parseInt(stat.amount) + (parseInt(stat.amount) * (newLevel - 1) * 1.5)).toString())
+                    }
+
+                    return {
+                        ...stat,
+                        amount: dollar
+                            ? `$${removeDollar(stat.amount) + (removeDollar(stat.amount) * (newLevel - 1) * 1.5)}`
+                            : (parseInt(stat.amount) + (parseInt(stat.amount) * (newLevel - 1) * 1.5)).toString()
+                    }
+                }
+
+                return stat
+            })
+
+            await restaurants.updateOne({ _id: restaurant._id }, {
+                $set: {
+                    stats: newStats
+                }
+            })
             
             let streak = userFind.streak
             if (twoDaysPassed(userFind.streakTime, time) && !userFind.gotStreak) {
@@ -1113,7 +1151,8 @@ app.patch('/api/items/user/upgrade/', checkToken, async (req, res) => {
             return res.send({
                 coins: newCoins,
                 newItem: newItem,
-                streak: streak
+                streak: streak,
+                restaurantStats: newStats
             })
         } else {
             return res.send({

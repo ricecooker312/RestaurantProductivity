@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { images } from '@/constants/images'
 import ItemModal from './ItemModal'
-import { RestaurantItem } from '@/types/restaurantTypes'
+import { Restaurant, RestaurantItem } from '@/types/restaurantTypes'
 
 const imagesMap = {
     'lvlonechair.png': require('../assets/images/lvlonechair.png')
@@ -13,11 +13,12 @@ interface ItemProps {
     item: RestaurantItem,
     setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
     setUnowned?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setRestaurant: Dispatch<SetStateAction<Restaurant>>,
     setCoins?: (value: string) => void,
     className?: string
 }
 
-const Item = ({ item, setItems, setUnowned, setCoins, className }: ItemProps) => {
+const Item = ({ item, setItems, setUnowned, setRestaurant, setCoins, className }: ItemProps) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -34,6 +35,7 @@ const Item = ({ item, setItems, setUnowned, setCoins, className }: ItemProps) =>
                 item={item}
                 setItems={setItems}
                 setUnowned={setUnowned}
+                setRestaurant={setRestaurant}
                 setCoins={setCoins}
             />
         </>

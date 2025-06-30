@@ -11,7 +11,7 @@ import React, { Dispatch, SetStateAction, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 
-import { RestaurantItem } from '@/types/restaurantTypes'
+import { Restaurant, RestaurantItem } from '@/types/restaurantTypes'
 import { icons } from '@/constants/icons'
 
 interface ItemModalProps {
@@ -20,10 +20,11 @@ interface ItemModalProps {
     item: RestaurantItem,
     setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
     setUnowned?: Dispatch<SetStateAction<RestaurantItem[]>>,
+    setRestaurant: Dispatch<SetStateAction<Restaurant>>,
     setCoins?: (value: string) => void
 }
 
-const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: ItemModalProps) => {
+const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setRestaurant, setCoins }: ItemModalProps) => {
     const [accessToken, setAccessToken] = useState('')
     const [maxLevel, setMaxLevel] = useState(false)
     const [unlockedFullMax, setUnlockedFullMax] = useState(item.unlockedFullMax)
@@ -116,6 +117,11 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
                     item
                 ])
 
+                setRestaurant(( restaurant: Restaurant ) => ({
+                    ...restaurant,
+                    stats: data.updatedStats
+                }))
+
                 await AsyncStorage.setItem('coins', `${data.coins}`)
                 setCoins(`${data.coins}`)
 
@@ -123,6 +129,8 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
             }
         }
     }
+
+    const removeDollar = (str: string) => parseInt(str.replace(/[^0-9.-]/g, ''))
 
     const itemImage = item.image[item.level - 1]
 
@@ -152,7 +160,12 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setCoins }: Item
 
                     {item.features.map(feature => (
                         <Text key={feature.feature} className='text-sm color-gray mr-auto'>{feature.feature}:{' '}
-                            <Text className='font-bold'>{feature.amount} {feature.ending}</Text>
+                            <Text className='font-bold'>
+                                {feature.feature === 'Average profit'
+                                ? `$${Math.round(removeDollar(feature.amount) + (removeDollar(feature.amount)) * (item.level - 1) * 1.5)}`
+                                : parseInt(feature.amount) + (parseInt(feature.amount) * (item.level - 1) * 1.5)}{' '} 
+                                {feature.ending}
+                            </Text>
                         </Text>
                     ))}
 

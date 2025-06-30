@@ -233,6 +233,7 @@ const restaurant = () => {
                                         item={item}
                                         setItems={setItems}
                                         setUnowned={setUnowned}
+                                        setRestaurant={setRestaurant}
                                         setCoins={setCoins}
                                     />
                                 )
@@ -272,6 +273,7 @@ const restaurant = () => {
                                         item={item}
                                         setItems={setItems}
                                         setUnowned={setUnowned}
+                                        setRestaurant={setRestaurant}
                                         setCoins={setCoins}
                                     />
                                 )
@@ -311,6 +313,7 @@ const restaurant = () => {
                                         item={item}
                                         setItems={setItems}
                                         setUnowned={setUnowned}
+                                        setRestaurant={setRestaurant}
                                         setCoins={setCoins}
                                     />
                                 )
