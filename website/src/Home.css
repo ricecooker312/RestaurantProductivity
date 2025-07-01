@@ -1,0 +1,40 @@
+.bg {
+    background-color: #d1d1d1;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header {
+    color: rgb(46, 47, 52);
+    margin-left: 2em;
+    margin-right: 2em;
+    font-size: 60px;
+}
+
+.button-primary {
+    color: white;
+    background-color: #5060EE;
+    padding: 1.5em;
+    border-radius: 0.5em;
+    font-size: 23px;
+    margin-bottom: 1.2em;
+    text-decoration: none;
+    cursor: pointer;
+    width: 25%;
+    text-align: center;
+}
+
+.button-primary:hover {
+    color: white;
+    background-color: #909bf9;
+}
+
+.image {
+    width: 10%;
+}

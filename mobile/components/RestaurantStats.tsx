@@ -23,6 +23,7 @@ const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, items, setI
     const canAfford = parseInt(coins) >= upgradeAmount
 
     const [accessToken, setAccessToken] = useState('')
+    const [maxLevel, setMaxLevel] = useState(false)
 
     useEffect(() => {
         const isAuthenticated = async () => {
@@ -35,6 +36,8 @@ const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, items, setI
                 router.navigate('/onboarding')
             } else {
                 setAccessToken(useEffectToken)
+
+                if (restaurant.level === 2) setMaxLevel(true)
             }
         }
 
@@ -70,6 +73,8 @@ const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, items, setI
                     ...prevRestaurant,
                     level: prevRestaurant.level + 1
                 }))
+
+                if (restaurant.level + 1 === 2) setMaxLevel(true)
 
                 setCoins(`${data.coins}`)
                 setOpen(false)
@@ -142,18 +147,24 @@ const RestaurantStats = ({ open, setOpen, restaurant, setRestaurant, items, setI
                                 m-6 
                                 p-4 
                                 rounded-lg 
-                                ${canAfford ? 'bg-primary' : 'bg-button-primaryDisabled'}`
+                                ${canAfford && !maxLevel ? 'bg-primary' : 'bg-button-primaryDisabled'}`
                             }
-                            underlayColor={canAfford ? '#0014C7' : '#A3ACFF'}
+                            underlayColor={canAfford && !maxLevel ? '#0014C7' : '#A3ACFF'}
                             onPress={upgradeRestaurant}
                         >
                             <View className='flex flex-row justify-around items-center'>
-                                <Text className='text-lg color-white'>Upgrade</Text>
+                                {maxLevel ? (
+                                    <Text className='text-lg color-white'>Max Level</Text>
+                                ) : (
+                                    <>
+                                        <Text className='text-lg color-white'>Upgrade</Text>
 
-                                <View className='flex flex-row items-center gap-3'>
-                                    <Image source={icons.coins} className='size-8' style={{ opacity: canAfford ? 1 : 0.6 }} />
-                                    <Text className='text-lg color-white'>{upgradeAmount}</Text>
-                                </View>
+                                        <View className='flex flex-row items-center gap-3'>
+                                            <Image source={icons.coins} className='size-8' style={{ opacity: canAfford ? 1 : 0.6 }} />
+                                            <Text className='text-lg color-white'>{upgradeAmount}</Text>
+                                        </View>
+                                    </>
+                                )}
                             </View>
                         </TouchableHighlight>
                     </View>
