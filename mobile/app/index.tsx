@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Alert, ScrollView, Dimensions } from 'react-native'
+import { View, Text, Image, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Alert, ScrollView, Dimensions, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -20,6 +20,7 @@ const index = () => {
     const [aspect, setAspect] = useState(1)
     const [streak, setStreak] = useState(0)
     const [suggestedUpgrades, setSuggestedUpgrades] = useState<RestaurantItem[]>()
+    const [restaurantLevel, setRestaurantLevel] = useState<number>(0)
 
     const insets = useSafeAreaInsets()
 
@@ -68,6 +69,27 @@ const index = () => {
 
       if (accessToken) fetchGoals()
     }, [accessToken])
+  
+    useEffect(() => {
+      const getResLevel = async () => {
+        const res = await fetch('https://restaurantproductivity.onrender.com/api/restaurants/find/stats', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        })
+
+        const data = await res.json()
+
+        if (data.error) {
+          Alert.alert(data.error)
+        } else {
+          setRestaurantLevel(data.level)
+        }
+      }
+
+      if (accessToken) getResLevel()
+    }, [accessToken])
 
     useEffect(() => {
       const getUserInfo = async () => {
@@ -93,6 +115,28 @@ const index = () => {
       if (accessToken) getUserInfo()
     }, [accessToken])
 
+    useEffect(() => {
+      const getSuggestedGoals = async () => {
+        const res = await fetch('https://restaurantproductivity.onrender.com/api/items/user/find/upgrade', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        })
+
+        const data = await res.json()
+
+        if (data.error) {
+          Alert.alert(data.error)
+        } else {
+          setSuggestedUpgrades(data.suggestedUpgrade)
+        }
+      }
+
+      if (accessToken) getSuggestedGoals()
+    }, [accessToken])
+
     const completeGoal = async (id: string) => {
       const completePayload = {
           method: 'PATCH',
@@ -110,6 +154,19 @@ const index = () => {
           console.log(data.error)
       } else {
         setCurrentGoals(cGoals => cGoals.filter(goal => goal._id !== id))
+      }
+    }
+
+    const removeDollar = (str: string) => parseInt(str.replace(/[^0-9.-]/g, ''))
+
+    if (suggestedUpgrades) {
+      for (let i = 0; i < suggestedUpgrades.length; i++) {
+        for (let j = 0; j < suggestedUpgrades[i].features.length; j++) {
+          const feature = suggestedUpgrades[i].features[j]
+          if (feature.feature === 'Average profit') {
+            console.log(removeDollar(feature.amount))
+          }
+        }
       }
     }
 
@@ -177,37 +234,38 @@ const index = () => {
                   <Text>Add New Goal</Text>
                 </View>
               </TouchableOpacity>
-            </View> 
-
-            <View className='m-6'>
-              <Text className='text-xl color-dark-heading font-bold'>Suggested Goals</Text>
-
-              <View className='border-button-good p-6 bg-light-100 flex flex-row items-center justify-between rounded-lg mt-4'>
-                <Text>Walk for 20 Minutes</Text>
-                <TouchableOpacity className='h-full'>
-                  <Text className='color-primary'>Add Goal</Text>
-                </TouchableOpacity>
-              </View>
             </View>
 
-            <View className='m-6 mb-24'>
+            <View className='m-6 mb-20'>
               <Text className='text-3xl color-dark-heading font-bold'>Upgrades</Text>
 
-              <View className='flex flex-row flex-wrap mt-6 gap-3 '>
-                <View className='bg-light-100 rounded-lg p-6 flex-1'>
-                  <Text className='text-xl font-bold color-dark-heading text-center'>Chair</Text>
-                  <Text className='color-dark-green mt-4'>+15 minutes of customer stay time</Text>
-                  <TouchableOpacity className='bg-primary mt-6 p-4 rounded-lg'>
-                    <Text className='text-center color-white text-md'>Upgrade</Text>
-                  </TouchableOpacity>
-                </View>
-                <View className='bg-light-100 rounded-lg p-6 flex-1'>
-                  <Text className='text-xl font-bold color-dark-heading text-center'>Table</Text>
-                  <Text className='color-dark-green mt-4'>+5 customers</Text>
-                  <TouchableOpacity className='bg-primary mt-6 p-4 rounded-lg'>
-                    <Text className='text-center color-white text-md'>Upgrade</Text>
-                  </TouchableOpacity>
-                </View>
+              <View className='flex flex-row flex-wrap mt-6 items-center justify-center'>
+                <FlatList 
+                  data={suggestedUpgrades}
+                  keyExtractor={item => item._id}
+                  scrollEnabled={false}
+                  renderItem={({ item }) => (
+                    <View className='rounded-lg p-6 bg-light-100 flex-1 mb-6'>
+                      <Text className='text-xl font-bold color-dark-heading text-center'>{item.name}</Text>
+                      {item.features.map(feature => (
+                        <Text key={feature.feature} className='color-dark-green mt-4'>
+                          +{' '} 
+                          {feature.feature === 'Average profit' 
+                            ? `$${Math.round(removeDollar(feature.amount)*(restaurantLevel - 1)*1.5)}`
+                            : parseInt(feature.amount)*(restaurantLevel - 1)*1.5} 
+                            {feature.ending === '' ? '' : ' '}
+                            {feature.ending} of {feature.feature.toLocaleLowerCase()}
+                        </Text>
+                      ))}
+                      <TouchableHighlight
+                        className='bg-primary mt-6 p-4 rounded-lg'
+                        onPress={() => router.navigate('/restaurant')}
+                      >
+                        <Text className='text-center color-white text-md'>Upgrade</Text>
+                      </TouchableHighlight>
+                    </View>
+                  )}
+				        />
               </View>
             </View>
           </ScrollView>

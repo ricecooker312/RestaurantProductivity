@@ -20,7 +20,7 @@ interface ItemModalProps {
     item: RestaurantItem,
     setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
     setUnowned?: Dispatch<SetStateAction<RestaurantItem[]>>,
-    setRestaurant: Dispatch<SetStateAction<Restaurant>>,
+    setRestaurant?: Dispatch<SetStateAction<Restaurant>>,
     setCoins?: (value: string) => void
 }
 
@@ -68,7 +68,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setRestaurant, s
                     Alert.alert(data.error)
                 }
             } else {
-                if (setItems && setCoins) {
+                if (setItems && setCoins && setRestaurant) {
                     setItems(prevItems => prevItems.map(mItem => mItem._id === item._id 
                         ? { ...item, 
                             level: data.newItem.level, 
@@ -116,7 +116,7 @@ const ItemModal = ({ open, setOpen, item, setItems, setUnowned, setRestaurant, s
         if (data.error) {
             Alert.alert(data.error)
         } else {
-            if (setItems && setCoins && setUnowned) {
+            if (setItems && setCoins && setUnowned && setRestaurant) {
                 setItems(prevItems => prevItems.filter(fItem => fItem._id !== item._id))
                 setUnowned(prevUnowned => [
                     ...prevUnowned,

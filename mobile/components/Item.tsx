@@ -13,7 +13,7 @@ interface ItemProps {
     item: RestaurantItem,
     setItems?: Dispatch<SetStateAction<RestaurantItem[]>>,
     setUnowned?: Dispatch<SetStateAction<RestaurantItem[]>>,
-    setRestaurant: Dispatch<SetStateAction<Restaurant>>,
+    setRestaurant?: Dispatch<SetStateAction<Restaurant>>,
     setCoins?: (value: string) => void,
     className?: string
 }
