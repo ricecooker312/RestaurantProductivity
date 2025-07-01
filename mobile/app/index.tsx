@@ -10,6 +10,7 @@ import { Goal } from '@/types/goalTypes'
 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { images } from '@/constants/images'
+import { RestaurantItem } from '@/types/restaurantTypes'
 
 const screenWidth = Dimensions.get('window').width
 
@@ -18,6 +19,7 @@ const index = () => {
     const [currentGoals, setCurrentGoals] = useState<Goal[]>([])
     const [aspect, setAspect] = useState(1)
     const [streak, setStreak] = useState(0)
+    const [suggestedUpgrades, setSuggestedUpgrades] = useState<RestaurantItem[]>()
 
     const insets = useSafeAreaInsets()
 

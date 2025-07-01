@@ -746,6 +746,12 @@ app.get('/api/items/user/find/upgrade', checkToken, async (req, res) => {
             console.log(item, maxLevel, newLevel, userItemId, user.coins)
 
             if (maxLevel > userItemId.level && user.coins >= (item.price * newLevel)) {
+                item.level = userItemId.level
+
+                const arrayMax = item.maxLevel
+                item.maxLevel = arrayMax[restaurant.level - 1]
+                item.unlockedFullMax = item.maxLevel === arrayMax[arrayMax.length - 1]
+
                 uItems.push(item)
             }
         }
