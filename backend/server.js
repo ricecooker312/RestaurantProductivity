@@ -707,6 +707,61 @@ app.post('/api/items/user/find/all', checkToken, async (req, res) => {
         })
     }
 })
+
+app.get('/api/items/user/find/upgrade', checkToken, async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const user = await users.findOne({ _id: new ObjectId(userId) })
+        if (!user) {
+            return res.send({
+                error: 'User does not exist',
+                userNotExist: true
+            })
+        }
+
+        const restaurant = await restaurants.findOne({ userId: userId })
+        if (!restaurant) {
+            return res.send({
+                error: 'You do not own a restaurant',
+                userNotExist: true
+            })
+        }
+
+        const userItemIds = await userItems.find({ userId: userId }).project({ itemId: 1, level: 1 }).toArray()
+        const uItems = []
+
+        for (let i = 0; i < userItemIds.length; i++) {
+            const userItemId = userItemIds[i]
+
+            const item = await items.findOne({ _id: new ObjectId(userItemId.itemId) })
+            if (!item) {
+                return res.send({
+                    error: 'Could not find item'
+                })
+            }
+
+            const maxLevel = item.maxLevel[restaurant.level - 1]
+            const newLevel = userItemId.level + 1
+            console.log(item, maxLevel, newLevel, userItemId, user.coins)
+
+            if (maxLevel > userItemId.level && user.coins >= (item.price * newLevel)) {
+                uItems.push(item)
+            }
+        }
+
+        return res.send({
+            suggestedUpgrade: uItems
+        })
+    } catch (err) {
+        console.log(`Upgradeable Items Find Error: ${err}`)
+        return res.send({
+            error: err
+        })
+    }
+
+})
+
 app.get('/api/items/user/find/:itemId', checkToken, async (req, res) => {
     const userId = req.user.id
     const itemId = req.params.itemId
