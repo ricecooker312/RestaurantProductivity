@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Mealstone",
-    "slug": "Mealstone",
+    "slug": "RestaurantProductivity",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/designlogo.png",
@@ -48,6 +48,7 @@
       "eas": {
         "projectId": "67f603da-5bd3-4eec-a71f-6a5f073b73c5"
       }
-    }
+    },
+    "owner": "saihanr"
   }
 }
