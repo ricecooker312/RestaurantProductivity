@@ -9,7 +9,8 @@ import {
     Platform,
     ScrollView, 
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    Linking
 } from 'react-native'
 import { AdvancedCheckbox } from 'react-native-advanced-checkbox'
 
@@ -226,14 +227,7 @@ const SignupModal = () => {
                                         I agree with the{' '}
                                         <Text
                                         style={{ color: '#6A4DFF' }}
-                                        onPress={() => setTacModal(true)}
-                                        >
-                                        Terms of Service
-                                        </Text>{' '}
-                                        and{' '}
-                                        <Text
-                                        style={{ color: '#6A4DFF' }}
-                                        onPress={() => setPrivPolModal(true)}
+                                        onPress={() => Linking.openURL('https://ricecooker312.github.io/RestaurantProductivity/priv')}
                                         >
                                         Privacy Policy
                                         </Text>
