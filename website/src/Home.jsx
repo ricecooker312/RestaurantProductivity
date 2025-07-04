@@ -9,8 +9,19 @@ function Home() {
 			<img src={logo} className='image' />
 			<h1 className='header'>Restaurant Productivity</h1>
 
-			<a className='button-primary'>Download on Android</a>
-			<a className='button-primary'>Download on iOS</a>
+			<a 
+				className='button-primary' 
+				target='_blank' 
+				href='https://expo.dev/artifacts/eas/7pf1969T93PxPjGdxyQqvu.apk'
+			>
+				Download on Android
+			</a>
+			<a 
+				className='button-primary'
+				target="_blank"
+			>
+				Download on iOS
+			</a>
 		</div>
 	)
 }
