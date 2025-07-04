@@ -14,7 +14,9 @@
     color: rgb(46, 47, 52);
     margin-left: 2em;
     margin-right: 2em;
-    font-size: 60px;
+    margin-bottom: 1em;
+    font-size: 2em;
+    text-align: center;
 }
 
 .button-primary {
@@ -22,11 +24,10 @@
     background-color: #5060EE;
     padding: 1.5em;
     border-radius: 0.5em;
-    font-size: 23px;
+    font-size: 1.2em;
     margin-bottom: 1.2em;
     text-decoration: none;
     cursor: pointer;
-    width: 25%;
     text-align: center;
 }
 
@@ -36,5 +37,5 @@
 }
 
 .image {
-    width: 10%;
+    width: 10em;
 }
