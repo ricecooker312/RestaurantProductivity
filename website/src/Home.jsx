@@ -9,6 +9,8 @@ function Home() {
 			<img src={logo} className='image' />
 			<h1 className='header'>Restaurant Productivity</h1>
 
+			<a className='link' href='https://forms.gle/N7bjjyt2aohvC7eQ6' target="_blank">Ask a question</a>
+
 			<a 
 				className='button-primary' 
 				target='_blank' 
