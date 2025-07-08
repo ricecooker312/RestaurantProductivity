@@ -6,6 +6,8 @@ import { ActivityIndicator } from "react-native";
 import './global.css'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import 'react-native-gesture-handler'
+
 export default function RootLayout() {
   const [loading, setLoading] = useState(true)
 

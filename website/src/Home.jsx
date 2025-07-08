@@ -29,6 +29,7 @@ function Home() {
 			<a 
 				className='button-primary'
 				target="_blank"
+				href='https://apps.apple.com/us/app/mealstone/id6747997769'
 			>
 				Download on iOS
 			</a>

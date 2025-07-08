@@ -15,8 +15,6 @@ import {
 import { AdvancedCheckbox } from 'react-native-advanced-checkbox'
 
 import FormInput from '@/components/FormInput'
-import TermsAndConditions from '@/components/TermsAndConditions'
-import PrivacyPolicy from '@/components/PrivacyPolicy'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Link, router } from 'expo-router'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -253,8 +251,6 @@ const SignupModal = () => {
                     </SafeAreaView>
                 </KeyboardAvoidingView>
             </TouchableWithoutFeedback>
-            <TermsAndConditions termsAndConditions={tacModal} setTermsAndConditions={setTacModal} />
-            <PrivacyPolicy privacyPolicy={privPolModal} setPrivacyPolicy={setPrivPolModal} />
         </View>
     )
 }

@@ -10,7 +10,6 @@ import {
     ScrollView, 
     TouchableOpacity
 } from 'react-native'
-import Modal from 'react-native-modal'
 import FormInput from '@/components/FormInput'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
