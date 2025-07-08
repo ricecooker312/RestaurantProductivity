@@ -22,7 +22,7 @@ function Home() {
 			<a 
 				className='button-primary' 
 				target='_blank' 
-				href='https://expo.dev/artifacts/eas/956ZgLByEpzCDXsh8S3FXC.apk'
+				href='https://expo.dev/artifacts/eas/giA4PRwah2m11JUiXyqMDa.apk'
 			>
 				Download on Android
 			</a>
